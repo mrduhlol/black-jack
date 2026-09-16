@@ -37,6 +37,69 @@
     </div>
   </main>
 
+  <!-- game screen: lobby + table + chat -->
+  <main id="game" class="hidden">
+    <div class="game-grid">
+      <section class="card table-card">
+        <div class="table-head">
+          <div><b id="roundLabel">Round 0</b> <span id="phaseLabel" class="phase"></span></div>
+          <div class="table-actions">
+            <button id="copyLinkBtn" class="small">🔗 Copy invite</button>
+            <button id="leaveBtn" class="small">Leave</button>
+          </div>
+        </div>
+        <div id="lobbyPanel" class="lobby-panel">
+          <h3>Lobby — waiting room</h3>
+          <div id="settingsBox" class="settings"></div>
+          <button id="startBtn" class="primary hidden">Start game</button>
+        </div>
+        <div class="dealer-zone">
+          <div class="dealer-title">🤵 Dealer <span id="dealerTotal"></span></div>
+          <div id="dealerCards" class="cards"></div>
+        </div>
+        <div id="betPanel" class="bet-panel hidden">
+          <b>Place your bet:</b>
+          <div class="bet-row">
+            <button data-bet="10">10</button>
+            <button data-bet="50">50</button>
+            <button data-bet="100">100</button>
+            <button data-bet="250">250</button>
+            <button id="betGo" class="primary">Bet</button>
+          </div>
+          <input id="betInput" type="number" min="10" value="50" />
+        </div>
+        <div id="actionPanel" class="action-panel hidden">
+          <div id="coachBox" class="coach"></div>
+          <div class="action-row">
+            <button id="hitBtn">Hit</button>
+            <button id="standBtn">Stand</button>
+            <button id="doubleBtn">Double</button>
+            <button id="splitBtn">Split</button>
+            <button id="surrenderBtn">Surrender</button>
+          </div>
+          <div id="turnTimer" class="timer"></div>
+        </div>
+        <div id="seats" class="seats"></div>
+        <div id="resultBanner" class="result hidden"></div>
+      </section>
+      <aside class="side">
+        <section class="card">
+          <h3>Players</h3>
+          <div id="playerList"></div>
+        </section>
+        <section class="card">
+          <h3>Table chat</h3>
+          <div id="chatBox" class="chat"></div>
+          <div class="chat-row">
+            <input id="chatInput" maxlength="200" placeholder="Say gl hf..." />
+            <button id="chatSend">➤</button>
+          </div>
+          <div class="emote-row" id="emoteRow"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="client.js"></script>
 </body>
