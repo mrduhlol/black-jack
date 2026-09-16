@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>black-jack.io — party Blackjack with friends</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">🃏 black-jack.io</div>
+    <div class="top-right"><span id="roomBadge" class="room-badge hidden"></span></div>
+  </header>
+
+  <!-- skribbl-style landing: avatar + name + play -->
+  <main id="landing" class="card landing">
+    <h1>Play Blackjack with friends</h1>
+    <p class="sub">Like skribbl.io — but Blackjack. Pick a face, enter a name, join a table.</p>
+    <div class="landing-grid">
+      <div class="avatar-box">
+        <div id="avatarPreview" class="avatar-preview">🙂</div>
+        <label>Face</label>
+        <div id="faceRow" class="face-row"></div>
+        <label>Color</label>
+        <div id="colorRow" class="color-row"></div>
+      </div>
+      <div class="join-box">
+        <input id="nameInput" maxlength="14" placeholder="Your nickname" />
+        <button id="playBtn" class="primary">▶ Play (public table)</button>
+        <button id="createBtn" class="secondary">＋ Create private room</button>
+        <div class="join-row">
+          <input id="codeInput" maxlength="6" placeholder="Room code" />
+          <button id="joinBtn">Join</button>
+        </div>
+        <p class="hint">Private rooms give you a link like <b>black-jack.io/?XXXXXX</b> to share.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
