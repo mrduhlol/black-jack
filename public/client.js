@@ -139,3 +139,62 @@ function renderSeats(r) {
     box.appendChild(seat);
   });
 }
+
+function renderLobby(r) {
+  const isHost = r.hostId === myId;
+  $('lobbyPanel').style.display = r.state === 'lobby' ? 'block' : 'none';
+  $('startBtn').classList.toggle('hidden', !isHost);
+  const s = $('settingsBox');
+  s.innerHTML = '';
+  const defs = [
+    ['maxPlayers', 'Max players', 'number', 2, 7],
+    ['startingChips', 'Starting chips', 'number', 100, 10000],
+    ['rounds', 'Rounds', 'number', 2, 20],
+    ['turnTimer', 'Turn timer (s)', 'number', 5, 60],
+    ['betTimer', 'Bet timer (s)', 'number', 5, 60],
+    ['numDecks', 'Decks', 'number', 1, 8],
+  ];
+  defs.forEach(([key, label, type, min, max]) => {
+    const lab = document.createElement('label');
+    lab.textContent = `${label}: `;
+    const inp = document.createElement('input');
+    inp.type = type; inp.min = min; inp.max = max; inp.value = r.settings[key];
+    inp.disabled = !isHost;
+    inp.onchange = () => socket.emit('setSettings', { [key]: Number(inp.value) });
+    lab.appendChild(inp);
+    s.appendChild(lab);
+  });
+  const toggles = [['dealerHitsSoft17', 'Dealer hits soft 17 (H17)'], ['allowDouble', 'Allow double'], ['allowSplit', 'Allow split'], ['allowSurrender', 'Allow surrender'], ['coachEnabled', 'Coach hints + bust %']];
+  toggles.forEach(([key, label]) => {
+    const lab = document.createElement('label');
+    const inp = document.createElement('input');
+    inp.type = 'checkbox'; inp.checked = !!r.settings[key]; inp.disabled = !isHost;
+    inp.onchange = () => socket.emit('setSettings', { [key]: inp.checked });
+    lab.appendChild(inp); lab.append(` ${label}`);
+    s.appendChild(lab);
+  });
+  const pay = document.createElement('label');
+  pay.textContent = 'Blackjack pays: ';
+  const sel = document.createElement('select');
+  ['3:2', '6:5'].forEach((v) => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v; if (r.settings.blackjackPays === v) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.disabled = !isHost;
+  sel.onchange = () => socket.emit('setSettings', { blackjackPays: sel.value });
+  pay.appendChild(sel);
+  s.appendChild(pay);
+}
+$('startBtn').onclick = () => socket.emit('startGame');
+
+function renderBetting(r) {
+  const me = r.players.find((p) => p.isYou);
+  const show = r.state === 'betting' && me && !me.spectating && (!me.hands || me.hands.length === 0);
+  $('betPanel').classList.toggle('hidden', !show);
+  $('actionPanel').classList.add('hidden');
+}
+document.querySelectorAll('[data-bet]').forEach((b) => {
+  b.onclick = () => { $('betInput').value = b.dataset.bet; };
+});
+$('betGo').onclick = () => socket.emit('placeBet', { amount: Number($('betInput').value) });
