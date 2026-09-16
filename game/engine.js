@@ -75,4 +75,44 @@ function bustChance(cards) {
   return Math.round((bustCards / 52) * 100);
 }
 
+// Basic-strategy coach: simplified hint for hard/soft/pairs vs dealer upcard.
+function coachHint(playerCards, dealerUp) {
+  const { total, soft } = handValue(playerCards);
+  const d = dealerUp.rank === 'A' ? 11 : cardValue(dealerUp.rank);
+  const pair = playerCards.length === 2 && playerCards[0].rank === playerCards[1].rank
+    ? playerCards[0].rank : null;
+
+  if (pair === 'A' || pair === '8') return 'Split';
+  if (pair === '10' || pair === 'J' || pair === 'Q' || pair === 'K') return 'Stand (never split 10s)';
+  if (soft) {
+    if (total <= 17) return 'Hit (soft — cannot bust)';
+    if (total === 18) return (d >= 9 || d <= 2) ? 'Hit' : d >= 3 && d <= 6 ? 'Double if allowed, else Stand' : 'Stand';
+    return 'Stand';
+  }
+  if (total <= 8) return 'Hit';
+  if (total === 9) return (d >= 3 && d <= 6) ? 'Double if allowed, else Hit' : 'Hit';
+  if (total === 10) return (d <= 9) ? 'Double if allowed, else Hit' : 'Hit';
+  if (total === 11) return d === 11 ? 'Hit' : 'Double if allowed, else Hit';
+  if (total === 12) return (d >= 4 && d <= 6) ? 'Stand' : 'Hit';
+  if (total >= 13 && total <= 16) return (d >= 2 && d <= 6) ? 'Stand' : 'Hit';
+  return 'Stand';
+}
+
+function settleBet(playerCards, dealerCards, bet, opts = {}) {
+  // Returns { outcome, payout } where payout = chips returned (incl. stake).
+  const bjPay = opts.blackjackPays === '6:5' ? 1.2 : 1.5;
+  const pBJ = isBlackjack(playerCards);
+  const dBJ = isBlackjack(dealerCards);
+  const p = handValue(playerCards);
+  const d = handValue(dealerCards);
+  if (pBJ && dBJ) return { outcome: 'push', payout: bet };
+  if (pBJ) return { outcome: 'blackjack', payout: Math.floor(bet + bet * bjPay) };
+  if (dBJ) return { outcome: 'lose', payout: 0 };
+  if (p.bust) return { outcome: 'bust', payout: 0 };
+  if (d.bust) return { outcome: 'win', payout: bet * 2 };
+  if (p.total > d.total) return { outcome: 'win', payout: bet * 2 };
+  if (p.total < d.total) return { outcome: 'lose', payout: 0 };
+  return { outcome: 'push', payout: bet };
+}
+
 module.exports = { cardValue, handValue };
