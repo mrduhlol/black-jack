@@ -226,6 +226,22 @@ io.on('connection', (socket) => {
     broadcast(room);
   });
 
+  socket.on('rematch', () => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.hostId !== socket.id) return;
+    if (room.state !== 'gameover' && room.state !== 'lobby') return;
+    room.round = 0;
+    for (const p of room.players) {
+      if (p.connected) {
+        p.chips = room.settings.startingChips;
+        p.spectating = false;
+        p.stats = { wins: 0, losses: 0, pushes: 0, blackjacks: 0, busts: 0 };
+      }
+    }
+    io.to(room.id).emit('chat', { sys: true, text: '🔁 Rematch! Fresh chips, same room.' });
+    startBetting(room);
+  });
+
   socket.on('disconnect', () => {
     const room = findRoomOf(socket.id);
     if (!room) return;
