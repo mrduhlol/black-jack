@@ -208,6 +208,9 @@ $('betGo').onclick = () => socket.emit('placeBet', { amount: Number($('betInput'
 socket.on('yourTurn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
   $('actionPanel').classList.remove('hidden');
   $('betPanel').classList.add('hidden');
+  Sound.turn();
+  if (navigator.vibrate) navigator.vibrate(80);
+  document.title = '🎯 Your turn! — black-jack.io';
   $('coachBox').textContent = hint
     ? `🧠 Coach: ${hint} • 💥 Bust if hit: ${bustChance}% • Dealer shows ${dealerUp.rank}${dealerUp.suit}`
     : `Dealer shows ${dealerUp.rank}${dealerUp.suit} • Bust if hit: ${bustChance}%`;
@@ -220,11 +223,11 @@ socket.on('yourTurn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
     else $('turnTimer').textContent = `⏱ ${t}s`;
   }, 1000);
 });
-$('hitBtn').onclick = () => socket.emit('action', { kind: 'hit' });
-$('standBtn').onclick = () => socket.emit('action', { kind: 'stand' });
-$('doubleBtn').onclick = () => socket.emit('action', { kind: 'double' });
-$('splitBtn').onclick = () => socket.emit('action', { kind: 'split' });
-$('surrenderBtn').onclick = () => socket.emit('action', { kind: 'surrender' });
+$('hitBtn').onclick = () => { Sound.click(); Sound.deal(); socket.emit('action', { kind: 'hit' }); };
+$('standBtn').onclick = () => { Sound.click(); socket.emit('action', { kind: 'stand' }); };
+$('doubleBtn').onclick = () => { Sound.chips(); socket.emit('action', { kind: 'double' }); };
+$('splitBtn').onclick = () => { Sound.chips(); socket.emit('action', { kind: 'split' }); };
+$('surrenderBtn').onclick = () => { Sound.click(); socket.emit('action', { kind: 'surrender' }); };
 socket.on('actionError', (m) => alert(m));
 
 socket.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
