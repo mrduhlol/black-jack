@@ -115,4 +115,4 @@ function settleBet(playerCards, dealerCards, bet, opts = {}) {
   return { outcome: 'push', payout: bet };
 }
 
-module.exports = { cardValue, handValue };
+module.exports = { cardValue, handValue, createShoe, isBlackjack, dealerShouldHit, bustChance, coachHint, settleBet, RANKS, SUITS };
