@@ -181,6 +181,51 @@ io.on('connection', (socket) => {
     doAction(room, socket.id, kind);
   });
 
+  socket.on('chat', ({ text }) => {
+    const room = findRoomOf(socket.id);
+    if (!room) return;
+    const p = room.players.find((x) => x.id === socket.id);
+    if (!p) return;
+    const clean = String(text || '').slice(0, 200);
+    if (!clean.trim()) return;
+    io.to(room.id).emit('chat', { name: p.name, avatar: p.avatar, text: clean });
+  });
+
+  socket.on('emote', ({ emoji }) => {
+    const room = findRoomOf(socket.id);
+    if (!room) return;
+    const p = room.players.find((x) => x.id === socket.id);
+    if (!p) return;
+    const allowed = ['🔥', '😎', '😭', '🍀', '💸', '👏', '🤯', '🃏'];
+    if (!allowed.includes(emoji)) return;
+    io.to(room.id).emit('emote', { name: p.name, emoji });
+  });
+
+  socket.on('kick', ({ targetId }) => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.hostId !== socket.id) return;
+    const idx = room.players.findIndex((x) => x.id === targetId);
+    if (idx < 0) return;
+    const [kicked] = room.players.splice(idx, 1);
+    delete room.hands[targetId];
+    io.to(targetId).emit('kicked', { text: 'Kicked by host' });
+    io.to(room.id).emit('chat', { sys: true, text: `👢 ${kicked.name} was kicked by host` });
+    broadcast(room);
+  });
+
+  socket.on('leave', () => {
+    const room = findRoomOf(socket.id);
+    if (!room) return;
+    room.players = room.players.filter((x) => x.id !== socket.id);
+    delete room.hands[socket.id];
+    socket.leave(room.id);
+    if (room.hostId === socket.id) {
+      const next = room.players.find((x) => x.connected);
+      room.hostId = next ? next.id : null;
+    }
+    broadcast(room);
+  });
+
   socket.on('disconnect', () => {
     const room = findRoomOf(socket.id);
     if (!room) return;
