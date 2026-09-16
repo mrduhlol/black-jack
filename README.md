@@ -78,6 +78,15 @@ black-jack.io mirrors that:
 - One shared shoe per room (6 decks, reshuffle at ~75% penetration), server deals, validates actions, broadcasts state.
 - Fun credits only — no real money, no gambling license needed for party play.
 
+## Run it
+
+```bash
+npm install
+npm start
+# open http://localhost:3000
+# private invite links look like http://localhost:3000/?ABC123
+```
+
 ## Roadmap
 
 - [x] README with real rules (this file)
