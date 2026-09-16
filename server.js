@@ -174,6 +174,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('action', ({ kind }) => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.state !== 'playing') return;
+    if (room.turnOrder[room.turnIndex] !== socket.id) return;
+    doAction(room, socket.id, kind);
+  });
+
   socket.on('disconnect', () => {
     const room = findRoomOf(socket.id);
     if (!room) return;
