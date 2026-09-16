@@ -320,6 +320,107 @@ function dealRound(room) {
   promptTurn(room);
 }
 
+function activeHand(room, pid) {
+  const hands = room.hands[pid] || [];
+  return hands.find((h) => h.status === 'active');
+}
+
+function promptTurn(room) {
+  clearTimeout(room.timers.turn);
+  const pid = room.turnOrder[room.turnIndex];
+  if (!pid) return dealerPlay(room);
+  const p = room.players.find((x) => x.id === pid);
+  if (!p || !p.connected || p.spectating) return nextTurn(room);
+  const hand = activeHand(room, pid);
+  if (!hand) return nextTurn(room);
+  broadcast(room);
+  const handIdx = room.hands[pid].indexOf(hand);
+  io.to(pid).emit('yourTurn', {
+    handIndex: handIdx,
+    cards: hand.cards,
+    dealerUp: room.dealerHand[0],
+    hint: room.settings.coachEnabled ? engine.coachHint(hand.cards, room.dealerHand[0]) : null,
+    bustChance: engine.bustChance(hand.cards),
+    endsIn: room.settings.turnTimer,
+  });
+  room.timers.turn = setTimeout(() => {
+    // auto-stand like skribbl auto-skip on timeout
+    hand.status = 'stood';
+    io.to(room.id).emit('chat', { sys: true, text: `⏱ ${p.name} timed out — auto-stand` });
+    nextTurn(room);
+  }, room.settings.turnTimer * 1000);
+}
+
+function nextTurn(room) {
+  clearTimeout(room.timers.turn);
+  // if current player still has another active hand (after split), stay; else advance
+  const pid = room.turnOrder[room.turnIndex];
+  if (pid && activeHand(room, pid)) return promptTurn(room);
+  room.turnIndex += 1;
+  if (room.turnIndex >= room.turnOrder.length) return dealerPlay(room);
+  promptTurn(room);
+}
+
+function doAction(room, pid, kind) {
+  const p = room.players.find((x) => x.id === pid);
+  const hand = activeHand(room, pid);
+  if (!p || !hand) return;
+  const hands = room.hands[pid];
+
+  if (kind === 'hit') {
+    hand.cards.push(draw(room));
+    const v = engine.handValue(hand.cards);
+    if (v.bust) {
+      hand.status = 'bust';
+      p.stats.busts += 1;
+      io.to(room.id).emit('chat', { sys: true, text: `💥 ${p.name} busts (${v.total})` });
+    } else if (v.total === 21) hand.status = 'stood';
+    if (hand.status !== 'active') return nextTurn(room);
+    broadcast(room);
+    promptTurn(room); // refresh hint/bust%
+  } else if (kind === 'stand') {
+    hand.status = 'stood';
+    nextTurn(room);
+  } else if (kind === 'double') {
+    if (!room.settings.allowDouble || hand.cards.length !== 2 || p.chips < hand.bet) {
+      return io.to(pid).emit('actionError', 'Cannot double now');
+    }
+    p.chips -= hand.bet;
+    hand.bet *= 2;
+    hand.doubled = true;
+    hand.cards.push(draw(room));
+    const v = engine.handValue(hand.cards);
+    hand.status = v.bust ? 'bust' : 'stood';
+    if (v.bust) p.stats.busts += 1;
+    io.to(room.id).emit('chat', { sys: true, text: `⚡ ${p.name} doubles to ${hand.bet}` });
+    nextTurn(room);
+  } else if (kind === 'split') {
+    if (!room.settings.allowSplit || hand.cards.length !== 2 || hands.length > 1 || p.chips < hand.bet) {
+      return io.to(pid).emit('actionError', 'Cannot split now');
+    }
+    const [c1, c2] = hand.cards;
+    const v1 = engine.cardValue(c1.rank);
+    const v2 = engine.cardValue(c2.rank);
+    if (v1 !== v2 && !(v1 === 10 && v2 === 10)) return io.to(pid).emit('actionError', 'Need a pair to split');
+    p.chips -= hand.bet;
+    hands.splice(0, 1,
+      { cards: [c1, draw(room)], bet: hand.bet, status: 'active', doubled: false, surrendered: false },
+      { cards: [c2, draw(room)], bet: hand.bet, status: 'active', doubled: false, surrendered: false });
+    io.to(room.id).emit('chat', { sys: true, text: `✂️ ${p.name} splits!` });
+    broadcast(room);
+    promptTurn(room);
+  } else if (kind === 'surrender') {
+    if (!room.settings.allowSurrender || hand.cards.length !== 2) {
+      return io.to(pid).emit('actionError', 'Cannot surrender now');
+    }
+    hand.status = 'surrendered';
+    const back = Math.floor(hand.bet / 2);
+    p.chips += back;
+    io.to(room.id).emit('chat', { sys: true, text: `🏳️ ${p.name} surrenders (+${back} back)` });
+    nextTurn(room);
+  }
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.json({ ok: true, rooms: rooms.size }));
 
