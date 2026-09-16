@@ -48,3 +48,94 @@ socket.on('roomCreated', ({ id }) => {
   history.replaceState(null, '', `/?${id}`);
 });
 socket.on('joinError', (msg) => alert(msg));
+
+// --- room rendering ---
+let room = null;
+let myId = null;
+
+socket.on('room', (r) => {
+  room = r;
+  const me = r.players.find((p) => p.isYou);
+  if (me) myId = me.id;
+  $('landing').classList.add('hidden');
+  $('game').classList.remove('hidden');
+  $('roomBadge').classList.remove('hidden');
+  $('roomBadge').textContent = `Room ${r.id} • ${r.state} • R${r.round}/${r.settings.rounds}`;
+  $('roundLabel').textContent = `Round ${r.round}/${r.settings.rounds}`;
+  $('phaseLabel').textContent = r.state;
+  renderPlayers(r);
+  renderDealer(r);
+  renderSeats(r);
+  renderLobby(r);
+  renderBetting(r);
+});
+
+function cardEl(c) {
+  const d = document.createElement('div');
+  d.className = 'playing-card';
+  if (c.hidden) { d.classList.add('back'); d.textContent = '?'; return d; }
+  const red = c.suit === '♥' || c.suit === '♦';
+  if (red) d.classList.add('red');
+  d.textContent = `${c.rank}${c.suit}`;
+  return d;
+}
+function handTotal(cards) {
+  let t = 0, aces = 0;
+  for (const c of cards) {
+    if (c.hidden) continue;
+    if (c.rank === 'A') { t += 11; aces++; }
+    else if (['K', 'Q', 'J'].includes(c.rank)) t += 10;
+    else t += parseInt(c.rank, 10);
+  }
+  while (t > 21 && aces > 0) { t -= 10; aces--; }
+  return t;
+}
+
+function renderDealer(r) {
+  const box = $('dealerCards');
+  box.innerHTML = '';
+  r.dealer.forEach((c) => box.appendChild(cardEl(c)));
+  $('dealerTotal').textContent = r.dealer.length ? `(${handTotal(r.dealer)})` : '';
+}
+
+function renderPlayers(r) {
+  const box = $('playerList');
+  box.innerHTML = '';
+  [...r.players].sort((a, b) => b.chips - a.chips).forEach((p) => {
+    const div = document.createElement('div');
+    div.innerHTML = `<span class="mini-avatar" style="background:${p.avatar.color}">${p.avatar.face}</span>
+      <b>${p.name}</b> ${p.isHost ? '👑' : ''} — ${p.chips} chips
+      <small>W${p.stats.wins}/L${p.stats.losses}/P${p.stats.pushes} BJ${p.stats.blackjacks}</small>`;
+    if (p.isHost && myId && r.hostId === myId && p.id !== myId) {
+      const k = document.createElement('button');
+      k.textContent = 'kick';
+      k.className = 'small';
+      k.onclick = () => socket.emit('kick', { targetId: p.id });
+      div.appendChild(k);
+    }
+    box.appendChild(div);
+  });
+}
+
+function renderSeats(r) {
+  const box = $('seats');
+  box.innerHTML = '';
+  r.players.forEach((p) => {
+    const seat = document.createElement('div');
+    seat.className = 'seat' + (r.turnId === p.id ? ' turn' : '');
+    const head = document.createElement('div');
+    head.className = 'seat-head';
+    head.innerHTML = `<span class="mini-avatar" style="background:${p.avatar.color}">${p.avatar.face}</span> ${p.name} (${p.chips})`;
+    seat.appendChild(head);
+    (p.hands || []).forEach((h, i) => {
+      const line = document.createElement('div');
+      line.innerHTML = `<small>Bet ${h.bet} • ${h.status}${h.doubled ? ' • x2' : ''} • (${handTotal(h.cards)})</small>`;
+      const cards = document.createElement('div');
+      cards.className = 'cards';
+      h.cards.forEach((c) => cards.appendChild(cardEl(c)));
+      seat.appendChild(line);
+      seat.appendChild(cards);
+    });
+    box.appendChild(seat);
+  });
+}
