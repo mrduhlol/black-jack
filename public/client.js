@@ -251,7 +251,43 @@ socket.on('gameover', ({ board }) => {
   banner.classList.remove('hidden');
   banner.textContent = `🏆 Winner: ${board[0].name} with ${board[0].chips} chips! ` +
     board.map((b, i) => `${i + 1}. ${b.name} ${b.chips}`).join(' • ');
+  Sound.blackjack();
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  showWinnerModal(board);
 });
+
+function showWinnerModal(board) {
+  const modal = $('winnerModal');
+  modal.classList.remove('hidden');
+  const medals = ['🥇', '🥈', '🥉'];
+  const podium = $('podium');
+  podium.innerHTML = '';
+  const order = [board[1], board[0], board[2]].filter(Boolean); // 2nd, 1st, 3rd visual
+  const classes = board[1] ? ['p2', 'p1', 'p3'] : ['p1'];
+  order.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'place ' + classes[i];
+    d.innerHTML = `${medals[board.indexOf(p)]}<br><span style="font-size:28px">${p.avatar.face}</span><br>${p.name}<br>${p.chips} chips`;
+    podium.appendChild(d);
+  });
+  $('winnerTitle').textContent = `🏆 ${board[0].name} wins the table!`;
+  $('winnerStats').textContent = board.map((b) => `${b.name}: ${b.stats.wins}W/${b.stats.losses}L/${b.stats.pushes}P, ${b.stats.blackjacks} BJ`).join(' • ');
+  const isHost = room && room.hostId === myId;
+  $('rematchBtn').classList.toggle('hidden', !isHost);
+  // confetti rain
+  const conf = $('confetti');
+  conf.innerHTML = '';
+  const emojis = ['🎉', '🃏', '💰', '⭐', '🎊', '♠️', '♥️'];
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('span');
+    s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    s.style.left = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 1.5) + 's';
+    conf.appendChild(s);
+  }
+}
+$('closeModalBtn').onclick = () => { Sound.click(); $('winnerModal').classList.add('hidden'); };
+$('rematchBtn').onclick = () => { Sound.chips(); socket.emit('rematch'); $('winnerModal').classList.add('hidden'); };
 
 // --- chat + emotes (skribbl-style social) ---
 function addChat({ name, avatar: av, text, sys }) {
