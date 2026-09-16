@@ -20,3 +20,21 @@ Play with friends: create a private room, share the link, sit at a virtual table
 - Soft hand = Ace counted as 11 (e.g. A+6 = soft 17, cannot bust on one hit).
 - Hard hand = no Ace, or Ace forced to 1 (e.g. 10+7 = hard 17, A+6+10 = hard 17).
 - Natural Blackjack = Ace + 10-value card on first two cards only. 21 with 3+ cards is just 21, not a natural.
+
+## Round flow (standard casino order)
+
+1. Place bets (chips, no real money in v1 — fun credits).
+2. Deal: each player gets 2 face-up cards, dealer gets 1 upcard + 1 hole card face-down.
+3. Peek/check: if dealer shows Ace or 10-value, check for dealer Blackjack before players act (variant-dependent).
+4. Players act in turn order, one hand at a time.
+5. Dealer reveals hole card and plays by fixed rules (no choices).
+6. Settle: compare each remaining player hand vs dealer, pay / take / push.
+
+## Player actions
+
+- Hit: take another card. Can repeat until stand or bust.
+- Stand: keep total, end your turn. Always stand hard 17+.
+- Double down: double bet, take exactly 1 more card, then done. Typical spot: hard 10/11 vs weak dealer card.
+- Split: if first two cards are a pair, pay a second bet and play two hands. Always split Aces and 8s, never split 10s or 5s. Split Aces usually get 1 card each.
+- Surrender (where offered): forfeit half bet and end hand on first two cards. Typical: hard 16 vs 9/10/Ace, hard 15 vs 10.
+- Insurance: side bet (half stake) when dealer shows Ace, pays 2:1 if dealer has Blackjack. Bad odds — basic strategy says never take it.
