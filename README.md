@@ -38,3 +38,20 @@ Play with friends: create a private room, share the link, sit at a virtual table
 - Split: if first two cards are a pair, pay a second bet and play two hands. Always split Aces and 8s, never split 10s or 5s. Split Aces usually get 1 card each.
 - Surrender (where offered): forfeit half bet and end hand on first two cards. Typical: hard 16 vs 9/10/Ace, hard 15 vs 10.
 - Insurance: side bet (half stake) when dealer shows Ace, pays 2:1 if dealer has Blackjack. Bad odds — basic strategy says never take it.
+
+## Dealer rules (fixed, no choices)
+
+- Must hit 16 or below, must stand 17 or above.
+- S17 = stands on all 17s incl. soft 17 (A+6). Better for player.
+- H17 = hits soft 17. Adds ~0.2% house edge.
+- Dealer cannot split, double, or surrender. If dealer busts, all remaining player hands win.
+- black-jack.io default: 6-deck shoe, dealer stands on soft 17 (S17), Blackjack pays 3:2, dealer peeks for Blackjack.
+
+## Payouts
+
+- Win = 1:1 (bet $10, win $10 + stake back).
+- Natural Blackjack = 3:2 ($10 wins $15). Avoid 6:5 tables (+1.39% house edge).
+- Push = stake returned.
+- Surrender = lose half bet.
+- Bust = lose immediately.
+- Dealer Blackjack beats all non-Blackjack hands; player Blackjack vs dealer Blackjack = push.
