@@ -48,4 +48,31 @@ function isBlackjack(cards) {
   return handValue(cards).total === 21;
 }
 
+// Dealer plays by fixed rules. S17 default, H17 optional.
+function dealerShouldHit(cards, hitSoft17 = false) {
+  const { total, soft } = handValue(cards);
+  if (total < 17) return true;
+  if (total > 17) return false;
+  // total === 17
+  if (soft) return hitSoft17;
+  return false;
+}
+
+function bustChance(cards) {
+  // Party feature: live bust % if you hit now. Counts ranks remaining naively (infinite deck approx).
+  const { total, soft } = handValue(cards);
+  if (soft) return 0; // soft hand cannot bust on one card
+  const bustAt = 22 - total; // need this value or higher to bust
+  if (bustAt > 11) return 0;
+  // values 2..11, with 10-valued = 16/52 approx using infinite deck: 10,J,Q,K = 16/13? use standard 52-deck weights
+  // weights: A=4, 2-9=4 each, 10-value=16
+  let bustCards = 0;
+  const weights = { A: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 16 };
+  for (const [rank, w] of Object.entries(weights)) {
+    const v = rank === 'A' ? 11 : rank === '10' ? 10 : parseInt(rank, 10);
+    if (v >= bustAt) bustCards += w;
+  }
+  return Math.round((bustCards / 52) * 100);
+}
+
 module.exports = { cardValue, handValue };
