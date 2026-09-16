@@ -103,7 +103,24 @@
     </div>
   </main>
 
+  <!-- winner podium card -->
+  <div id="winnerModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="confetti" id="confetti"></div>
+      <h2 id="winnerTitle">🏆 Winner!</h2>
+      <div id="podium" class="podium"></div>
+      <div id="winnerStats" class="winner-stats"></div>
+      <div class="modal-row">
+        <button id="rematchBtn" class="primary hidden">🔁 Rematch</button>
+        <button id="closeModalBtn" class="secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="historyBar" class="history hidden"></div>
+
   <script src="/socket.io/socket.io.js"></script>
+  <script src="sounds.js"></script>
   <script src="client.js"></script>
 </body>
 </html>
