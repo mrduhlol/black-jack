@@ -70,3 +70,26 @@ black-jack.io mirrors that:
 - Live sync via WebSocket (Socket.IO): joinRoom, placeBet, playerAction, dealerPlay, roundSettle, chatMessage.
 - Scoring: chip stacks persist across rounds. Busted-out players spectate. After N rounds, richest stack is crowned winner.
 - Moderation like skribbl.io: host kick/ban, votekick, mute, report.
+
+## Tech plan (v1)
+
+- Frontend: single-page web app (HTML/CSS/JS), table UI, no download.
+- Backend: Node.js + Socket.IO (same stack pattern as skribbl.io), server-authoritative shoe + dealer logic.
+- One shared shoe per room (6 decks, reshuffle at ~75% penetration), server deals, validates actions, broadcasts state.
+- Fun credits only — no real money, no gambling license needed for party play.
+
+## Roadmap
+
+- [x] README with real rules (this file)
+- [ ] Room lobby + invite links + nickname join (waiting for your order to build)
+- [ ] Single-table Blackjack engine (deal, hit/stand/double/split/surrender, S17 dealer, 3:2 payout)
+- [ ] Multiplayer sync + timers + chat + host controls
+- [ ] Rounds, chip leaderboard, winner screen
+- [ ] Polish: avatars, sounds, mobile layout, reconnect
+
+## Disclaimer
+
+Party game for fun with friends using virtual chips. Not a casino, no real-money betting. If you add real money later, gambling laws and licenses apply.
+
+---
+Status: README done. Awaiting order to build black-jack.io.
