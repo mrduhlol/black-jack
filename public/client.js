@@ -40,9 +40,14 @@ buildAvatarPicker();
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
 
-$('playBtn').onclick = () => socket.emit('joinPublic', { name: myName(), avatar });
-$('createBtn').onclick = () => socket.emit('createPrivate', { name: myName(), avatar });
-$('joinBtn').onclick = () => socket.emit('joinPrivate', { code: $('codeInput').value.trim(), name: myName(), avatar });
+$('playBtn').onclick = () => { Sound.click(); socket.emit('joinPublic', { name: myName(), avatar }); };
+$('createBtn').onclick = () => { Sound.click(); socket.emit('createPrivate', { name: myName(), avatar }); };
+$('joinBtn').onclick = () => { Sound.click(); socket.emit('joinPrivate', { code: $('codeInput').value.trim(), name: myName(), avatar }); };
+$('soundBtn').onclick = () => {
+  const on = Sound.toggle();
+  $('soundBtn').textContent = on ? '🔊' : '🔇';
+  if (on) Sound.click();
+};
 
 socket.on('roomCreated', ({ id }) => {
   history.replaceState(null, '', `/?${id}`);
