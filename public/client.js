@@ -289,6 +289,17 @@ function showWinnerModal(board) {
 $('closeModalBtn').onclick = () => { Sound.click(); $('winnerModal').classList.add('hidden'); };
 $('rematchBtn').onclick = () => { Sound.chips(); socket.emit('rematch'); $('winnerModal').classList.add('hidden'); };
 
+// round history ticker
+socket.on('room', (r) => {
+  // history is rendered by second listener to keep main render clean
+  const bar = document.getElementById('historyBar');
+  if (r.history && r.history.length) {
+    bar.classList.remove('hidden');
+    bar.textContent = '📜 ' + r.history.join('   •   ');
+  }
+});
+socket.on('phase', ({ phase }) => { if (phase === 'betting') Sound.chips(); if (phase === 'playing') Sound.deal(); });
+
 // --- chat + emotes (skribbl-style social) ---
 function addChat({ name, avatar: av, text, sys }) {
   const box = $('chatBox');
