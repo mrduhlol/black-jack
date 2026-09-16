@@ -100,6 +100,100 @@ function hideHole(room) {
   return room.dealerHand;
 }
 
+function broadcast(room) {
+  for (const p of room.players) {
+    if (!p.connected) continue;
+    io.to(p.id).emit('room', roomView(room, p.id));
+  }
+}
+
+function findRoomOf(socketId) {
+  for (const r of rooms.values()) {
+    if (r.players.some((p) => p.id === socketId)) return r;
+  }
+  return null;
+}
+
+io.on('connection', (socket) => {
+  socket.on('createPrivate', ({ name, avatar }) => {
+    const room = createRoom(true);
+    joinSocket(room, socket, name, avatar);
+    socket.emit('roomCreated', { id: room.id });
+  });
+
+  socket.on('joinPublic', ({ name, avatar }) => {
+    const room = publicRoom();
+    const err = joinSocket(room, socket, name, avatar);
+    if (err) socket.emit('joinError', err);
+  });
+
+  socket.on('joinPrivate', ({ code, name, avatar }) => {
+    const room = rooms.get((code || '').toUpperCase());
+    if (!room) return socket.emit('joinError', 'Room not found. Check the invite code.');
+    const err = joinSocket(room, socket, name, avatar);
+    if (err) socket.emit('joinError', err);
+  });
+
+  socket.on('setSettings', (patch) => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.hostId !== socket.id || room.state !== 'lobby') return;
+    const allowed = ['maxPlayers', 'startingChips', 'rounds', 'turnTimer', 'betTimer', 'numDecks', 'dealerHitsSoft17', 'blackjackPays', 'allowDouble', 'allowSplit', 'allowSurrender', 'coachEnabled'];
+    for (const k of allowed) if (patch[k] !== undefined) room.settings[k] = patch[k];
+    room.settings.maxPlayers = Math.min(7, Math.max(2, room.settings.maxPlayers | 0 || 5));
+    broadcast(room);
+  });
+
+  socket.on('disconnect', () => {
+    const room = findRoomOf(socket.id);
+    if (!room) return;
+    const p = room.players.find((x) => x.id === socket.id);
+    if (p) p.connected = false;
+    if (room.hostId === socket.id) {
+      const next = room.players.find((x) => x.connected);
+      if (next) room.hostId = next.id;
+    }
+    broadcast(room);
+    // cleanup empty private rooms
+    if (room.players.every((x) => !x.connected)) {
+      clearTimeout(room.timers.bet);
+      clearTimeout(room.timers.turn);
+      if (room.isPrivate) rooms.delete(room.id);
+    }
+  });
+});
+
+function joinSocket(room, socket, name, avatar) {
+  if (room.banned.has(socket.handshake.address)) return 'You are banned from this room.';
+  if (room.players.length >= room.settings.maxPlayers && !room.players.some((p) => p.id === socket.id)) {
+    return 'Room is full.';
+  }
+  const cleanName = String(name || 'Player').slice(0, 14) || 'Player';
+  let p = room.players.find((x) => x.id === socket.id);
+  if (!p) {
+    // rejoin by name? keep simple: new seat
+    p = {
+      id: socket.id,
+      name: cleanName,
+      avatar: avatar || { face: '🙂', color: '#ffd54f' },
+      chips: room.settings.startingChips,
+      connected: true,
+      spectating: false,
+      stats: { wins: 0, losses: 0, pushes: 0, blackjacks: 0, busts: 0 },
+    };
+    room.players.push(p);
+    if (!room.hostId) room.hostId = p.id;
+  } else {
+    p.connected = true;
+    p.name = cleanName;
+    if (avatar) p.avatar = avatar;
+  }
+  socket.join(room.id);
+  // rebind socket id room: socket.io rooms keyed by room id string
+  socket.data.roomId = room.id;
+  broadcast(room);
+  return null;
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.json({ ok: true, rooms: rooms.size }));
 
