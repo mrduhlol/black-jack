@@ -522,6 +522,10 @@ function settleRound(room, note = null) {
   }
   const dealerTotal = dVal.total;
   io.to(room.id).emit('settle', { dealer: room.dealerHand, dealerTotal, dealerBust: dVal.bust, results, note });
+  const winners = results.filter((r) => r.outcome === 'win' || r.outcome === 'blackjack')
+    .map((r) => room.players.find((x) => x.id === r.pid)?.name).filter(Boolean);
+  room.history.push(`R${room.round}: D${dealerTotal}${dVal.bust ? '💥' : ''} • ${winners.length ? '👏 ' + [...new Set(winners)].join(', ') : 'house takes it'}`);
+  room.history = room.history.slice(-8);
   broadcast(room);
   const done = room.round >= room.settings.rounds;
   setTimeout(() => {
