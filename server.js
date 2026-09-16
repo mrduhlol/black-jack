@@ -54,6 +54,7 @@ function createRoom(isPrivate) {
     round: 0,
     timers: {},
     banned: new Set(),
+    history: [], // last round summaries for history bar
   };
   rooms.set(id, room);
   return room;
