@@ -17,3 +17,13 @@ button.secondary { background: #10231c; color: #fff; }
 .join-row { display: flex; gap: 8px; }
 .hint { font-size: 13px; opacity: .7; }
 .hidden { display: none !important; }
+.game-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; padding: 0 14px 20px; max-width: 1100px; margin: 0 auto; }
+.table-card { background: linear-gradient(180deg, #1a7a52, #0e5a3c); color: #fff; }
+.table-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+button.small { padding: 6px 10px; font-size: 13px; }
+.phase { background: #0007; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
+.dealer-zone { text-align: center; margin: 10px 0; }
+.cards { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 74px; }
+.playing-card { width: 52px; height: 72px; background: #fff; color: #111; border-radius: 8px; display: grid; place-items: center; font-weight: 800; font-size: 18px; box-shadow: 0 3px 0 #0005; }
+.playing-card.red { color: #d21f3c; }
+.playing-card.back { background: repeating-linear-gradient(45deg, #243, #243 6px, #2f6 6px, #2f6 12px); color: transparent; }
