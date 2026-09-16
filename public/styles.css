@@ -44,3 +44,17 @@ button.small { padding: 6px 10px; font-size: 13px; }
 .lobby-panel { background: #0006; padding: 10px; border-radius: 12px; margin-bottom: 10px; }
 .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; font-size: 13px; }
 .room-badge { background: #0008; padding: 6px 12px; border-radius: 20px; font-size: 14px; }
+.sound-btn { background: #0008; color: #fff; }
+.modal { position: fixed; inset: 0; background: #000a; display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal-card { position: relative; overflow: hidden; background: linear-gradient(180deg, #fff, #ffe9a8); color: #10231c; border-radius: 18px; padding: 24px; max-width: 520px; width: 100%; text-align: center; box-shadow: 0 20px 60px #000; animation: pop .35s ease-out; }
+@keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 14px 0; }
+.podium .place { border-radius: 12px 12px 0 0; padding: 10px; min-width: 100px; font-weight: 800; }
+.podium .p1 { background: gold; height: 130px; font-size: 18px; }
+.podium .p2 { background: silver; height: 100px; }
+.podium .p3 { background: #cd7f32; color: #fff; height: 80px; }
+.winner-stats { font-size: 13px; opacity: .8; margin-bottom: 12px; }
+.modal-row { display: flex; gap: 10px; justify-content: center; }
+.confetti span { position: absolute; top: -10px; font-size: 20px; animation: fall 2.6s linear forwards; }
+@keyframes fall { to { transform: translateY(420px) rotate(360deg); opacity: 0; } }
+.history { position: fixed; bottom: 0; left: 0; right: 0; background: #000c; color: #fff; font-size: 13px; padding: 6px 12px; white-space: nowrap; overflow-x: auto; }
