@@ -55,3 +55,18 @@ Play with friends: create a private room, share the link, sit at a virtual table
 - Surrender = lose half bet.
 - Bust = lose immediately.
 - Dealer Blackjack beats all non-Blackjack hands; player Blackjack vs dealer Blackjack = push.
+
+## How it plays like skribbl.io (rooms, not matchmaking)
+
+skribbl.io loop: create private room -> share link -> host sets players/rounds/draw-time -> everyone joins with a nickname -> host starts -> rotating turns -> live canvas + chat guessing -> points -> winner crowned.
+
+black-jack.io mirrors that:
+
+- Home: enter nickname -> Play (public table) or Create Private Room.
+- Private room link like `black-jack.io/?XXXXXX` — friends join anytime from browser, no account.
+- Lobby: player list with avatars/chip stacks, chat before start, host badge.
+- Host controls: max players (2–7 + dealer), starting chips, number of rounds/shoes, turn timer (e.g. 15–30s per decision), S17/H17 toggle, 3:2/6:5 toggle, allow surrender / insurance / split / double toggles.
+- Game: all players sit at one virtual table vs one dealer (bot dealer, server-authoritative). Turn order left-to-right, action buttons Hit/Stand/Double/Split/Surrender with countdown timer. Auto-stand on timeout.
+- Live sync via WebSocket (Socket.IO): joinRoom, placeBet, playerAction, dealerPlay, roundSettle, chatMessage.
+- Scoring: chip stacks persist across rounds. Busted-out players spectate. After N rounds, richest stack is crowned winner.
+- Moderation like skribbl.io: host kick/ban, votekick, mute, report.
