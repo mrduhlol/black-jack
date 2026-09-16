@@ -90,11 +90,12 @@ npm start
 ## Roadmap
 
 - [x] README with real rules (this file)
-- [ ] Room lobby + invite links + nickname join (waiting for your order to build)
-- [ ] Single-table Blackjack engine (deal, hit/stand/double/split/surrender, S17 dealer, 3:2 payout)
-- [ ] Multiplayer sync + timers + chat + host controls
-- [ ] Rounds, chip leaderboard, winner screen
-- [ ] Polish: avatars, sounds, mobile layout, reconnect
+- [x] Room lobby + invite links + nickname join
+- [x] Single-table Blackjack engine (deal, hit/stand/double/split/surrender, S17 dealer, 3:2 payout)
+- [x] Multiplayer sync + timers + chat + host controls
+- [x] Rounds, chip leaderboard, winner screen
+- [x] Blackjack party features: coach hints, live bust %, emotes, stats, avatars
+- [ ] Polish next: sounds, mobile layout, reconnect, side bets (Perfect Pairs / 21+3)
 
 ## Disclaimer
 
