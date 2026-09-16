@@ -90,6 +90,7 @@ function roomView(room, forSocketId = null) {
     })),
     turnId: room.turnOrder[room.turnIndex] || null,
     shoeLeft: room.shoe.length,
+    history: room.history.slice(-8),
   };
 }
 
