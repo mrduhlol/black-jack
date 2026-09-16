@@ -237,3 +237,35 @@ socket.on('gameover', ({ board }) => {
   banner.textContent = `🏆 Winner: ${board[0].name} with ${board[0].chips} chips! ` +
     board.map((b, i) => `${i + 1}. ${b.name} ${b.chips}`).join(' • ');
 });
+
+// --- chat + emotes (skribbl-style social) ---
+function addChat({ name, avatar: av, text, sys }) {
+  const box = $('chatBox');
+  const div = document.createElement('div');
+  div.textContent = sys ? text : `${name}: ${text}`;
+  if (sys) div.style.opacity = '.7';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+socket.on('chat', addChat);
+socket.on('phase', ({ phase, round }) => addChat({ sys: true, text: `— ${phase} (round ${round}) —` }));
+socket.on('emote', ({ name, emoji }) => addChat({ sys: true, text: `${name} ${emoji}` }));
+$('chatSend').onclick = sendChat;
+$('chatInput').onkeydown = (e) => { if (e.key === 'Enter') sendChat(); };
+function sendChat() {
+  const v = $('chatInput').value;
+  $('chatInput').value = '';
+  socket.emit('chat', { text: v });
+}
+['🔥', '😎', '😭', '🍀', '💸', '👏', '🤯', '🃏'].forEach((e) => {
+  const b = document.createElement('button');
+  b.textContent = e;
+  b.onclick = () => socket.emit('emote', { emoji: e });
+  $('emoteRow').appendChild(b);
+});
+$('copyLinkBtn').onclick = () => {
+  const url = `${location.origin}/?${room.id}`;
+  navigator.clipboard.writeText(url).then(() => alert('Invite copied: ' + url));
+};
+$('leaveBtn').onclick = () => { socket.emit('leave'); location.href = '/'; };
+socket.on('kicked', () => { alert('Kicked by host'); location.href = '/'; });
