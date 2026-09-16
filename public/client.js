@@ -232,11 +232,18 @@ socket.on('actionError', (m) => alert(m));
 
 socket.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
   $('actionPanel').classList.add('hidden');
+  document.title = 'black-jack.io — party Blackjack';
+  Sound.reveal();
   const me = results.filter((r) => room.players.find((p) => p.id === r.pid && p.isYou));
   const banner = $('resultBanner');
   banner.classList.remove('hidden');
   banner.textContent = `${note ? note + ' ' : ''}Dealer ${dealerTotal}${dealerBust ? ' BUST' : ''} • ` +
     me.map((r) => `${r.outcome} ${r.payout > 0 ? '+' + r.payout : ''}`).join(' | ');
+  // personal sounds: blackjack fanfare > win > bust thud > lose
+  if (me.some((r) => r.outcome === 'blackjack')) Sound.blackjack();
+  else if (me.some((r) => r.outcome === 'win')) Sound.win();
+  else if (me.some((r) => r.outcome === 'bust')) Sound.bust();
+  else if (me.some((r) => r.outcome === 'lose')) Sound.lose();
   setTimeout(() => banner.classList.add('hidden'), 5000);
 });
 socket.on('gameover', ({ board }) => {
