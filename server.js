@@ -143,6 +143,37 @@ io.on('connection', (socket) => {
     broadcast(room);
   });
 
+  socket.on('startGame', () => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.hostId !== socket.id) return;
+    if (room.players.filter((p) => p.connected).length < 1) return;
+    room.round = 0;
+    for (const p of room.players) {
+      if (p.connected) {
+        p.chips = room.settings.startingChips;
+        p.spectating = false;
+        p.stats = { wins: 0, losses: 0, pushes: 0, blackjacks: 0, busts: 0 };
+      }
+    }
+    startBetting(room);
+  });
+
+  socket.on('placeBet', ({ amount }) => {
+    const room = findRoomOf(socket.id);
+    if (!room || room.state !== 'betting') return;
+    const p = room.players.find((x) => x.id === socket.id);
+    if (!p || p.spectating) return;
+    const bet = Math.max(10, Math.min(p.chips, Math.floor(amount || 0)));
+    if (bet <= 0) return;
+    if (!room.hands[p.id] || room.hands[p.id].length === 0) {
+      p.chips -= bet;
+      room.hands[p.id] = [{ cards: [], bet, status: 'betting', doubled: false, surrendered: false }];
+      io.to(room.id).emit('chat', { sys: true, text: `${p.name} bets ${bet}` });
+      broadcast(room);
+      if (allBetsIn(room)) dealRound(room);
+    }
+  });
+
   socket.on('disconnect', () => {
     const room = findRoomOf(socket.id);
     if (!room) return;
