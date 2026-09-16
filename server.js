@@ -421,6 +421,58 @@ function doAction(room, pid, kind) {
   }
 }
 
+function dealerPlay(room) {
+  clearTimeout(room.timers.turn);
+  room.state = 'dealer';
+  broadcast(room);
+  // small drama delay so players see hole reveal
+  setTimeout(() => {
+    while (engine.dealerShouldHit(room.dealerHand, room.settings.dealerHitsSoft17)) {
+      room.dealerHand.push(draw(room));
+    }
+    settleRound(room);
+  }, 1200);
+}
+
+function settleRound(room, note = null) {
+  room.state = 'settle';
+  const dVal = engine.handValue(room.dealerHand);
+  const results = [];
+  for (const [pid, hands] of Object.entries(room.hands)) {
+    const p = room.players.find((x) => x.id === pid);
+    if (!p) continue;
+    for (let i = 0; i < hands.length; i++) {
+      const h = hands[i];
+      if (h.status === 'surrendered') {
+        results.push({ pid, hand: i, outcome: 'surrender', payout: 0 });
+        p.stats.losses += 1;
+        continue;
+      }
+      const r = engine.settleBet(h.cards, room.dealerHand, h.bet, { blackjackPays: room.settings.blackjackPays });
+      p.chips += r.payout;
+      if (r.outcome === 'win' || r.outcome === 'blackjack') p.stats.wins += 1;
+      else if (r.outcome === 'push') p.stats.pushes += 1;
+      else p.stats.losses += 1;
+      if (r.outcome === 'blackjack') p.stats.blackjacks += 1;
+      results.push({ pid, hand: i, outcome: r.outcome, payout: r.payout, total: engine.handValue(h.cards).total });
+    }
+  }
+  const dealerTotal = dVal.total;
+  io.to(room.id).emit('settle', { dealer: room.dealerHand, dealerTotal, dealerBust: dVal.bust, results, note });
+  broadcast(room);
+  const done = room.round >= room.settings.rounds;
+  setTimeout(() => {
+    if (done) {
+      room.state = 'gameover';
+      const board = [...room.players].sort((a, b) => b.chips - a.chips);
+      io.to(room.id).emit('gameover', { board: board.map((x) => ({ name: x.name, chips: x.chips, avatar: x.avatar, stats: x.stats })) });
+      broadcast(room);
+    } else {
+      startBetting(room);
+    }
+  }, 5000);
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.json({ ok: true, rooms: rooms.size }));
 
