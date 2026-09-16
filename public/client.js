@@ -198,3 +198,42 @@ document.querySelectorAll('[data-bet]').forEach((b) => {
   b.onclick = () => { $('betInput').value = b.dataset.bet; };
 });
 $('betGo').onclick = () => socket.emit('placeBet', { amount: Number($('betInput').value) });
+
+// --- turns: Blackjack party features (coach + bust %) ---
+socket.on('yourTurn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
+  $('actionPanel').classList.remove('hidden');
+  $('betPanel').classList.add('hidden');
+  $('coachBox').textContent = hint
+    ? `🧠 Coach: ${hint} • 💥 Bust if hit: ${bustChance}% • Dealer shows ${dealerUp.rank}${dealerUp.suit}`
+    : `Dealer shows ${dealerUp.rank}${dealerUp.suit} • Bust if hit: ${bustChance}%`;
+  let t = endsIn;
+  $('turnTimer').textContent = `⏱ ${t}s`;
+  clearInterval(window._tt);
+  window._tt = setInterval(() => {
+    t -= 1;
+    if (t <= 0) clearInterval(window._tt);
+    else $('turnTimer').textContent = `⏱ ${t}s`;
+  }, 1000);
+});
+$('hitBtn').onclick = () => socket.emit('action', { kind: 'hit' });
+$('standBtn').onclick = () => socket.emit('action', { kind: 'stand' });
+$('doubleBtn').onclick = () => socket.emit('action', { kind: 'double' });
+$('splitBtn').onclick = () => socket.emit('action', { kind: 'split' });
+$('surrenderBtn').onclick = () => socket.emit('action', { kind: 'surrender' });
+socket.on('actionError', (m) => alert(m));
+
+socket.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
+  $('actionPanel').classList.add('hidden');
+  const me = results.filter((r) => room.players.find((p) => p.id === r.pid && p.isYou));
+  const banner = $('resultBanner');
+  banner.classList.remove('hidden');
+  banner.textContent = `${note ? note + ' ' : ''}Dealer ${dealerTotal}${dealerBust ? ' BUST' : ''} • ` +
+    me.map((r) => `${r.outcome} ${r.payout > 0 ? '+' + r.payout : ''}`).join(' | ');
+  setTimeout(() => banner.classList.add('hidden'), 5000);
+});
+socket.on('gameover', ({ board }) => {
+  const banner = $('resultBanner');
+  banner.classList.remove('hidden');
+  banner.textContent = `🏆 Winner: ${board[0].name} with ${board[0].chips} chips! ` +
+    board.map((b, i) => `${i + 1}. ${b.name} ${b.chips}`).join(' • ');
+});
