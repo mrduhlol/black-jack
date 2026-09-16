@@ -23,4 +23,29 @@ function handValue(cards) {
   return { total, soft, bust: total > 21 };
 }
 
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const SUITS = ['♠', '♥', '♦', '♣'];
+
+function createShoe(numDecks = 6) {
+  const shoe = [];
+  for (let d = 0; d < numDecks; d++) {
+    for (const suit of SUITS) {
+      for (const rank of RANKS) {
+        shoe.push({ rank, suit });
+      }
+    }
+  }
+  // Fisher-Yates shuffle
+  for (let i = shoe.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
+  }
+  return shoe;
+}
+
+function isBlackjack(cards) {
+  if (cards.length !== 2) return false;
+  return handValue(cards).total === 21;
+}
+
 module.exports = { cardValue, handValue };
