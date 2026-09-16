@@ -225,6 +225,94 @@ function joinSocket(room, socket, name, avatar) {
   return null;
 }
 
+const engine = require('./game/engine');
+
+function needReshuffle(room) {
+  return room.shoe.length < 52 || room.shoe.length < room.settings.numDecks * 52 * 0.25;
+}
+
+function startBetting(room) {
+  room.state = 'betting';
+  room.dealerHand = [];
+  room.hands = {};
+  room.turnOrder = [];
+  room.turnIndex = 0;
+  room.round += 1;
+  if (needReshuffle(room)) {
+    room.shoe = engine.createShoe(room.settings.numDecks);
+    io.to(room.id).emit('chat', { sys: true, text: `🔀 Shuffling fresh ${room.settings.numDecks}-deck shoe` });
+  }
+  // broke players spectate
+  for (const p of room.players) {
+    if (p.connected && p.chips < 10) {
+      p.spectating = true;
+      io.to(room.id).emit('chat', { sys: true, text: `💸 ${p.name} is out of chips and spectates` });
+    } else if (p.connected && p.chips >= 10) {
+      p.spectating = false;
+    }
+  }
+  broadcast(room);
+  io.to(room.id).emit('phase', { phase: 'betting', round: room.round, endsIn: room.settings.betTimer });
+  clearTimeout(room.timers.bet);
+  room.timers.bet = setTimeout(() => autoBets(room), room.settings.betTimer * 1000);
+}
+
+function allBetsIn(room) {
+  const active = room.players.filter((p) => p.connected && !p.spectating);
+  return active.length > 0 && active.every((p) => room.hands[p.id] && room.hands[p.id].length > 0);
+}
+
+function autoBets(room) {
+  if (room.state !== 'betting') return;
+  for (const p of room.players) {
+    if (!p.connected || p.spectating) continue;
+    if (!room.hands[p.id]) {
+      const bet = Math.min(50, p.chips);
+      if (bet > 0) {
+        p.chips -= bet;
+        room.hands[p.id] = [{ cards: [], bet, status: 'betting', doubled: false, surrendered: false }];
+      } else {
+        p.spectating = true;
+      }
+    }
+  }
+  const active = room.players.filter((p) => p.connected && !p.spectating && room.hands[p.id]);
+  if (active.length === 0) {
+    room.state = 'lobby';
+    broadcast(room);
+    return;
+  }
+  dealRound(room);
+}
+
+function draw(room) {
+  if (room.shoe.length === 0) room.shoe = engine.createShoe(room.settings.numDecks);
+  return room.shoe.pop();
+}
+
+function dealRound(room) {
+  clearTimeout(room.timers.bet);
+  room.state = 'playing';
+  room.dealerHand = [draw(room), draw(room)];
+  for (const pid of Object.keys(room.hands)) {
+    room.hands[pid][0].cards = [draw(room), draw(room)];
+    room.hands[pid][0].status = 'active';
+  }
+  // dealer blackjack peek: if dealer has BJ, skip player turns
+  if (engine.isBlackjack(room.dealerHand)) {
+    return settleRound(room, 'Dealer Blackjack!');
+  }
+  // mark player blackjacks as stood
+  for (const pid of Object.keys(room.hands)) {
+    if (engine.isBlackjack(room.hands[pid][0].cards)) room.hands[pid][0].status = 'stood';
+  }
+  room.turnOrder = Object.keys(room.hands).filter((pid) => room.hands[pid].some((h) => h.status === 'active'));
+  room.turnIndex = 0;
+  if (room.turnOrder.length === 0) return settleRound(room, 'All players hit Blackjack!');
+  broadcast(room);
+  promptTurn(room);
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.json({ ok: true, rooms: rooms.size }));
 
