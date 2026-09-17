@@ -275,7 +275,7 @@ function joinSocket(room, socket, name, avatar) {
     p = {
       id: socket.id,
       name: cleanName,
-      avatar: avatar || { face: '🙂', color: '#ffd54f' },
+      avatar: avatar && avatar.style ? avatar : { style: 'adventurer', seed: cleanName + Date.now() % 997, bg: 'ffd54f' },
       chips: room.settings.startingChips,
       connected: true,
       spectating: false,
