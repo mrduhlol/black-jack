@@ -150,11 +150,18 @@ function renderSeats(r) {
     seat.className = 'seat' + (r.turnId === p.id ? ' turn' : '');
     const head = document.createElement('div');
     head.className = 'seat-head';
-    head.innerHTML = `<span class="mini-avatar" style="background:${p.avatar.color}">${p.avatar.face}</span> ${p.name} (${p.chips})`;
+    head.appendChild(avatarImg(p, 'seat-avatar'));
+    const name = document.createElement('span');
+    name.innerHTML = ` ${p.name} <span class="stack-chips"><span class="pile"></span>${p.chips}</span>`;
+    head.appendChild(name);
     seat.appendChild(head);
     (p.hands || []).forEach((h, i) => {
+      const spot = document.createElement('div');
+      spot.className = 'bet-spot';
+      spot.appendChild(betStack(h.bet));
+      seat.appendChild(spot);
       const line = document.createElement('div');
-      line.innerHTML = `<small>Bet ${h.bet} • ${h.status}${h.doubled ? ' • x2' : ''} • (${handTotal(h.cards)})</small>`;
+      line.innerHTML = `<small>${h.status}${h.doubled ? ' • x2' : ''} • (${handTotal(h.cards)})</small>`;
       const cards = document.createElement('div');
       cards.className = 'cards';
       h.cards.forEach((c) => cards.appendChild(cardEl(c)));
