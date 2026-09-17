@@ -34,6 +34,7 @@ function myName() {
 }
 
 buildAvatarPicker();
+buildChipTray();
 // auto-fill invite code from ?XXXXXX like skribbl.io
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
