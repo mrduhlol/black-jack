@@ -40,42 +40,40 @@
   <!-- game screen: lobby + table + chat -->
   <main id="game" class="hidden">
     <div class="game-grid">
-      <section class="card table-card">
+      <section class="felt">
         <div class="table-head">
           <div><b id="roundLabel">Round 0</b> <span id="phaseLabel" class="phase"></span></div>
           <div class="table-actions">
-            <button id="copyLinkBtn" class="small">🔗 Copy invite</button>
-            <button id="leaveBtn" class="small">Leave</button>
+            <button id="copyLinkBtn" class="btn small">🔗 Invite</button>
+            <button id="leaveBtn" class="btn small ghost">Leave</button>
           </div>
         </div>
         <div id="lobbyPanel" class="lobby-panel">
           <h3>Lobby — waiting room</h3>
           <div id="settingsBox" class="settings"></div>
-          <button id="startBtn" class="primary hidden">Start game</button>
+          <button id="startBtn" class="btn primary hidden">Start game</button>
         </div>
+        <div class="felt-print">BLACKJACK PAYS 3 TO 2 • Dealer must stand on 17</div>
         <div class="dealer-zone">
-          <div class="dealer-title">🤵 Dealer <span id="dealerTotal"></span></div>
+          <div class="dealer-title"><span class="dealer-avatar">🤵</span> Dealer <span id="dealerTotal"></span></div>
           <div id="dealerCards" class="cards"></div>
         </div>
         <div id="betPanel" class="bet-panel hidden">
           <b>Place your bet:</b>
+          <div id="chipRow" class="chip-row"></div>
           <div class="bet-row">
-            <button data-bet="10">10</button>
-            <button data-bet="50">50</button>
-            <button data-bet="100">100</button>
-            <button data-bet="250">250</button>
-            <button id="betGo" class="primary">Bet</button>
+            <button id="betClear" class="btn small ghost">Clear</button>
+            <button id="betGo" class="btn primary">Deal me in</button>
           </div>
-          <input id="betInput" type="number" min="10" value="50" />
         </div>
         <div id="actionPanel" class="action-panel hidden">
           <div id="coachBox" class="coach"></div>
           <div class="action-row">
-            <button id="hitBtn">Hit</button>
-            <button id="standBtn">Stand</button>
-            <button id="doubleBtn">Double</button>
-            <button id="splitBtn">Split</button>
-            <button id="surrenderBtn">Surrender</button>
+            <button id="hitBtn" class="btn action hit">Hit</button>
+            <button id="standBtn" class="btn action stand">Stand</button>
+            <button id="doubleBtn" class="btn action">2×</button>
+            <button id="splitBtn" class="btn action">Split</button>
+            <button id="surrenderBtn" class="btn action danger">Give up</button>
           </div>
           <div id="turnTimer" class="timer"></div>
         </div>
