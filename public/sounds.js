@@ -26,12 +26,38 @@ const Sound = (() => {
     } catch (e) { /* audio blocked */ }
   }
 
+  // crispy noise bursts: card slides, chip clacks, shuffle
+  let noiseBuf = null;
+  function noise(dur = 0.08, vol = 0.12, freq = 3000, when = 0) {
+    if (!enabled) return;
+    try {
+      const c = ac();
+      if (!noiseBuf) {
+        noiseBuf = c.createBuffer(1, c.sampleRate * 0.3, c.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      const src = c.createBufferSource();
+      src.buffer = noiseBuf;
+      const f = c.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.value = freq;
+      const g = c.createGain();
+      g.gain.setValueAtTime(vol, c.currentTime + when);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + when + dur);
+      src.connect(f).connect(g).connect(c.destination);
+      src.start(c.currentTime + when);
+      src.stop(c.currentTime + when + dur);
+    } catch (e) { /* audio blocked */ }
+  }
+
   return {
     get enabled() { return enabled; },
     toggle() { enabled = !enabled; return enabled; },
-    click() { tone(600, 0.06, 'square', 0.08); },
-    deal() { tone(440, 0.08, 'triangle', 0.15); tone(520, 0.08, 'triangle', 0.12, 0.07); },
-    chips() { tone(1200, 0.05, 'square', 0.06); tone(1600, 0.05, 'square', 0.06, 0.05); },
+    click() { tone(720, 0.05, 'triangle', 0.1); },
+    deal() { noise(0.09, 0.14, 2500); tone(440, 0.07, 'triangle', 0.12, 0.03); },
+    shuffle() { noise(0.12, 0.12, 1800); noise(0.12, 0.12, 2400, 0.12); noise(0.15, 0.12, 2000, 0.24); },
+    chips() { noise(0.05, 0.16, 5200); noise(0.05, 0.16, 6100, 0.06); tone(1560, 0.05, 'sine', 0.07, 0.02); },
     win() { tone(523, 0.12, 'sine', 0.2); tone(659, 0.12, 'sine', 0.2, 0.1); tone(784, 0.2, 'sine', 0.2, 0.2); },
     blackjack() { tone(523, 0.1, 'sine', 0.22); tone(659, 0.1, 'sine', 0.22, 0.09); tone(784, 0.1, 'sine', 0.22, 0.18); tone(1046, 0.3, 'sine', 0.22, 0.27); },
     lose() { tone(300, 0.15, 'sawtooth', 0.1); tone(220, 0.25, 'sawtooth', 0.1, 0.12); },
