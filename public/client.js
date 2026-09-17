@@ -101,14 +101,36 @@ function renderDealer(r) {
   $('dealerTotal').textContent = r.dealer.length ? `(${handTotal(r.dealer)})` : '';
 }
 
+function avatarImg(p, cls = 'mini-avatar') {
+  const img = document.createElement('img');
+  img.className = cls;
+  img.alt = p.name;
+  const url = avatarUrl(p.avatar);
+  if (url) {
+    img.src = url;
+    img.onerror = () => { img.replaceWith(document.createTextNode('🙂')); };
+  } else {
+    // back-compat: old emoji avatars
+    const s = document.createElement('span');
+    s.className = cls;
+    s.style.background = p.avatar.color || '#ffd54f';
+    s.textContent = p.avatar.face || '🙂';
+    return s;
+  }
+  return img;
+}
+
 function renderPlayers(r) {
   const box = $('playerList');
   box.innerHTML = '';
   [...r.players].sort((a, b) => b.chips - a.chips).forEach((p) => {
     const div = document.createElement('div');
-    div.innerHTML = `<span class="mini-avatar" style="background:${p.avatar.color}">${p.avatar.face}</span>
-      <b>${p.name}</b> ${p.isHost ? '👑' : ''} — ${p.chips} chips
+    div.className = 'player-row';
+    div.appendChild(avatarImg(p));
+    const label = document.createElement('span');
+    label.innerHTML = ` <b>${p.name}</b> ${p.isHost ? '👑' : ''} — <span class="stack-chips"><span class="pile"></span>${p.chips}</span>
       <small>W${p.stats.wins}/L${p.stats.losses}/P${p.stats.pushes} BJ${p.stats.blackjacks}</small>`;
+    div.appendChild(label);
     if (p.isHost && myId && r.hostId === myId && p.id !== myId) {
       const k = document.createElement('button');
       k.textContent = 'kick';
