@@ -1,36 +1,34 @@
 const socket = io();
 const $ = (id) => document.getElementById(id);
 
-// --- skribbl-style avatar picker ---
-const FACES = ['🙂', '😎', '🤠', '🦊', '🐼', '🤖', '👽', '🔥'];
-const COLORS = ['#ffd54f', '#ff8a80', '#80d8ff', '#b9f6ca', '#ea80fc', '#ffccbc'];
-let avatar = { face: FACES[0], color: COLORS[0] };
+// --- character picker (cool DiceBear characters) ---
+let avatar = { style: AVATAR_STYLES[0].id, seed: randomSeed(), bg: AVATAR_BGS[0] };
 
 function buildAvatarPicker() {
-  const fr = $('faceRow');
+  const sr = $('styleRow');
   const cr = $('colorRow');
-  FACES.forEach((f) => {
+  AVATAR_STYLES.forEach((s) => {
     const b = document.createElement('button');
-    b.textContent = f;
-    if (f === avatar.face) b.classList.add('sel');
-    b.onclick = () => { avatar.face = f; [...fr.children].forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); renderAvatar(); };
-    fr.appendChild(b);
+    b.textContent = s.label;
+    if (s.id === avatar.style) b.classList.add('sel');
+    b.onclick = () => { Sound.click(); avatar.style = s.id; [...sr.children].forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); renderAvatar(); };
+    sr.appendChild(b);
   });
-  COLORS.forEach((c) => {
+  AVATAR_BGS.forEach((c) => {
     const b = document.createElement('button');
-    b.style.background = c;
-    b.textContent = '●';
-    if (c === avatar.color) b.classList.add('sel');
-    b.onclick = () => { avatar.color = c; [...cr.children].forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); renderAvatar(); };
+    b.style.background = '#' + c;
+    if (c === avatar.bg) b.classList.add('sel');
+    b.onclick = () => { Sound.click(); avatar.bg = c; [...cr.children].forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); renderAvatar(); };
     cr.appendChild(b);
   });
   renderAvatar();
 }
 function renderAvatar() {
-  const p = $('avatarPreview');
-  p.textContent = avatar.face;
-  p.style.background = avatar.color;
+  const img = $('avatarPreview');
+  img.src = avatarUrl(avatar);
+  img.style.background = '#' + avatar.bg;
 }
+$('shuffleBtn').onclick = () => { Sound.click(); avatar.seed = randomSeed(); renderAvatar(); };
 function myName() {
   return ($('nameInput').value || 'Player').slice(0, 14);
 }
