@@ -125,15 +125,16 @@ input { padding: 10px; border-radius: 12px; border: 2px solid #ddd; font-size: 1
 
 /* mobile: stack table + side, big touch buttons, swipeable seats */
 @media (max-width: 820px) {
-  .landing-grid { grid-template-columns: 1fr; }
-  .landing { margin: 10px; }
+  .landing { margin: 10px; max-width: none; }
   .game-grid { grid-template-columns: 1fr; padding: 0 8px 60px; }
   .topbar { font-size: 17px; padding: 10px 12px; }
-  .bet-row button, .action-row button { flex: 1 1 30%; padding: 14px 10px; font-size: 16px; }
+  .felt { border-radius: 40px 40px 20px 20px; }
+  .btn.action { flex: 1 1 30%; padding: 14px 10px; font-size: 16px; }
   .action-row { position: sticky; bottom: 0; background: #0009; padding: 8px; border-radius: 12px; }
   .seats { grid-template-columns: 1fr; max-height: 40vh; overflow-y: auto; }
   .playing-card { width: 44px; height: 62px; font-size: 16px; }
   .chat { height: 150px; }
   .modal-card { padding: 18px 14px; }
   .podium .place { min-width: 80px; }
+  .poker-chip { width: 52px; height: 52px; font-size: 12px; }
 }
