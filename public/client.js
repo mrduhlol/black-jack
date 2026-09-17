@@ -226,10 +226,73 @@ function renderBetting(r) {
   $('betPanel').classList.toggle('hidden', !show);
   $('actionPanel').classList.add('hidden');
 }
-document.querySelectorAll('[data-bet]').forEach((b) => {
-  b.onclick = () => { $('betInput').value = b.dataset.bet; };
-});
-$('betGo').onclick = () => socket.emit('placeBet', { amount: Number($('betInput').value) });
+
+// real coins: break a bet into poker-chip denominations for the stack visual
+const DENOMS = [500, 250, 100, 50, 10];
+function breakChips(amount) {
+  const out = [];
+  let rest = amount;
+  for (const d of DENOMS) {
+    while (rest >= d) { out.push(d); rest -= d; }
+  }
+  return out.slice(0, 8);
+}
+const CHIP_COLORS = { 10: '#2b6cb0', 50: '#229654', 100: '#1a202c', 250: '#6b46c1', 500: '#c53030' };
+function betStack(amount) {
+  const wrap = document.createElement('div');
+  wrap.className = 'bet-stack';
+  breakChips(amount).forEach((d, i) => {
+    const c = document.createElement('div');
+    c.className = 'mini-chip';
+    c.style.setProperty('--chip', CHIP_COLORS[d]);
+    c.style.bottom = (i * 7) + 'px';
+    c.style.marginLeft = ((i % 2) ? 4 : -4) + 'px';
+    c.textContent = d;
+    wrap.appendChild(c);
+  });
+  return wrap;
+}
+
+// chip tray: tap coins to stack a bet, then deal
+let pendingBet = 0;
+const TRAY = [10, 50, 100, 250, 500];
+function buildChipTray() {
+  const row = $('chipRow');
+  row.innerHTML = '';
+  TRAY.forEach((d) => {
+    const b = document.createElement('button');
+    b.className = 'poker-chip c' + d;
+    b.textContent = d;
+    b.onclick = () => {
+      const me = room && room.players.find((p) => p.isYou);
+      if (pendingBet + d > (me ? me.chips : d)) return;
+      pendingBet += d;
+      Sound.chips();
+      paintTray();
+    };
+    row.appendChild(b);
+  });
+  const total = document.createElement('div');
+  total.id = 'betTotal';
+  total.className = 'bet-total';
+  row.appendChild(total);
+  paintTray();
+}
+function paintTray() {
+  const t = $('betTotal');
+  if (t) t.textContent = pendingBet > 0 ? `Bet: ${pendingBet}` : 'Tap coins to bet';
+  [...$('chipRow').querySelectorAll('.poker-chip')].forEach((b) => {
+    b.classList.toggle('sel', pendingBet > 0 && Number(b.textContent) <= pendingBet);
+  });
+}
+$('betClear').onclick = () => { Sound.click(); pendingBet = 0; paintTray(); };
+$('betGo').onclick = () => {
+  if (pendingBet < 10) { pendingBet = 50; }
+  Sound.chips();
+  socket.emit('placeBet', { amount: pendingBet });
+  pendingBet = 0;
+  paintTray();
+};
 
 // --- turns: Blackjack party features (coach + bust %) ---
 socket.on('yourTurn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
