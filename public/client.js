@@ -400,6 +400,7 @@ function addChat({ name, avatar: av, text, sys }) {
   if (sys) div.style.opacity = '.7';
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
+  if (sys && text.includes('Shuffling')) Sound.shuffle();
 }
 socket.on('chat', addChat);
 socket.on('phase', ({ phase, round }) => addChat({ sys: true, text: `— ${phase} (round ${round}) —` }));
