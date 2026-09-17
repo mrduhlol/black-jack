@@ -358,7 +358,8 @@ function showWinnerModal(board) {
   order.forEach((p, i) => {
     const d = document.createElement('div');
     d.className = 'place ' + classes[i];
-    d.innerHTML = `${medals[board.indexOf(p)]}<br><span style="font-size:28px">${p.avatar.face}</span><br>${p.name}<br>${p.chips} chips`;
+    const url = avatarUrl(p.avatar);
+    d.innerHTML = `${medals[board.indexOf(p)]}<br>${url ? `<img src="${url}" style="width:44px;height:44px;border-radius:50%" />` : '🙂'}<br>${p.name}<br>${p.chips} chips`;
     podium.appendChild(d);
   });
   $('winnerTitle').textContent = `🏆 ${board[0].name} wins the table!`;
