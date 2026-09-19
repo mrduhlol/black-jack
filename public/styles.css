@@ -183,6 +183,29 @@ button { font-family: inherit; touch-action: manipulation; }
 .btn.action.pending { outline: 3px solid var(--gold-hi); filter: brightness(1.12); }
 .btn.action:disabled { cursor: wait; opacity: 0.75; }
 
+/* button redesign — shine sweep + tactile lift */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn.primary::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 60px; left: -80px; z-index: 1;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform: skewX(-18deg); animation: btnShine 3.8s ease-in-out infinite; pointer-events: none;
+}
+@keyframes btnShine { 0%, 55% { left: -80px; } 85%, 100% { left: calc(100% + 40px); } }
+.btn.primary:hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 6px 0 rgba(0,0,0,0.35), 0 12px 28px rgba(212,164,55,0.35); }
+.play { font-size: 17px; letter-spacing: 0.04em; box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 10px 26px rgba(212,164,55,0.4); }
+.play svg { filter: drop-shadow(0 1px 0 rgba(255,255,255,0.4)); }
+.create {
+  border: 1px dashed rgba(212,164,55,0.6) !important;
+  background: linear-gradient(180deg, rgba(212,164,55,0.16), rgba(0,0,0,0.35)) !important;
+  color: var(--gold-hi) !important;
+  transition: background var(--transition), transform 120ms var(--ease);
+}
+.create:hover { background: linear-gradient(180deg, rgba(212,164,55,0.28), rgba(0,0,0,0.4)) !important; transform: translateY(-1px); }
+.join-inline { transition: border-color var(--transition), box-shadow var(--transition); }
+.join-inline:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,164,55,0.25); }
+.join-inline .btn { border-radius: var(--r-pill); box-shadow: none; }
+.join-inline .btn:hover { transform: translateY(-1px); }
+
 /* landing */
 .landing { max-width: 560px; margin: 0 auto; padding: 18px 18px 48px; }
 .landing-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
