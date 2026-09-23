@@ -15,6 +15,10 @@ let turnEndsAt = 0;           // local deadline for turn countdown (mine + obser
 let turnTotalSecs = 0;
 let warnedAt = 0;
 let chatUnread = 0;
+// --- room rendering state (declared early: ticker + paintTray run before init) ---
+let room = null;
+let myId = null;
+let lastTurn = null;
 
 function toast(msg, kind = '') {
   const stack = $('toastStack');
@@ -234,11 +238,7 @@ socket.on('roomCreated', ({ id }) => {
 socket.on('joinError', (msg) => toast(String(msg || 'Could not join room'), 'bad'));
 socket.on('kicked', () => { toast('Kicked by host', 'bad'); setTimeout(() => { location.href = '/'; }, 900); });
 
-// --- room rendering ---
-let room = null;
-let myId = null;
-let lastTurn = null;
-
+// --- room rendering (state declared at top) ---
 socket.on('room', (r) => {
   room = r;
   const me = r.players.find((p) => p.isYou);
