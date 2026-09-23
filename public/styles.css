@@ -713,6 +713,57 @@ input:focus, select:focus { border-color: var(--gold); outline: none; box-shadow
 .bet-panel.locked .poker-chip, .bet-panel.locked #betClear, .bet-panel.locked #betUndo, .bet-panel.locked #betGo { display: none; }
 .bet-locked-note { font-size: 13.5px; font-weight: 700; color: var(--gold-hi); text-align: center; padding: 4px 0; }
 
+/* ---- Phase 3: real casino table, seated pods, side chat ---- */
+.felt {
+  border: 14px solid #3a2412;
+  outline: 2px solid rgba(212,164,55,0.6);
+  box-shadow: inset 0 0 0 3px rgba(212,164,55,0.25), inset 0 0 110px rgba(0,0,0,0.55), var(--shadow-2);
+  background:
+    radial-gradient(ellipse at 50% 16%, rgba(255,255,255,0.10) 0%, transparent 46%),
+    radial-gradient(ellipse at 50% 30%, var(--felt-hi) 0%, var(--table) 55%, var(--felt-lo) 100%);
+}
+.felt::before { border-color: rgba(212,164,55,0.35); }
+/* dealer pit at the head of the table */
+.dealer-zone {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(212,164,55,0.25);
+  border-radius: 0 0 60px 60px;
+  padding: 10px 12px 14px;
+  margin: 6px auto 4px;
+  max-width: 560px;
+}
+/* seats arc around the table — every player sits at the felt */
+.seats {
+  display: flex; justify-content: center; align-items: flex-end; flex-wrap: wrap;
+  gap: var(--space-3); margin-top: var(--space-4);
+}
+.seat {
+  flex: 1 1 180px; max-width: 250px;
+  background: linear-gradient(180deg, rgba(24,16,9,0.88), rgba(0,0,0,0.5));
+  border: 1.5px solid rgba(212,164,55,0.35);
+  border-radius: 16px 16px var(--radius) var(--radius);
+  padding-top: var(--space-6);
+}
+.seat-avatar {
+  width: 46px; height: 46px; margin-top: -36px;
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+/* betting circle printed on the felt — chips land inside it */
+.bet-spot {
+  justify-content: center;
+  border: 2px dashed rgba(212,164,55,0.55);
+  border-radius: 999px;
+  min-height: 54px; min-width: 120px; margin: 6px auto;
+  background: rgba(0,0,0,0.22);
+  padding: 6px 10px;
+}
+/* chips land on the table one by one (delay set inline per chip) */
+.bet-stack .mini-chip, .bet-preview .pv-chip { animation: chipDrop 220ms var(--ease) backwards; }
+/* side panel stays docked next to the table on desktop */
+.side { position: sticky; top: 12px; }
+.chat { height: 280px; }
+
 /* mobile tab bar (table / players / chat) */
 .mobile-tabs { display: none; gap: 8px; margin-top: 12px; }
 .mobile-tab {

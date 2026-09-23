@@ -708,6 +708,7 @@ function betStack(amount) {
     const c = document.createElement('div');
     c.className = 'mini-chip';
     c.style.background = CHIP_COLORS[d];
+    c.style.animationDelay = (i * 90) + 'ms'; // land on the felt one by one
     c.style.bottom = (i * 6) + 'px';
     c.style.marginLeft = ((i % 2) ? 4 : -4) + 'px';
     c.textContent = d;
@@ -770,10 +771,11 @@ function paintTray() {
   const pv = $('betPreview');
   if (pv) {
     pv.innerHTML = '';
-    pendingStack.slice(-10).forEach((d) => {
+    pendingStack.slice(-10).forEach((d, i) => {
       const s = document.createElement('span');
       s.className = 'pv-chip';
       s.style.background = CHIP_COLORS[d];
+      s.style.animationDelay = (i * 70) + 'ms';
       s.textContent = `+${d}`;
       pv.appendChild(s);
     });
