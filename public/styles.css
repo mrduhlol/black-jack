@@ -1,6 +1,6 @@
 /* black-jack.io — polished casino theme. Lightweight, no frameworks. */
 :root {
-  /* Design tokens (single source of truth) */
+  /* Design tokens (single source of truth) — Phase 1 system */
   --bg: #060d0a;
   --surface: rgba(13, 24, 19, 0.82);
   --surface-elevated: rgba(0, 0, 0, 0.55);
@@ -14,6 +14,15 @@
   --radius: 14px;
   --shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
   --transition: 200ms cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
 
   /* Aliases kept for compatibility */
   --bg-2: #0a1712;
@@ -285,16 +294,14 @@ button { font-family: inherit; touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   .bg-card, .btn.primary::after, .live-dot { animation: none !important; }
 }
+/* Panel base: setup-card (single definition) */
 .setup-card {
-  width: 100%; background: var(--surface);
-  border: 1px solid rgba(212,164,55,0.28); border-radius: var(--r-lg);
-  padding: 22px; box-shadow: var(--shadow-2);
-}
-/* setup-card glass + avatar glow + input focus */
-.setup-card {
+  width: 100%;
   background: linear-gradient(180deg, rgba(24,38,31,0.92), rgba(10,20,15,0.94));
   backdrop-filter: blur(8px);
   border: 1px solid rgba(212,164,55,0.38);
+  border-radius: var(--r-lg);
+  padding: var(--space-5);
   box-shadow: 0 18px 50px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
   position: relative; overflow: hidden;
 }
