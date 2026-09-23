@@ -380,14 +380,14 @@ input:focus, select:focus { border-color: var(--gold); outline: none; box-shadow
   gap: 16px; padding: 0 18px 24px; max-width: 1240px; margin: 0 auto; align-items: start;
 }
 .felt {
-  position: relative; border-radius: 120px 120px 22px 22px;
+  position: relative; border-radius: 28px;
   padding: 18px 22px 22px; color: #fff;
   background: radial-gradient(ellipse at 50% 22%, var(--felt-hi) 0%, var(--table) 52%, var(--felt-lo) 100%);
   border: 10px solid #3d2a16; outline: 2px solid rgba(212,164,55,0.45);
   box-shadow: inset 0 0 80px rgba(0,0,0,0.5), var(--shadow-2);
   overflow: hidden; min-width: 0;
 }
-.felt::before { content: ""; position: absolute; inset: 16px; border: 1.5px solid var(--felt-line); border-radius: 104px 104px 16px 16px; pointer-events: none; }
+.felt::before { content: ""; position: absolute; inset: 16px; border: 1.5px solid var(--felt-line); border-radius: 20px; pointer-events: none; }
 .felt::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 22px 22px; pointer-events: none; }
 .felt > * { position: relative; z-index: 1; }
 .felt-sheen { position: absolute; left: 10%; right: 10%; top: 6px; height: 70px; background: radial-gradient(ellipse, rgba(255,255,255,0.14), transparent 70%); z-index: 0 !important; }
@@ -597,11 +597,28 @@ input:focus, select:focus { border-color: var(--gold); outline: none; box-shadow
 .poker-chip.c10 { --chip: #2b6cb0; } .poker-chip.c50 { --chip: #1f9d63; }
 .poker-chip.c100 { --chip: #2b313c; } .poker-chip.c250 { --chip: #6b5cc7; }
 .poker-chip.c500 { --chip: #b32335; }
-.bet-preview { display: flex; gap: 4px; justify-content: center; align-items: flex-end; min-height: 8px; margin: 2px 0 4px; flex-wrap: wrap; }
+/* 2.5D betting spot on the felt — tapped chips pile up here as you click */
+.bet-preview {
+  display: flex; justify-content: center; align-items: flex-end; flex-wrap: wrap;
+  min-height: 64px; margin: 6px auto; max-width: 320px;
+  background: rgba(0,0,0,0.22);
+  border: 2px dashed rgba(212,164,55,0.55); border-radius: 999px;
+  padding: 10px 14px 14px;
+  perspective: 320px;
+}
+.bet-preview:empty { min-height: 8px; padding: 0; border: 0; background: transparent; }
 .bet-preview .pv-chip {
-  font-size: 10px; font-weight: 900; color: #fff; border-radius: var(--r-pill);
-  padding: 2px 8px; border: 1px dashed rgba(255,255,255,0.7);
-  animation: chipDrop 200ms var(--ease);
+  font-size: 10px; font-weight: 900; color: #fff;
+  min-width: 44px; text-align: center;
+  padding: 7px 8px 9px;
+  border-radius: 50% / 50%;
+  transform: rotateX(52deg) scale(1.06);
+  transform-style: preserve-3d;
+  border: 2px dashed rgba(255,255,255,0.85);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.35), 0 10px 14px rgba(0,0,0,0.45), inset 0 2px 3px rgba(255,255,255,0.35);
+  text-shadow: 0 1px 2px #000;
+  margin: 0 -6px;
+  animation: chipDrop 220ms var(--ease) backwards;
 }
 .bet-row, .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 0; }
 .bet-row .btn.primary { flex: 1; min-height: 52px; }
@@ -836,8 +853,8 @@ input:focus, select:focus { border-color: var(--gold); outline: none; box-shadow
   .setup-card { padding: 18px 14px 14px; }
   .primary-row { grid-template-columns: 1fr; }
   .game-layout { padding: 0 10px 90px; gap: 10px; }
-  .felt { border-radius: 28px 28px 18px 18px; border-width: 6px; padding: 12px 10px 14px; }
-  .felt::before { inset: 8px; border-radius: 22px 22px 12px 12px; }
+  .felt { border-radius: 20px; border-width: 6px; padding: 12px 10px 14px; }
+  .felt::before { inset: 8px; border-radius: 14px; }
   .felt-print { font-size: 8px; letter-spacing: 0.12em; margin-bottom: 6px; }
   .table-head { gap: 8px; }
   .phase-banner { padding: 8px 10px; }
