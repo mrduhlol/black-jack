@@ -19,6 +19,13 @@ let chatUnread = 0;
 let room = null;
 let myId = null;
 let lastTurn = null;
+// --- chip tray state (declared early: buildChipTray runs during init) ---
+let pendingBet = 0;
+let pendingStack = [];
+const TRAY = [10, 50, 100, 250, 500];
+// real coins: denominations + colors (used by paintTray during init)
+const DENOMS = [500, 250, 100, 50, 10];
+const CHIP_COLORS = { 10: '#2b6cb0', 50: '#1f9d63', 100: '#2b313c', 250: '#6b5cc7', 500: '#b32335' };
 
 function toast(msg, kind = '') {
   const stack = $('toastStack');
@@ -684,8 +691,7 @@ function renderBetting(r) {
   }
 }
 
-// real coins: break a bet into poker-chip denominations for the stack visual
-const DENOMS = [500, 250, 100, 50, 10];
+// real coins: break a bet into poker-chip denominations for the stack visual (consts declared at top)
 function breakChips(amount) {
   const out = [];
   let rest = amount;
@@ -694,7 +700,6 @@ function breakChips(amount) {
   }
   return out.slice(0, 8);
 }
-const CHIP_COLORS = { 10: '#2b6cb0', 50: '#1f9d63', 100: '#2b313c', 250: '#6b5cc7', 500: '#b32335' };
 function betStack(amount) {
   const wrap = document.createElement('div');
   wrap.className = 'bet-stack';
@@ -711,10 +716,7 @@ function betStack(amount) {
   return wrap;
 }
 
-// chip tray: tap coins to stack a bet, then deal
-let pendingBet = 0;
-let pendingStack = [];
-const TRAY = [10, 50, 100, 250, 500];
+// chip tray: tap coins to stack a bet, then deal (state declared at top)
 function buildChipTray() {
   const row = $('chipRow');
   row.innerHTML = '';
