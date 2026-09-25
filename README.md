@@ -1,6 +1,11 @@
-# black-jack.io
+<div align="center">
+  <img src="public/favicon.svg" alt="Black-Jack.io 21 logo" width="88" height="88">
+  <h1>black-jack.io</h1>
+  <p>Browser-based multiplayer Blackjack to play with friends.</p>
+  <p><strong>Private rooms · Live multiplayer · Virtual chips</strong></p>
+</div>
 
-black-jack.io is a browser-based multiplayer Blackjack game for playing with friends. Create a private table and share its invite link, or join a public table. Players join with a nickname and avatar; no account or download is required.
+Create a private table and share its invite link, or join a public table. Players join with a nickname and avatar; no account or download is required.
 
 The game uses virtual chips and is intended for casual play. It does not support real-money betting.
 
