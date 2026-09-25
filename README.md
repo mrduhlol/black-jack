@@ -1,105 +1,68 @@
 # black-jack.io
 
-Multiplayer online Blackjack party game — inspired by skribbl.io, but for Blackjack.
+black-jack.io is a browser-based multiplayer Blackjack game for playing with friends. Create a private table and share its invite link, or join a public table. Players join with a nickname and avatar; no account or download is required.
 
-Play with friends: create a private room, share the link, sit at a virtual table together, and play rounds live. No download, browser-based, room-based, host-controlled — just like skribbl.io is for drawing, black-jack.io is for Blackjack.
+The game uses virtual chips and is intended for casual play. It does not support real-money betting.
 
-## Objective (real casino rules)
+## Features
 
-- Beat the dealer, not the other players. Each hand is you vs dealer.
-- Get closer to 21 than the dealer without going over 21 (bust).
-- You win if: your total > dealer total (no bust), dealer busts and you don't, or you hit a natural Blackjack and dealer doesn't.
-- You lose if: you bust (lose immediately, even if dealer busts later), or dealer total > yours.
-- Tie = push: bet returned, no win, no loss.
+- Private rooms with shareable invite links and public matchmaking
+- Live multiplayer tables with chat, emotes, and host controls
+- Configurable table settings, including player limit, starting chips, rounds, timers, deck count, and dealer rules
+- Blackjack actions: hit, stand, double down, split, and surrender
+- Optional strategy hints and hit bust-percentage estimates
+- Round summaries, chip standings, and a winner screen
+- Responsive browser interface with sound controls
 
-## Card values
+## Getting started
 
-- 2–10 = face value (e.g. 7 = 7).
-- J / Q / K = 10.
-- Ace = 1 or 11, whichever keeps the hand valid.
-- Soft hand = Ace counted as 11 (e.g. A+6 = soft 17, cannot bust on one hit).
-- Hard hand = no Ace, or Ace forced to 1 (e.g. 10+7 = hard 17, A+6+10 = hard 17).
-- Natural Blackjack = Ace + 10-value card on first two cards only. 21 with 3+ cards is just 21, not a natural.
+### Requirements
 
-## Round flow (standard casino order)
+- Node.js 18 or newer
+- npm
 
-1. Place bets (chips, no real money in v1 — fun credits).
-2. Deal: each player gets 2 face-up cards, dealer gets 1 upcard + 1 hole card face-down.
-3. Peek/check: if dealer shows Ace or 10-value, check for dealer Blackjack before players act (variant-dependent).
-4. Players act in turn order, one hand at a time.
-5. Dealer reveals hole card and plays by fixed rules (no choices).
-6. Settle: compare each remaining player hand vs dealer, pay / take / push.
-
-## Player actions
-
-- Hit: take another card. Can repeat until stand or bust.
-- Stand: keep total, end your turn. Always stand hard 17+.
-- Double down: double bet, take exactly 1 more card, then done. Typical spot: hard 10/11 vs weak dealer card.
-- Split: if first two cards are a pair, pay a second bet and play two hands. Always split Aces and 8s, never split 10s or 5s. Split Aces usually get 1 card each.
-- Surrender (where offered): forfeit half bet and end hand on first two cards. Typical: hard 16 vs 9/10/Ace, hard 15 vs 10.
-- Insurance: side bet (half stake) when dealer shows Ace, pays 2:1 if dealer has Blackjack. Bad odds — basic strategy says never take it.
-
-## Dealer rules (fixed, no choices)
-
-- Must hit 16 or below, must stand 17 or above.
-- S17 = stands on all 17s incl. soft 17 (A+6). Better for player.
-- H17 = hits soft 17. Adds ~0.2% house edge.
-- Dealer cannot split, double, or surrender. If dealer busts, all remaining player hands win.
-- black-jack.io default: 6-deck shoe, dealer stands on soft 17 (S17), Blackjack pays 3:2, dealer peeks for Blackjack.
-
-## Payouts
-
-- Win = 1:1 (bet $10, win $10 + stake back).
-- Natural Blackjack = 3:2 ($10 wins $15). Avoid 6:5 tables (+1.39% house edge).
-- Push = stake returned.
-- Surrender = lose half bet.
-- Bust = lose immediately.
-- Dealer Blackjack beats all non-Blackjack hands; player Blackjack vs dealer Blackjack = push.
-
-## How it plays like skribbl.io (rooms, not matchmaking)
-
-skribbl.io loop: create private room -> share link -> host sets players/rounds/draw-time -> everyone joins with a nickname -> host starts -> rotating turns -> live canvas + chat guessing -> points -> winner crowned.
-
-black-jack.io mirrors that:
-
-- Home: enter nickname -> Play (public table) or Create Private Room.
-- Private room link like `black-jack.io/?XXXXXX` — friends join anytime from browser, no account.
-- Lobby: player list with avatars/chip stacks, chat before start, host badge.
-- Host controls: max players (2–7 + dealer), starting chips, number of rounds/shoes, turn timer (e.g. 15–30s per decision), S17/H17 toggle, 3:2/6:5 toggle, allow surrender / insurance / split / double toggles.
-- Game: all players sit at one virtual table vs one dealer (bot dealer, server-authoritative). Turn order left-to-right, action buttons Hit/Stand/Double/Split/Surrender with countdown timer. Auto-stand on timeout.
-- Live sync via WebSocket (Socket.IO): joinRoom, placeBet, playerAction, dealerPlay, roundSettle, chatMessage.
-- Scoring: chip stacks persist across rounds. Busted-out players spectate. After N rounds, richest stack is crowned winner.
-- Moderation like skribbl.io: host kick/ban, votekick, mute, report.
-
-## Tech plan (v1)
-
-- Frontend: single-page web app (HTML/CSS/JS), table UI, no download.
-- Backend: Node.js + Socket.IO (same stack pattern as skribbl.io), server-authoritative shoe + dealer logic.
-- One shared shoe per room (6 decks, reshuffle at ~75% penetration), server deals, validates actions, broadcasts state.
-- Fun credits only — no real money, no gambling license needed for party play.
-
-## Run it
+### Run locally
 
 ```bash
 npm install
 npm start
-# open http://localhost:3000
-# private invite links look like http://localhost:3000/?ABC123
 ```
 
-## Roadmap
+Open [http://localhost:3000](http://localhost:3000) in your browser. To invite someone to a private room, create a room in the app and share its generated link.
 
-- [x] README with real rules (this file)
-- [x] Room lobby + invite links + nickname join
-- [x] Single-table Blackjack engine (deal, hit/stand/double/split/surrender, S17 dealer, 3:2 payout)
-- [x] Multiplayer sync + timers + chat + host controls
-- [x] Rounds, chip leaderboard, winner screen
-- [x] Blackjack party features: coach hints, live bust %, emotes, stats, avatars
-- [ ] Polish next: sounds, mobile layout, reconnect, side bets (Perfect Pairs / 21+3)
+For local development, `npm run dev` starts the same server.
 
-## Disclaimer
+## How to play
 
-Party game for fun with friends using virtual chips. Not a casino, no real-money betting. If you add real money later, gambling laws and licenses apply.
+Each player plays their hand against the dealer. The goal is to finish closer to 21 than the dealer without exceeding 21. A hand over 21 busts. A tie returns the wager.
 
----
-Status: README done. Awaiting order to build black-jack.io.
+Card values follow standard Blackjack rules: number cards count at face value, face cards count as 10, and an ace counts as 1 or 11 as appropriate. A natural Blackjack is an ace and a 10-value card in the initial two cards.
+
+Players place bets, then act when their turn begins. Depending on the table settings and hand, they can hit, stand, double down, split a pair, or surrender. The dealer follows fixed rules and does not make player choices. By default, the dealer stands on soft 17, and a natural Blackjack pays 3:2.
+
+## Table settings
+
+The host can configure the number of players, starting chips, rounds, betting and turn timers, and number of decks. The host can also choose whether the dealer hits soft 17, select a 3:2 or 6:5 natural Blackjack payout, and enable or disable double down, splitting, surrender, and strategy coaching.
+
+Default settings are five players, 1,000 starting chips, eight rounds, six decks, a 20-second betting timer, a 20-second turn timer, stand on soft 17, and 3:2 Blackjack payouts.
+
+## Technology
+
+- Node.js and Express serve the web application.
+- Socket.IO synchronizes rooms, player actions, chat, and game state in real time.
+- The Blackjack rules engine is in `game/engine.js`.
+- The browser client and static assets are in `public/`.
+
+Room and game state are held in server memory. Restarting the server clears active rooms and their game state.
+
+## Project structure
+
+```text
+game/       Blackjack rules engine
+public/     Browser client, styles, and static assets
+server.js   Express server and Socket.IO room/game handling
+```
+
+## License
+
+This project is licensed under the MIT License. See the `package.json` license field.
