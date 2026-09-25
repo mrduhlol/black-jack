@@ -5,6 +5,59 @@ const CROWN_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="current
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Phones play in landscape. Fullscreen must be requested from a user gesture,
+// so the landscape screen provides a single, explicit entry action.
+const orientationGate = $('orientationGate');
+const orientationContinue = $('orientationContinue');
+const orientationTitle = $('orientationTitle');
+const orientationHint = $('orientationHint');
+const coarsePointer = window.matchMedia('(pointer: coarse)');
+const portraitOrientation = window.matchMedia('(orientation: portrait)');
+function updateOrientationGate() {
+  const isPhone = coarsePointer.matches;
+  const isPortrait = portraitOrientation.matches;
+  document.documentElement.classList.toggle('mobile-play-gated', isPhone);
+  const appContent = $('shake-wrap');
+  if (appContent) appContent.inert = isPhone;
+  if (!orientationGate) return;
+  orientationGate.classList.toggle('hidden', !isPhone);
+  orientationContinue.hidden = !isPhone || isPortrait;
+  if (isPortrait) {
+    orientationTitle.textContent = 'Rotate your phone';
+    orientationHint.textContent = 'Blackjack is designed to be played in landscape. Turn your phone sideways to continue.';
+  } else {
+    orientationTitle.textContent = 'Ready to play in landscape';
+    orientationHint.textContent = 'Enter full screen for an immersive table. Your browser controls will be hidden when supported.';
+  }
+}
+async function enterMobilePlay() {
+  try {
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      try {
+        await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+      } catch {
+        await document.documentElement.requestFullscreen();
+      }
+    }
+  } catch {
+    // Fullscreen is optional when the browser does not support it.
+  }
+  try {
+    if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
+  } catch {
+    // Orientation locking is not available in every mobile browser.
+  }
+  document.documentElement.classList.remove('mobile-play-gated');
+  orientationGate.classList.add('hidden');
+  const appContent = $('shake-wrap');
+  if (appContent) appContent.inert = false;
+}
+updateOrientationGate();
+coarsePointer.addEventListener ? coarsePointer.addEventListener('change', updateOrientationGate) : coarsePointer.addListener(updateOrientationGate);
+portraitOrientation.addEventListener ? portraitOrientation.addEventListener('change', updateOrientationGate) : portraitOrientation.addListener(updateOrientationGate);
+window.addEventListener('orientationchange', updateOrientationGate);
+if (orientationContinue) orientationContinue.addEventListener('click', enterMobilePlay);
+
 // ---- gameplay state UX (display-only; no rule/socket changes) ----
 let prevSnap = null;          // { phase, turnId, round, hands: Map(pid -> sig) }
 let prevPlayerIds = new Set();

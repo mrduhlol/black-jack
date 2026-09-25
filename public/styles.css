@@ -615,3 +615,66 @@ html:not(.advanced-mode) #fx,html:not(.advanced-mode) #cursorGlow,html:not(.adva
   .kicker-pill{font-size:9px;letter-spacing:.08em;padding:7px 10px}
   .hero-sub{font-size:11px;letter-spacing:.02em;padding:8px 11px}
 }
+
+/* Mobile play orientation and fullscreen entry */
+.orientation-gate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;overflow:auto;padding:max(24px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));background:radial-gradient(ellipse at 50% 20%,rgba(27,91,62,.38),transparent 58%),#07100c;color:var(--text);text-align:center}
+.mobile-play-gated #orientationGate{display:grid}
+.orientation-card{width:min(100%,390px);display:flex;align-items:center;flex-direction:column}
+.rotate-visual{width:74px;height:74px;display:grid;place-items:center;margin:0 0 20px;color:var(--gold-hi);border:1px solid rgba(215,182,108,.28);border-radius:22px;background:linear-gradient(145deg,rgba(215,182,108,.12),rgba(255,255,255,.025));box-shadow:0 14px 44px rgba(0,0,0,.28)}
+.rotate-visual svg{width:58px;height:58px}
+.orientation-kicker{margin:0 0 8px;color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.orientation-card h1{margin:0;color:var(--cream);font-family:var(--display);font-size:clamp(30px,8vw,42px);letter-spacing:-.045em;line-height:1.05;text-wrap:balance}
+.orientation-hint{max-width:34ch;margin:14px 0 0;color:#bac7be;font-size:15px;line-height:1.6;text-wrap:pretty}
+.orientation-continue{margin-top:24px;min-width:min(100%,270px);min-height:54px}
+.orientation-continue[hidden]{display:none}
+.orientation-foot{max-width:36ch;margin:20px 0 0;color:#829188;font-size:12px;line-height:1.5}
+@media(pointer:coarse) and (orientation:landscape){
+  .mobile-play-gated{overflow:hidden}
+  .mobile-play-gated .orientation-card{width:min(100%,580px);display:grid;grid-template-columns:78px minmax(0,1fr);column-gap:18px;text-align:left;align-items:center}
+  .mobile-play-gated .rotate-visual{grid-column:1;grid-row:1/5;width:72px;height:72px;margin:0}
+  .mobile-play-gated .orientation-kicker{grid-column:2;margin:0 0 4px}
+  .mobile-play-gated .orientation-card h1{grid-column:2;font-size:clamp(25px,5vw,34px)}
+  .mobile-play-gated .orientation-hint{grid-column:2;margin:6px 0 0;font-size:13px}
+  .mobile-play-gated .orientation-continue{grid-column:2;justify-self:start;min-width:210px;min-height:48px;margin-top:13px}
+  .mobile-play-gated .orientation-foot{grid-column:2;margin-top:8px;font-size:11px}
+}
+@media(pointer:coarse) and (orientation:landscape) and (max-height:520px){
+  :root{--card-w:clamp(38px,6.5vh,54px);--card-h:calc(var(--card-w) * 1.36)}
+  body{min-height:100svh;min-height:100dvh;padding:0;overflow-x:hidden}
+  .topbar{padding:4px 10px}
+  .brand{font-size:11px}
+  .brand-mark{width:24px;height:24px}
+  .room-badge{padding:4px 8px;font-size:10px}
+  #game:not(.hidden) .game-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,25vw);gap:8px;max-width:none;padding:6px 8px 8px}
+  #game:not(.hidden) .felt{border-width:5px;border-radius:17px;padding:7px 10px 9px;outline-width:1px}
+  #game:not(.hidden) .felt::before{inset:6px;border-radius:10px}
+  #game:not(.hidden) .felt-print{margin-bottom:3px;font-size:7px}
+  #game:not(.hidden) .table-head{margin-bottom:3px;gap:4px}
+  #game:not(.hidden) .table-status{gap:6px;font-size:11px}
+  #game:not(.hidden) .table-status b{font-size:11px}
+  #game:not(.hidden) .table-actions{gap:4px}
+  #game:not(.hidden) .table-actions .btn{min-height:32px;padding:4px 9px;font-size:10px}
+  #game:not(.hidden) .phase-banner{padding:5px 8px}
+  #game:not(.hidden) .phase-text b{font-size:11px}
+  #game:not(.hidden) .phase-text span{font-size:9px}
+  #game:not(.hidden) .seat{padding:5px;padding-top:19px}
+  #game:not(.hidden) .seat-avatar{width:28px;height:28px;margin-top:-25px}
+  #game:not(.hidden) .playing-card .pip{font-size:17px}
+  #game:not(.hidden) .playing-card .corner{font-size:10px}
+  #game:not(.hidden) .action-panel{position:static;padding:7px;margin-top:6px}
+  #game:not(.hidden) .turn-head{margin-bottom:4px}
+  #game:not(.hidden) .hand-summary{margin:3px 0;font-size:11px}
+  #game:not(.hidden) .coach{margin:3px 0;padding:4px 7px;font-size:10px}
+  #game:not(.hidden) .action-row{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  #game:not(.hidden) .action-row .btn.action{min-height:39px;padding:5px;font-size:12px}
+  #game:not(.hidden) #surrenderBtn{grid-column:auto;min-height:39px;font-size:11px}
+  #game:not(.hidden) .bet-panel{padding:8px;margin-top:6px}
+  #game:not(.hidden) .poker-chip{width:44px;height:44px;min-width:44px;min-height:44px;font-size:11px}
+  #game:not(.hidden) .side{display:flex;flex-direction:column;gap:6px;min-width:0}
+  #game:not(.hidden) .side-card{padding:9px}
+  #game:not(.hidden) .side-card h3{margin-bottom:5px;font-size:12px}
+  #game:not(.hidden) .room-note{margin-top:4px;font-size:10px}
+  #game:not(.hidden) .chat{height:clamp(70px,19dvh,110px);max-height:none}
+  #game:not(.hidden) .mobile-tabs{display:none}
+  #game:not(.hidden) .history{padding:4px 10px;font-size:10px}
+}
