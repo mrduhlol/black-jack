@@ -119,6 +119,7 @@
           <span><b>Free</b> virtual chips</span>
           <span><b>Private</b> invite links</span>
         </section>
+        <a class="rules-jump" href="#rules">Read how to play <span aria-hidden="true">↓</span></a>
       </div>
 
       <section class="setup-card" aria-label="Player setup" id="setupCard">
@@ -178,33 +179,40 @@
         <span><b>3</b> Beat the dealer</span>
       </div>
 
-      <section class="rules-section" aria-labelledby="rulesTitle">
+      <section class="rules-section" id="rules" aria-labelledby="rulesTitle">
         <div class="rules-heading">
-          <p class="rules-kicker">At the table</p>
-          <h2 id="rulesTitle">Blackjack rules</h2>
-          <p>Get as close to 21 as you can without going over. Each player competes against the dealer.</p>
+          <p class="rules-kicker">The table guide</p>
+          <h2 id="rulesTitle">How a Blackjack round works</h2>
+          <p>Everyone plays their own hand against the dealer. The aim is to finish closer to 21 without going over.</p>
         </div>
-        <div class="rules-grid">
-          <article class="rules-card">
+        <ol class="rules-steps">
+          <li class="rules-step">
             <span class="rules-number" aria-hidden="true">01</span>
-            <h3>Know your cards</h3>
-            <p>Number cards count at face value. Jacks, queens, and kings count as 10. An ace counts as 1 or 11, whichever keeps your hand at 21 or less.</p>
-            <p>An ace and a 10-value card in your first two cards is a natural Blackjack.</p>
-          </article>
-          <article class="rules-card">
+            <div><h3>Place your wager</h3><p>Choose how many virtual chips to bet for the round. Your wager is committed to your hand.</p></div>
+          </li>
+          <li class="rules-step">
             <span class="rules-number" aria-hidden="true">02</span>
-            <h3>Choose your move</h3>
-            <p>After placing a bet, choose to hit for another card or stand with your total. When allowed, you can also double down, split a pair, or surrender half your bet.</p>
-            <p>Go over 21 and your hand busts. The dealer plays after everyone finishes.</p>
-          </article>
-          <article class="rules-card">
+            <div><h3>Get your first cards</h3><p>Each player receives two cards. The dealer also gets two: one face up and one hidden. An ace plus a 10-value card is a natural Blackjack; it stands automatically. If the dealer has a natural, the round settles before players act.</p></div>
+          </li>
+          <li class="rules-step">
             <span class="rules-number" aria-hidden="true">03</span>
-            <h3>Beat the dealer</h3>
-            <p>Higher than the dealer without busting wins. If the dealer busts, remaining hands win. Equal totals push and return your bet.</p>
-            <p>By default, the dealer stands on soft 17. A regular win pays 1:1; a natural Blackjack pays 3:2.</p>
-          </article>
-        </div>
-        <p class="rules-note">Table settings can change the dealer’s soft 17 rule, Blackjack payout, and available actions. All chips are virtual.</p>
+            <div><h3>Play your hand</h3><p>Players take turns. Hit to draw a card, or stand to keep your total. A total over 21 busts and loses the wager. A hand that reaches 21 stands automatically.</p></div>
+          </li>
+          <li class="rules-step">
+            <span class="rules-number" aria-hidden="true">04</span>
+            <div><h3>Use optional actions</h3><p>If enabled and you have two cards, double down by doubling your wager and taking exactly one more card. Split a pair into two hands by adding an equal wager; only one split is allowed. Surrender on your first two cards to give up the hand and get half your wager back.</p></div>
+          </li>
+          <li class="rules-step">
+            <span class="rules-number" aria-hidden="true">05</span>
+            <div><h3>The dealer finishes</h3><p>After all players finish, the dealer reveals the hidden card. The dealer must draw on 16 or less. By default the dealer stands on every 17, including soft 17 (an ace counted as 11); the host can change the soft 17 rule.</p></div>
+          </li>
+          <li class="rules-step">
+            <span class="rules-number" aria-hidden="true">06</span>
+            <div><h3>Compare hands and settle</h3><p>Each hand is settled against the dealer, not other players. The higher total up to 21 wins; if the dealer has the higher total, you lose. A tie is a push and returns your wager. If the dealer busts, every player hand that has not busted wins. Regular wins pay 1:1. A natural Blackjack beats other 21s and pays 3:2 by default; if both sides have a natural, it is a push.</p></div>
+          </li>
+        </ol>
+        <div class="rules-values"><b>Card values</b><span>2–10 count at face value</span><span>J, Q, K count as 10</span><span>A counts as 1 or 11</span></div>
+        <p class="rules-note">Room settings may change the Blackjack payout to 6:5 and enable or disable optional actions. The game uses virtual chips only.</p>
       </section>
 
       <footer class="landing-foot">
