@@ -556,7 +556,8 @@ input:focus,select:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 
 }
 
 /* ===== focused landing and game-night layout ===== */
-.ht-gold{background:linear-gradient(100deg,#fff8e8,var(--gold-hi),var(--gold),#c7a35d,#fff2d4);background-size:auto;filter:drop-shadow(0 5px 18px rgba(215,182,108,.18));animation:none}
+.ht-gold{background:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 3px 18px rgba(255,255,255,.2);filter:none;animation:none}
+.ht-gold i{color:#fff;-webkit-text-stroke:0}
 .setup-card::before{background:linear-gradient(90deg,transparent,var(--gold-hi),var(--gold),transparent)}
 .avatar-ring{background:conic-gradient(from 0deg,var(--gold-hi),#78947e,var(--gold),var(--gold-hi));opacity:.38}
 .trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:16px auto 0}
