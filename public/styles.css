@@ -679,6 +679,85 @@ html:not(.advanced-mode) #fx,html:not(.advanced-mode) #cursorGlow,html:not(.adva
   #game:not(.hidden) .history{padding:4px 10px;font-size:10px}
 }
 
+/* ===== refined chip rail ===== */
+.small-label{
+  margin:12px 0 0;
+  text-align:left;
+  color:#b5c2b8;
+  font-size:10px;
+  letter-spacing:.14em;
+}
+.chip-row{
+  justify-content:center;
+  gap:clamp(10px,2.5vw,18px);
+  margin:9px 0 12px;
+  padding:2px 4px 5px;
+}
+.poker-chip{
+  width:58px;
+  height:58px;
+  min-width:58px;
+  min-height:58px;
+  border:3px solid rgba(255,255,255,.72);
+  background:
+    radial-gradient(circle at center,transparent 55%,rgba(255,255,255,.17) 56% 59%,transparent 60%),
+    repeating-conic-gradient(from 0deg,rgba(255,255,255,.84) 0deg 9deg,transparent 9deg 18deg),
+    var(--chip,#2b6cb0);
+  box-shadow:0 3px 0 rgba(0,0,0,.42),0 7px 12px rgba(0,0,0,.22),inset 0 0 0 4px rgba(0,0,0,.22);
+  font-size:12px;
+  transition:transform 180ms var(--ease),filter 180ms var(--ease),box-shadow 180ms var(--ease);
+}
+.poker-chip::after{inset:8px;border:1px solid rgba(255,255,255,.42)}
+.poker-chip:hover{transform:translateY(-3px);filter:brightness(1.12);box-shadow:0 6px 0 rgba(0,0,0,.34),0 11px 18px rgba(0,0,0,.26),inset 0 0 0 4px rgba(0,0,0,.2)}
+.poker-chip.sel{transform:translateY(-3px);outline:2px solid var(--gold-hi);outline-offset:3px;box-shadow:0 5px 0 rgba(0,0,0,.35),0 0 0 5px rgba(215,182,108,.13),0 10px 20px rgba(215,182,108,.2),inset 0 0 0 4px rgba(0,0,0,.2)}
+.poker-chip.c500{box-shadow:0 3px 0 rgba(0,0,0,.42),0 7px 12px rgba(0,0,0,.22),inset 0 0 0 4px rgba(0,0,0,.22)}
+.bet-preview{
+  justify-content:flex-start;
+  align-items:center;
+  gap:0;
+  min-height:48px;
+  max-width:none;
+  margin:8px 0 4px;
+  padding:7px 12px;
+  border:1px solid rgba(199,218,202,.13);
+  border-radius:12px;
+  background:linear-gradient(100deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  perspective:none;
+}
+.bet-preview:empty{min-height:0;margin:0;padding:0;border:0;background:transparent}
+.bet-preview:not(:empty)::before{
+  content:"STACK";
+  flex:0 0 auto;
+  margin-right:12px;
+  padding-right:12px;
+  border-right:1px solid rgba(199,218,202,.16);
+  color:#98a99d;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.13em;
+}
+.bet-preview .pv-chip{
+  display:grid;
+  place-items:center;
+  width:34px;
+  min-width:34px;
+  height:34px;
+  padding:0;
+  margin:0 -3px 0 0;
+  border:2px solid rgba(255,255,255,.8);
+  border-radius:50%;
+  transform:none;
+  box-shadow:0 2px 0 rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.2);
+  font-size:8px;
+  animation:chipDrop 180ms var(--ease) backwards;
+}
+@media(max-width:760px){
+  .bet-preview{min-height:42px;padding:5px 9px}
+  .bet-preview .pv-chip{width:30px;min-width:30px;height:30px}
+}
+@media(pointer:coarse){.poker-chip:hover{transform:none;filter:none}}
+@media(prefers-reduced-motion:reduce){.poker-chip{transition:none}}
+
 .rules-section{width:100%;margin-top:28px;padding:24px 0 0;border-top:1px solid rgba(215,182,108,.2);text-align:left}
 .rules-heading{max-width:620px;margin:0 auto 18px;text-align:center}
 .rules-kicker{margin:0 0 5px;color:var(--gold);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
