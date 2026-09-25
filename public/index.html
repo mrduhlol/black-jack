@@ -4,12 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="black-jack.io — premium multiplayer Blackjack with friends. Private rooms, live table, real casino feel." />
-  <meta name="theme-color" content="#060d0a" />
+  <meta name="theme-color" content="#05070d" />
   <title>black-jack.io — Multiplayer Blackjack</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,800;0,900;1,800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div id="cursorGlow" aria-hidden="true"></div>
+  <div id="flash" aria-hidden="true"></div>
+  <div id="shake-wrap">
   <div class="bg" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="orb orb-gold"></div>
+    <div class="orb orb-green"></div>
+    <div class="orb orb-pink"></div>
+    <div class="beam beam-l"></div>
+    <div class="beam beam-r"></div>
     <div class="bg-glow"></div>
     <div class="bg-vignette"></div>
     <div class="bg-cards" aria-hidden="true">
@@ -28,12 +43,13 @@
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="26" height="26" fill="none"><rect x="2" y="2" width="28" height="28" rx="7" fill="#0e2a1f" stroke="#d4a437" stroke-width="1.5"/><path d="M16 7c-3.6 4.2-7 6.6-7 10a4 4 0 0 0 7 2.6A4 4 0 0 0 23 17c0-3.4-3.4-5.8-7-10Z" fill="#f5ead2"/><rect x="11" y="21" width="10" height="2.4" rx="1.2" fill="#d4a437"/></svg>
+        <span class="brand-chip">21</span>
       </span>
-      <span class="brand-text">BLACK-JACK.IO</span>
-      <span class="brand-sub">Multiplayer Blackjack</span>
+      <span class="brand-text">BLACK-JACK<span class="brand-io">.IO</span></span>
+      <span class="brand-sub">Neon Casino</span>
     </div>
     <div class="top-right">
+      <span class="live-online"><i></i><b id="onlineCount">2,431</b>&nbsp;online</span>
       <span id="roomBadge" class="room-badge hidden"></span>
       <div class="sound-wrap">
         <button id="soundBtn" class="icon-btn sound-btn" title="Sound settings" aria-label="Sound settings" aria-pressed="true" aria-haspopup="true" aria-expanded="false">
@@ -58,56 +74,97 @@
   <main id="landing" class="landing">
     <div class="landing-inner">
       <div class="hero">
-        <div class="hero-fan" aria-hidden="true">
+        <div class="hero-kicker">
+          <span class="kicker-pill pulse"><i class="live-dot" aria-hidden="true"></i> SEASON 6 · LIVE TABLES</span>
+          <span class="kicker-pill ghost">♠ No sign-up · Free forever</span>
+        </div>
+        <div class="hero-fan" id="heroFan" aria-hidden="true">
+          <i class="fan-card fc-1">7<span>♣</span></i>
           <i class="fan-card fc-left">Q<span>♦</span></i>
           <i class="fan-card fc-right">K<span>♥</span></i>
           <i class="fan-card fc-top">A<span>♠</span></i>
+          <i class="fan-card fc-5">J<span>♠</span></i>
+          <span class="fan-glow"></span>
+          <span class="fan-chip chip-a">$500</span>
+          <span class="fan-chip chip-b">$100</span>
         </div>
-        <div class="hero-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64" width="52" height="52" fill="none"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0d2b1f" stroke="#d4a437" stroke-width="2"/><path d="M32 14c-7 8.2-13.5 12.8-13.5 19.4a7.4 7.4 0 0 0 13.5 4.2 7.4 7.4 0 0 0 13.5-4.2C45.5 26.8 39 22.2 32 14Z" fill="#f5ead2"/><rect x="22" y="41" width="20" height="4.6" rx="2.3" fill="#d4a437"/><text x="32" y="55" text-anchor="middle" font-size="7" fill="#8a6d2b" font-weight="800" letter-spacing="1.5">21</text></svg>
-        </div>
-        <h1 class="hero-title">BLACK-JACK.IO</h1>
-        <p class="hero-sub"><i class="live-dot" aria-hidden="true"></i>Multiplayer Blackjack</p>
-        <p class="hero-tag">Grab a seat, place your bets, beat the dealer — with friends.</p>
+        <h1 class="hero-title">
+          <span class="ht-line ht-outline">BLACK-JACK</span>
+          <span class="ht-line ht-gold">WILD<i>.</i>NIGHT<i>.</i>21<i>.</i></span>
+        </h1>
+        <p class="hero-sub"><i class="live-dot" aria-hidden="true"></i>Multiplayer Blackjack — Vegas energy, party rules</p>
+        <p class="hero-tag">Grab a seat, stack neon chips, double down with your crew and make the dealer sweat. Private rooms in one click.</p>
         <div class="hero-cards-strip" aria-hidden="true">
           <span class="mini-card red">A♥</span>
           <span class="mini-card">K♠</span>
-          <span class="mini-card gold">21</span>
+          <span class="mini-card gold">★ 21</span>
+          <span class="mini-card ghost">⚡ instant deals</span>
+        </div>
+        <div class="stats-row" aria-hidden="true">
+          <div class="stat"><b data-count="18420">18,420</b><span>hands tonight</span></div>
+          <div class="stat-div"></div>
+          <div class="stat"><b data-count="97">97%</b><span>would rematch</span></div>
+          <div class="stat-div"></div>
+          <div class="stat"><b>3:2</b><span>blackjack pays</span></div>
         </div>
       </div>
 
-      <section class="setup-card" aria-label="Player setup">
+      <section class="setup-card" aria-label="Player setup" id="setupCard">
+        <div class="setup-head">
+          <span class="step-no">01</span>
+          <div>
+            <h2>Build your player</h2>
+            <p>This is how the table sees you. Make it loud.</p>
+          </div>
+          <span class="setup-shine" aria-hidden="true"></span>
+        </div>
         <div class="avatar-block">
+          <span class="avatar-ring" aria-hidden="true"></span>
           <img id="avatarPreview" class="avatar-preview" alt="Your avatar preview" />
           <button id="shuffleBtn" class="icon-btn shuffle" title="Random avatar" aria-label="Random avatar">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/></svg>
           </button>
         </div>
         <label class="field-label" for="nameInput">Nickname</label>
-        <input id="nameInput" class="name-input" maxlength="14" placeholder="Your nickname" autocomplete="off" />
+        <input id="nameInput" class="name-input" maxlength="14" placeholder="Your nickname — e.g. xX_DealerSlayer_Xx" autocomplete="off" />
         <p class="field-label small">Avatar style</p>
         <div id="styleRow" class="style-row" role="group" aria-label="Avatar style"></div>
         <p class="field-label small">Avatar background</p>
         <div id="colorRow" class="color-row" role="group" aria-label="Avatar background"></div>
 
         <div class="join-box">
+          <div class="step-line"><span class="step-no sm">02</span><span>Get in the game</span></div>
           <div class="primary-row">
-            <button id="playBtn" class="btn primary play">
+            <button id="playBtn" class="btn primary play magnetic">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
-              <span>Play</span>
+              <span>Play now</span>
             </button>
             <div class="join-inline">
-              <input id="codeInput" maxlength="6" placeholder="Room code" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Private room code" />
+              <input id="codeInput" maxlength="6" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Private room code" />
               <button id="joinBtn" class="btn light">Join room</button>
             </div>
           </div>
           <button id="createBtn" class="btn dark create">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             <span>Create private room</span>
+            <em>free link</em>
           </button>
-          <p class="hint">Private rooms give you a shareable link like <b>black-jack.io/?ABC123</b>.</p>
+          <p class="hint">Private rooms give you a shareable link like <b>black-jack.io/?ABC123</b>. Send it, fill the table, talk trash.</p>
         </div>
       </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>★ BLACKJACK PAYS 3:2</span><span>♠ DEALER STANDS ON 17</span><span>⚡ LIGHTNING ROUNDS</span><span>🔒 PRIVATE TABLES</span><span>🍀 DOUBLE · SPLIT · SURRENDER</span>
+          <span>★ BLACKJACK PAYS 3:2</span><span>♠ DEALER STANDS ON 17</span><span>⚡ LIGHTNING ROUNDS</span><span>🔒 PRIVATE TABLES</span><span>🍀 DOUBLE · SPLIT · SURRENDER</span>
+        </div>
+      </div>
+
+      <div class="feat-grid">
+        <div class="feat"><span class="feat-ic">⚡</span><b>Lightning rounds</b><span>20s bets, 20s turns. Zero dead air, pure adrenaline.</span></div>
+        <div class="feat"><span class="feat-ic">🎙</span><b>Party table talk</b><span>Live chat + emotes. Tilt your friends legally.</span></div>
+        <div class="feat"><span class="feat-ic">🧠</span><b>Coach mode</b><span>Basic-strategy hints + bust % while you play.</span></div>
+      </div>
 
       <div class="landing-meta">
         <span class="meta-pill">⚡ Live multiplayer</span>
@@ -136,7 +193,8 @@
   <!-- GAME -->
   <main id="game" class="hidden">
     <div class="game-layout">
-      <section class="felt" aria-label="Blackjack table">
+      <section class="felt" aria-label="Blackjack table" id="feltTable">
+        <div class="felt-spotlight" aria-hidden="true"></div>
         <div class="felt-sheen" aria-hidden="true"></div>
         <div class="table-head">
           <div class="table-status">
@@ -163,7 +221,7 @@
           <div id="settingsBox" class="settings"></div>
         </div>
 
-        <div class="felt-print" aria-hidden="true">Blackjack pays 3 to 2 &nbsp;•&nbsp; Dealer must stand on 17</div>
+        <div class="felt-print" aria-hidden="true">Blackjack pays 3 to 2 &nbsp;•&nbsp; Dealer must stand on 17 &nbsp;•&nbsp; Insure? Nah — send it</div>
 
         <div id="phaseBanner" class="phase-banner" role="status" aria-live="polite">
           <span id="phaseDot" class="phase-dot" aria-hidden="true"></span>
@@ -255,7 +313,7 @@
           </div>
           <p class="room-note">Share the code or the invite link to fill the table.</p>
         </section>
-        <details class="card side-card chat-card" data-panel="chat">
+        <details class="card side-card chat-card" data-panel="chat" open>
           <summary>Table chat <span id="chatDot" class="chat-dot hidden" aria-hidden="true"></span></summary>
           <div id="chatBox" class="chat" aria-live="polite"></div>
           <div class="chat-row">
@@ -290,10 +348,13 @@
   </div>
 
   <div id="historyBar" class="history hidden"></div>
+  </div><!-- /shake-wrap -->
+  <div id="burst-layer" aria-hidden="true"></div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="avatars.js"></script>
   <script src="sounds.js"></script>
+  <script src="fx.js"></script>
   <script src="client.js"></script>
 </body>
 </html>
