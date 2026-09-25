@@ -2,10 +2,20 @@
 (() => {
   const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (id) => document.getElementById(id);
+  const root = document.documentElement;
+  const toggle = $('advancedToggle');
+  const modeKey = 'blackjack.advancedMode';
+  let enabled = false;
+  try { enabled = localStorage.getItem(modeKey) === 'on'; } catch {}
+  root.classList.toggle('advanced-mode', enabled);
+  if (toggle) {
+    toggle.setAttribute('aria-checked', String(enabled));
+    toggle.title = enabled ? 'Turn off extra animations and visual effects' : 'Enable extra animations and visual effects';
+  }
 
   /* ---------- gold dust + floating suits canvas ---------- */
   const canvas = $('fx');
-  let ctx = null, parts = [], W = 0, H = 0;
+  let ctx = null, parts = [], W = 0, H = 0, fxFrame = 0, cursorFrame = 0, active = false;
   const SUITS = ['♠', '♥', '♦', '♣', '★', '✦'];
   function resize() {
     if (!canvas) return;
@@ -31,7 +41,7 @@
     }
   }
   function tick() {
-    if (!ctx) return;
+    if (!ctx || !active) return;
     ctx.clearRect(0, 0, W, H);
     const t = Date.now() / 1000;
     for (const p of parts) {
@@ -52,32 +62,34 @@
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2); ctx.fill();
       }
     }
-    requestAnimationFrame(tick);
+    fxFrame = requestAnimationFrame(tick);
   }
-  if (canvas && !reduced()) {
-    ctx = canvas.getContext('2d');
-    resize(); seed(); tick();
-    window.addEventListener('resize', () => { resize(); seed(); });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && parts.length === 0) seed(); });
+  if (canvas) {
+    window.addEventListener('resize', () => { if (active) { resize(); seed(); } });
+    document.addEventListener('visibilitychange', () => { if (active && !document.hidden && parts.length === 0) seed(); });
   }
 
   /* ---------- cursor glow ---------- */
   const glow = $('cursorGlow');
-  if (glow && !reduced() && window.matchMedia('(hover:hover)').matches) {
+  if (glow && window.matchMedia('(hover:hover)').matches) {
     let gx = -999, gy = -999, tx = gx, ty = gy;
-    window.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; }, { passive: true });
-    (function follow() {
+    window.addEventListener('pointermove', (e) => { if (active) { tx = e.clientX; ty = e.clientY; } }, { passive: true });
+    function follow() {
+      if (!active) return;
       gx += (tx - gx) * 0.12; gy += (ty - gy) * 0.12;
       glow.style.transform = `translate(${gx - 260}px,${gy - 260}px)`;
-      requestAnimationFrame(follow);
-    })();
-  } else if (glow) glow.style.display = 'none';
+      cursorFrame = requestAnimationFrame(follow);
+    }
+    glow.dataset.startFollow = 'true';
+    glow._startFollow = follow;
+  }
 
   /* ---------- hero 3D tilt ---------- */
   const fan = $('heroFan');
-  if (fan && !reduced() && window.matchMedia('(hover:hover)').matches) {
+  if (fan && window.matchMedia('(hover:hover)').matches) {
     const card = $('setupCard') || fan;
     card.addEventListener('pointermove', (e) => {
+      if (!active) return;
       const r = fan.getBoundingClientRect();
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const dx = (e.clientX - cx) / r.width, dy = (e.clientY - cy) / r.height;
@@ -91,8 +103,9 @@
 
   /* ---------- magnetic play button ---------- */
   document.querySelectorAll('.magnetic').forEach((btn) => {
-    if (reduced() || !window.matchMedia('(hover:hover)').matches) return;
+    if (!window.matchMedia('(hover:hover)').matches) return;
     btn.addEventListener('pointermove', (e) => {
+      if (!active) return;
       const r = btn.getBoundingClientRect();
       const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
       btn.style.transform = `translate(${dx * 0.08}px,${dy * 0.12 - 2}px)`;
@@ -100,10 +113,41 @@
     btn.addEventListener('pointerleave', () => { btn.style.transform = ''; });
   });
 
+  function setEnabled(value) {
+    active = Boolean(value) && !reduced();
+    if (active) {
+      if (canvas) {
+        ctx = ctx || canvas.getContext('2d');
+        if (ctx) { resize(); seed(); fxFrame = requestAnimationFrame(tick); }
+      }
+      if (glow && glow._startFollow) cursorFrame = requestAnimationFrame(glow._startFollow);
+      return;
+    }
+    cancelAnimationFrame(fxFrame); cancelAnimationFrame(cursorFrame);
+    fxFrame = 0; cursorFrame = 0;
+    if (ctx) ctx.clearRect(0, 0, W, H);
+    if (glow) glow.style.transform = 'translate(-9999px,-9999px)';
+    if (fan) { fan.style.setProperty('--rx', '0deg'); fan.style.setProperty('--ry', '0deg'); }
+    document.querySelectorAll('.magnetic').forEach((btn) => { btn.style.transform = ''; });
+    if (layer) layer.replaceChildren();
+    if (flash) flash.classList.remove('go');
+    if (wrap) wrap.classList.remove('shake');
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      enabled = !enabled;
+      root.classList.toggle('advanced-mode', enabled);
+      toggle.setAttribute('aria-checked', String(enabled));
+      toggle.title = enabled ? 'Turn off extra animations and visual effects' : 'Enable extra animations and visual effects';
+      try { localStorage.setItem(modeKey, enabled ? 'on' : 'off'); } catch {}
+      setEnabled(enabled);
+    });
+  }
+
   /* ---------- win bursts: DOM chips + flash + shake ---------- */
   const layer = $('burst-layer'), flash = $('flash'), wrap = $('shake-wrap');
   function burst(n = 26, emojis = ['♠', '♥', '♦', '♣', '★', '$', '✦']) {
-    if (!layer || reduced()) { if (flash) { flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); } return; }
+    if (!active || !layer || reduced()) return;
     const cx = window.innerWidth / 2, cy = window.innerHeight * 0.38;
     for (let i = 0; i < n; i++) {
       const s = document.createElement('span');
@@ -124,7 +168,7 @@
     if (flash) { flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); }
     if (wrap) { wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake'); }
   }
-  window.FX = { burst };
+  window.FX = { burst, setEnabled };
 
   // Watch the existing game banner — no changes to client.js needed.
   const banner = $('resultBanner');
@@ -134,7 +178,7 @@
       const c = banner.className;
       if (c.includes('blackjack')) burst(44);
       else if (c.includes('win')) burst(26);
-      else if (c.includes('lose')) { if (wrap) { wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake'); } }
+      else if (active && c.includes('lose')) { if (wrap) { wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake'); } }
     });
     obs.observe(banner, { attributes: true, attributeFilter: ['class'] });
   }
@@ -149,7 +193,7 @@
   // Chip click sparkle on bet
   document.addEventListener('click', (e) => {
     const chip = e.target && e.target.closest ? e.target.closest('.poker-chip') : null;
-    if (!chip || reduced() || !layer) return;
+    if (!active || !chip || reduced() || !layer) return;
     for (let i = 0; i < 8; i++) {
       const s = document.createElement('span');
       s.className = 'burst-p'; s.textContent = '✦';
@@ -164,4 +208,9 @@
       setTimeout(() => s.remove(), 900);
     }
   });
+  if (window.matchMedia) {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    motionPreference.addEventListener?.('change', () => setEnabled(enabled));
+  }
+  setEnabled(enabled);
 })();
