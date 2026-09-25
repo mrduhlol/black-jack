@@ -1,6 +1,6 @@
 {
   "name": "black-jack-io",
-  "version": "0.1.0",
+  "version": "2.1.0",
   "description": "Multiplayer online Blackjack party game like skribbl.io — private rooms, live table, fun chips",
   "main": "server.js",
   "scripts": {
