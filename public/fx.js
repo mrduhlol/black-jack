@@ -100,31 +100,6 @@
     btn.addEventListener('pointerleave', () => { btn.style.transform = ''; });
   });
 
-  /* ---------- fake-live online counter ---------- */
-  const online = $('onlineCount');
-  if (online) {
-    let n = 2000 + Math.floor(Math.random() * 900);
-    const fmt = (v) => v.toLocaleString('en-US');
-    online.textContent = fmt(n);
-    setInterval(() => {
-      n = Math.max(1400, n + Math.floor(Math.random() * 61) - 28);
-      online.textContent = fmt(n);
-    }, 3200);
-    // count-up stats
-    document.querySelectorAll('[data-count]').forEach((el) => {
-      const target = Number(el.dataset.count);
-      if (!Number.isFinite(target) || reduced()) return;
-      const t0 = performance.now();
-      const step = (t) => {
-        const k = Math.min(1, (t - t0) / 1400);
-        const e = 1 - Math.pow(1 - k, 3);
-        el.textContent = fmt(Math.round(target * e));
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }
-
   /* ---------- win bursts: DOM chips + flash + shake ---------- */
   const layer = $('burst-layer'), flash = $('flash'), wrap = $('shake-wrap');
   function burst(n = 26, emojis = ['♠', '♥', '♦', '♣', '★', '$', '✦']) {

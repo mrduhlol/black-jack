@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="black-jack.io — premium multiplayer Blackjack with friends. Private rooms, live table, real casino feel." />
-  <meta name="theme-color" content="#05070d" />
+  <meta name="description" content="Free multiplayer Blackjack with friends. Create a private room, share an invite link, and play with virtual chips. No account required." />
+  <meta name="theme-color" content="#080e0b" />
   <title>black-jack.io — Multiplayer Blackjack</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,800;0,900;1,800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#landing">Skip to player setup</a>
   <canvas id="fx" aria-hidden="true"></canvas>
   <div id="cursorGlow" aria-hidden="true"></div>
   <div id="flash" aria-hidden="true"></div>
@@ -49,7 +50,7 @@
       <span class="brand-sub">Neon Casino</span>
     </div>
     <div class="top-right">
-      <span class="live-online"><i></i><b id="onlineCount">2,431</b>&nbsp;online</span>
+      <span class="table-note"><i aria-hidden="true"></i>Free play · virtual chips</span>
       <span id="roomBadge" class="room-badge hidden"></span>
       <div class="sound-wrap">
         <button id="soundBtn" class="icon-btn sound-btn" title="Sound settings" aria-label="Sound settings" aria-pressed="true" aria-haspopup="true" aria-expanded="false">
@@ -75,8 +76,8 @@
     <div class="landing-inner">
       <div class="hero">
         <div class="hero-kicker">
-          <span class="kicker-pill pulse"><i class="live-dot" aria-hidden="true"></i> SEASON 6 · LIVE TABLES</span>
-          <span class="kicker-pill ghost">♠ No sign-up · Free forever</span>
+          <span class="kicker-pill"><i class="status-dot" aria-hidden="true"></i> PRIVATE TABLES</span>
+          <span class="kicker-pill ghost">No account needed</span>
         </div>
         <div class="hero-fan" id="heroFan" aria-hidden="true">
           <i class="fan-card fc-1">7<span>♣</span></i>
@@ -92,29 +93,27 @@
           <span class="ht-line ht-outline">BLACK-JACK</span>
           <span class="ht-line ht-gold">WILD<i>.</i>NIGHT<i>.</i>21<i>.</i></span>
         </h1>
-        <p class="hero-sub"><i class="live-dot" aria-hidden="true"></i>Multiplayer Blackjack — Vegas energy, party rules</p>
-        <p class="hero-tag">Grab a seat, stack neon chips, double down with your crew and make the dealer sweat. Private rooms in one click.</p>
+        <p class="hero-sub"><i class="status-dot" aria-hidden="true"></i>Multiplayer blackjack, played with friends</p>
+        <p class="hero-tag">Take a seat, invite your friends, and play a hand together. No account or real money required.</p>
         <div class="hero-cards-strip" aria-hidden="true">
           <span class="mini-card red">A♥</span>
           <span class="mini-card">K♠</span>
           <span class="mini-card gold">★ 21</span>
           <span class="mini-card ghost">⚡ instant deals</span>
         </div>
-        <div class="stats-row" aria-hidden="true">
-          <div class="stat"><b data-count="18420">18,420</b><span>hands tonight</span></div>
-          <div class="stat-div"></div>
-          <div class="stat"><b data-count="97">97%</b><span>would rematch</span></div>
-          <div class="stat-div"></div>
-          <div class="stat"><b>3:2</b><span>blackjack pays</span></div>
-        </div>
+        <section class="trust-row" aria-label="Table details">
+          <span><b>3:2</b> blackjack payout</span>
+          <span><b>Free</b> virtual chips</span>
+          <span><b>Private</b> invite links</span>
+        </section>
       </div>
 
       <section class="setup-card" aria-label="Player setup" id="setupCard">
         <div class="setup-head">
           <span class="step-no">01</span>
           <div>
-            <h2>Build your player</h2>
-            <p>This is how the table sees you. Make it loud.</p>
+            <h2>Choose your seat</h2>
+            <p>Pick a nickname and you’re ready to play.</p>
           </div>
           <span class="setup-shine" aria-hidden="true"></span>
         </div>
@@ -126,7 +125,7 @@
           </button>
         </div>
         <label class="field-label" for="nameInput">Nickname</label>
-        <input id="nameInput" class="name-input" maxlength="14" placeholder="Your nickname — e.g. xX_DealerSlayer_Xx" autocomplete="off" />
+        <input id="nameInput" class="name-input" maxlength="14" placeholder="Enter a nickname" autocomplete="nickname" />
         <p class="field-label small">Avatar style</p>
         <div id="styleRow" class="style-row" role="group" aria-label="Avatar style"></div>
         <p class="field-label small">Avatar background</p>
@@ -140,39 +139,25 @@
               <span>Play now</span>
             </button>
             <div class="join-inline">
-              <input id="codeInput" maxlength="6" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Private room code" />
+              <input id="codeInput" maxlength="6" placeholder="ROOM CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Private room code" />
               <button id="joinBtn" class="btn light">Join room</button>
             </div>
           </div>
           <button id="createBtn" class="btn dark create">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Create private room</span>
-            <em>free link</em>
+            <span>Create a private room</span>
           </button>
-          <p class="hint">Private rooms give you a shareable link like <b>black-jack.io/?ABC123</b>. Send it, fill the table, talk trash.</p>
+          <p class="hint">Share the invite link so your friends can take a seat.</p>
         </div>
       </section>
 
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee-track">
-          <span>★ BLACKJACK PAYS 3:2</span><span>♠ DEALER STANDS ON 17</span><span>⚡ LIGHTNING ROUNDS</span><span>🔒 PRIVATE TABLES</span><span>🍀 DOUBLE · SPLIT · SURRENDER</span>
-          <span>★ BLACKJACK PAYS 3:2</span><span>♠ DEALER STANDS ON 17</span><span>⚡ LIGHTNING ROUNDS</span><span>🔒 PRIVATE TABLES</span><span>🍀 DOUBLE · SPLIT · SURRENDER</span>
-        </div>
-      </div>
+      <section class="feat-grid" aria-label="How the game works">
+        <article class="feat"><span class="feat-ic" aria-hidden="true">01</span><b>Make a table</b><span>Start a public game or create a private room for your group.</span></article>
+        <article class="feat"><span class="feat-ic" aria-hidden="true">02</span><b>Play your hand</b><span>Bet, hit, stand, double, or split against the dealer.</span></article>
+        <article class="feat"><span class="feat-ic" aria-hidden="true">03</span><b>Keep the chips</b><span>Virtual chips track your run. There’s no cash betting.</span></article>
+      </section>
 
-      <div class="feat-grid">
-        <div class="feat"><span class="feat-ic">⚡</span><b>Lightning rounds</b><span>20s bets, 20s turns. Zero dead air, pure adrenaline.</span></div>
-        <div class="feat"><span class="feat-ic">🎙</span><b>Party table talk</b><span>Live chat + emotes. Tilt your friends legally.</span></div>
-        <div class="feat"><span class="feat-ic">🧠</span><b>Coach mode</b><span>Basic-strategy hints + bust % while you play.</span></div>
-      </div>
-
-      <div class="landing-meta">
-        <span class="meta-pill">⚡ Live multiplayer</span>
-        <span class="meta-pill">🔒 Private tables</span>
-        <span class="meta-pill">🎉 No sign-up</span>
-      </div>
-
-      <div class="how-strip" aria-label="How it works">
+      <div class="how-strip" role="group" aria-label="How it works">
         <span><b>1</b> Pick a nickname</span>
         <span class="how-sep" aria-hidden="true">•</span>
         <span><b>2</b> Play or create a room</span>
