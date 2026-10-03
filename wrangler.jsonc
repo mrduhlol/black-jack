@@ -1,0 +1,30 @@
+{
+  // Cloudflare Workers + Durable Objects configuration for black-jack.io.
+  // Local dev:  npm run dev     (http://localhost:8787)
+  // Deploy:     npm run deploy  (after `npx wrangler login`)
+  "name": "black-jack-io",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  // Static frontend served from ./public (index.html, client.js, styles.css, …).
+  "assets": {
+    "directory": "./public"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "GAME_ROOM",
+        "class_name": "GameRoom"
+      },
+      {
+        "name": "LOBBY",
+        "class_name": "LobbyDirectory"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["GameRoom", "LobbyDirectory"]
+    }
+  ]
+}
