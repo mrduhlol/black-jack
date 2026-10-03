@@ -1,4 +1,98 @@
-const socket = io();
+// --- realtime layer: native WebSocket to the Cloudflare Worker + Durable Object ---
+// (One socket per room: wss://<host>/room/<CODE>/socket in production,
+// ws://<host>/room/<CODE>/socket for local `wrangler dev`.)
+const Net = {
+  ws: null,
+  handlers: {}, // event -> [fn]; multiple handlers per event are allowed
+  playerId: null, // stable for this page; reused across reconnects into the same seat
+  roomCode: null,
+  joined: false,
+  manualClose: false,
+  reconnectTries: 0,
+  epoch: 0, // bumped per connect; stale sockets never trigger reconnects
+  on(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn); },
+  dispatch(msg) {
+    const fns = this.handlers[msg.t] || [];
+    for (const fn of fns) {
+      try { fn(msg); } catch (e) { console.error(e); }
+    }
+  },
+  isOpen() { return !!this.ws && this.ws.readyState === 1; },
+  send(obj) {
+    if (!this.isOpen()) { toast('Not connected — refresh to rejoin', 'bad'); return false; }
+    try { this.ws.send(JSON.stringify(obj)); return true; }
+    catch (e) { toast('Not connected — refresh to rejoin', 'bad'); return false; }
+  },
+  socketUrl(code) {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${proto}://${location.host}/room/${code}/socket`;
+  },
+  connect(code) {
+    try { if (this.ws) { this.manualClose = true; this.ws.close(); } } catch (e) {}
+    this.manualClose = false;
+    const myEpoch = ++this.epoch;
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const ws = new WebSocket(this.socketUrl(code));
+      ws.onopen = () => { if (!settled) { settled = true; this.ws = ws; resolve(); } };
+      ws.onmessage = (ev) => {
+        let msg = null;
+        try { msg = JSON.parse(ev.data); } catch (e) { return; }
+        if (msg && typeof msg.t === 'string') this.dispatch(msg);
+      };
+      ws.onerror = () => { if (!settled) { settled = true; reject(new Error('ws error')); } };
+      ws.onclose = () => {
+        if (this.ws === ws) this.ws = null;
+        if (!settled) { settled = true; reject(new Error('ws closed')); return; }
+        if (myEpoch !== this.epoch) return; // superseded by a newer connection
+        this.onUnexpectedClose();
+      };
+      this.ws = ws;
+    });
+  },
+  onUnexpectedClose() {
+    if (this.manualClose || !this.joined) return;
+    if (this.reconnectTries >= 5) {
+      toast('Connection lost — please refresh to rejoin', 'bad');
+      return;
+    }
+    this.reconnectTries += 1;
+    toast('Reconnecting…', '');
+    setTimeout(async () => {
+      if (this.manualClose || !this.roomCode) return;
+      try {
+        await this.connect(this.roomCode);
+        this.reconnectTries = 0;
+        this.send({ t: 'join', create: true, playerId: this.playerId, name: myName(), avatar });
+        toast('Reconnected', 'good');
+      } catch (e) { this.onUnexpectedClose(); }
+    }, 1200 * this.reconnectTries);
+  },
+  newIdentity() {
+    this.playerId = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : String(Date.now()) + Math.random().toString(16).slice(2);
+  },
+  async joinRoom(code, create) {
+    code = String(code || '').toUpperCase();
+    if (!code) { toast('Enter a room code', 'bad'); return; }
+    this.manualClose = false;
+    this.reconnectTries = 0;
+    this.newIdentity();
+    this.roomCode = code;
+    this.joined = false;
+    await this.connect(code);
+    this.joined = true;
+    this.send({ t: 'join', create: !!create, playerId: this.playerId, name: myName(), avatar });
+    history.replaceState(null, '', `/?${code}`);
+  },
+  disconnect() {
+    this.manualClose = true;
+    this.joined = false;
+    try { if (this.ws) this.ws.close(); } catch (e) {}
+    this.ws = null;
+  },
+};
 const $ = (id) => document.getElementById(id);
 
 const CROWN_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M3 17 2 7l5.5 3.5L12 4l4.5 6.5L22 7l-1 10H3Zm0 2h18v2H3v-2Z"/></svg>';
@@ -208,9 +302,30 @@ initMobileTabs();
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
 
-$('playBtn').onclick = () => { Sound.unlock(); Sound.click(); socket.emit('joinPublic', { name: myName(), avatar }); };
-$('createBtn').onclick = () => { Sound.unlock(); Sound.click(); socket.emit('createPrivate', { name: myName(), avatar }); };
-$('joinBtn').onclick = () => { Sound.unlock(); Sound.click(); socket.emit('joinPrivate', { code: $('codeInput').value.trim(), name: myName(), avatar }); };
+$('playBtn').onclick = async () => {
+  Sound.unlock(); Sound.click();
+  try {
+    const res = await fetch('/api/public-room', { method: 'POST' });
+    if (!res.ok) throw new Error('no room');
+    const { code } = await res.json();
+    await Net.joinRoom(code, true);
+  } catch (e) { toast('Could not join a table — try again', 'bad'); }
+};
+$('createBtn').onclick = async () => {
+  Sound.unlock(); Sound.click();
+  try {
+    const res = await fetch('/api/create-room', { method: 'POST' });
+    if (!res.ok) throw new Error('no room');
+    const { code } = await res.json();
+    await Net.joinRoom(code, true);
+  } catch (e) { toast('Could not create a room — try again', 'bad'); }
+};
+$('joinBtn').onclick = async () => {
+  Sound.unlock(); Sound.click();
+  try {
+    await Net.joinRoom($('codeInput').value.trim(), false);
+  } catch (e) { toast('Could not join room — check the code', 'bad'); }
+};
 
 // --- sound settings UI (mute + volume, persisted in sounds.js) ---
 function initSoundUI() {
@@ -292,14 +407,11 @@ function paintChatBadge() {
   if (dot) dot.classList.toggle('hidden', chatUnread <= 0);
 }
 
-socket.on('roomCreated', ({ id }) => {
-  history.replaceState(null, '', `/?${id}`);
-});
-socket.on('joinError', (msg) => toast(String(msg || 'Could not join room'), 'bad'));
-socket.on('kicked', () => { toast('Kicked by host', 'bad'); setTimeout(() => { location.href = '/'; }, 900); });
+Net.on('error', ({ message }) => toast(String(message || 'Could not join room'), 'bad'));
+Net.on('kicked', () => { Net.disconnect(); toast('Kicked by host', 'bad'); setTimeout(() => { location.href = '/'; }, 900); });
 
 // --- room rendering (state declared at top) ---
-socket.on('room', (r) => {
+Net.on('room', (r) => {
   room = r;
   const me = r.players.find((p) => p.isYou);
   if (me) myId = me.id;
@@ -545,7 +657,7 @@ function renderPlayers(r) {
       k.textContent = 'Kick';
       k.className = 'small';
       k.setAttribute('aria-label', `Kick ${p.name}`);
-      k.onclick = () => socket.emit('kick', { targetId: p.id });
+      k.onclick = () => Net.send({ t: 'kick', targetId: p.id });
       div.appendChild(k);
     }
     box.appendChild(div);
@@ -683,7 +795,7 @@ function renderLobby(r) {
     inp.type = type; inp.min = min; inp.max = max; inp.value = r.settings[key];
     inp.disabled = !isHost;
     inp.setAttribute('aria-label', label);
-    inp.onchange = () => socket.emit('setSettings', { [key]: Number(inp.value) });
+    inp.onchange = () => Net.send({ t: 'set_settings', [key]: Number(inp.value) });
     lab.appendChild(inp);
     s.appendChild(lab);
   });
@@ -693,7 +805,7 @@ function renderLobby(r) {
     const inp = document.createElement('input');
     inp.type = 'checkbox'; inp.checked = !!r.settings[key]; inp.disabled = !isHost;
     inp.setAttribute('aria-label', label);
-    inp.onchange = () => socket.emit('setSettings', { [key]: inp.checked });
+    inp.onchange = () => Net.send({ t: 'set_settings', [key]: inp.checked });
     lab.appendChild(inp); lab.append(` ${label}`);
     s.appendChild(lab);
   });
@@ -707,11 +819,11 @@ function renderLobby(r) {
   });
   sel.disabled = !isHost;
   sel.setAttribute('aria-label', 'Blackjack payout');
-  sel.onchange = () => socket.emit('setSettings', { blackjackPays: sel.value });
+  sel.onchange = () => Net.send({ t: 'set_settings', blackjackPays: sel.value });
   pay.appendChild(sel);
   s.appendChild(pay);
 }
-$('startBtn').onclick = () => { Sound.unlock(); Sound.chips(); socket.emit('startGame'); };
+$('startBtn').onclick = () => { Sound.unlock(); Sound.chips(); Net.send({ t: 'start_game' }); };
 
 function renderBetting(r) {
   const me = r.players.find((p) => p.isYou);
@@ -866,14 +978,14 @@ $('betGo').onclick = (e) => {
   Sound.unlock();
   Sound.chips();
   markActionPending(e.currentTarget);
-  socket.emit('placeBet', { amount: pendingBet });
+  Net.send({ t: 'place_bet', amount: pendingBet });
   pendingBet = 0;
   pendingStack = [];
   paintTray();
 };
 
 // --- turns ---
-socket.on('yourTurn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
+Net.on('your_turn', ({ cards, dealerUp, hint, bustChance, endsIn }) => {
   lastTurn = { cards, dealerUp, endsIn };
   $('actionPanel').classList.remove('hidden');
   $('betPanel').classList.add('hidden');
@@ -961,14 +1073,14 @@ function canSplit(room, me, cards) {
   return me.chips >= myActiveBet() && myActiveBet() > 0;
 }
 
-$('hitBtn').onclick = (e) => { Sound.unlock(); Sound.click(); Sound.deal(); markActionPending(e.currentTarget); socket.emit('action', { kind: 'hit' }); };
-$('standBtn').onclick = (e) => { Sound.unlock(); Sound.click(); markActionPending(e.currentTarget); socket.emit('action', { kind: 'stand' }); };
-$('doubleBtn').onclick = (e) => { Sound.unlock(); Sound.chips(); markActionPending(e.currentTarget); socket.emit('action', { kind: 'double' }); };
-$('splitBtn').onclick = (e) => { Sound.unlock(); Sound.chips(); markActionPending(e.currentTarget); socket.emit('action', { kind: 'split' }); };
-$('surrenderBtn').onclick = (e) => { Sound.unlock(); Sound.click(); markActionPending(e.currentTarget); socket.emit('action', { kind: 'surrender' }); };
-socket.on('actionError', (m) => { clearActionPending(); toast(String(m || 'Action not allowed'), 'bad'); });
+$('hitBtn').onclick = (e) => { Sound.unlock(); Sound.click(); Sound.deal(); markActionPending(e.currentTarget); Net.send({ t: 'action', kind: 'hit' }); };
+$('standBtn').onclick = (e) => { Sound.unlock(); Sound.click(); markActionPending(e.currentTarget); Net.send({ t: 'action', kind: 'stand' }); };
+$('doubleBtn').onclick = (e) => { Sound.unlock(); Sound.chips(); markActionPending(e.currentTarget); Net.send({ t: 'action', kind: 'double' }); };
+$('splitBtn').onclick = (e) => { Sound.unlock(); Sound.chips(); markActionPending(e.currentTarget); Net.send({ t: 'action', kind: 'split' }); };
+$('surrenderBtn').onclick = (e) => { Sound.unlock(); Sound.click(); markActionPending(e.currentTarget); Net.send({ t: 'action', kind: 'surrender' }); };
+Net.on('action_error', ({ message }) => { clearActionPending(); toast(String(message || 'Action not allowed'), 'bad'); });
 
-socket.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
+Net.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
   lastTurn = null;
   clearInterval(window._tt);
   turnEndsAt = 0;
@@ -999,7 +1111,7 @@ socket.on('settle', ({ dealerTotal, dealerBust, results, note }) => {
   else if (hasLose) toast('✕ Dealer takes it', 'bad');
   setTimeout(() => banner.classList.add('hidden'), 6000);
 });
-socket.on('gameover', ({ board }) => {
+Net.on('gameover', ({ board }) => {
   lastTurn = null;
   clearInterval(window._tt);
   const banner = $('resultBanner');
@@ -1050,7 +1162,7 @@ function showWinnerModal(board) {
   if (closeBtn) closeBtn.focus();
 }
 $('closeModalBtn').onclick = () => { Sound.click(); $('winnerModal').classList.add('hidden'); };
-$('rematchBtn').onclick = () => { Sound.unlock(); Sound.chips(); socket.emit('rematch'); $('winnerModal').classList.add('hidden'); };
+$('rematchBtn').onclick = () => { Sound.unlock(); Sound.chips(); Net.send({ t: 'rematch' }); $('winnerModal').classList.add('hidden'); };
 const homeBtn = $('homeBtn');
 if (homeBtn) homeBtn.onclick = () => { location.href = '/'; };
 document.addEventListener('keydown', (e) => {
@@ -1058,7 +1170,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // round history ticker
-socket.on('room', (r) => {
+Net.on('room', (r) => {
   const bar = document.getElementById('historyBar');
   if (r.history && r.history.length) {
     bar.classList.remove('hidden');
@@ -1092,9 +1204,9 @@ function addChat({ name, avatar: av, text, sys }) {
   }
   if (sys && text.includes('Shuffling')) Sound.shuffle();
 }
-socket.on('chat', addChat);
-socket.on('phase', ({ phase, round }) => addChat({ sys: true, text: `— ${phase} (round ${round}) —` }));
-socket.on('emote', ({ name, emoji }) => addChat({ sys: true, text: `${name} ${emoji}` }));
+Net.on('chat', addChat);
+Net.on('phase', ({ phase, round }) => addChat({ sys: true, text: `— ${phase} (round ${round}) —` }));
+Net.on('emote', ({ name, emoji }) => addChat({ sys: true, text: `${name} ${emoji}` }));
 $('chatSend').onclick = sendChat;
 $('chatInput').onkeydown = (e) => { if (e.key === 'Enter') sendChat(); };
 function sendChat() {
@@ -1102,14 +1214,14 @@ function sendChat() {
   if (!v.trim()) return;
   Sound.unlock();
   $('chatInput').value = '';
-  socket.emit('chat', { text: v });
+  Net.send({ t: 'chat', text: v });
 }
 ['🔥', '😎', '😭', '🍀', '💸', '👏', '🤯', '🃏'].forEach((e) => {
   const b = document.createElement('button');
   b.type = 'button';
   b.textContent = e;
   b.setAttribute('aria-label', `Send ${e} reaction`);
-  b.onclick = () => { Sound.unlock(); socket.emit('emote', { emoji: e }); };
+  b.onclick = () => { Sound.unlock(); Net.send({ t: 'emote', emoji: e }); };
   $('emoteRow').appendChild(b);
 });
 function copyInvite() {
@@ -1145,4 +1257,4 @@ function copyInvite() {
 $('copyLinkBtn').onclick = copyInvite;
 const sideCopy = $('sideCopyBtn');
 if (sideCopy) sideCopy.onclick = copyInvite;
-$('leaveBtn').onclick = () => { Sound.click(); socket.emit('leave'); location.href = '/'; };
+$('leaveBtn').onclick = () => { Sound.click(); Net.send({ t: 'leave' }); Net.disconnect(); location.href = '/'; };
