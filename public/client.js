@@ -618,7 +618,8 @@ function renderSeats(r) {
         spot.className = 'bet-spot';
         spot.appendChild(betStack(h.bet));
         const amt = document.createElement('span');
-        amt.textContent = fmt(h.bet);
+        amt.className = 'bet-amt';
+        amt.textContent = '$' + fmt(h.bet);
         spot.appendChild(amt);
         hb.appendChild(spot);
       }
@@ -749,24 +750,39 @@ function breakChips(amount) {
   const out = [];
   let rest = amount;
   for (const d of DENOMS) {
-    while (rest >= d) { out.push(d); rest -= d; }
+    while (rest >= d) { out.push(d); rest -= d; if (out.length >= 12) break; }
+    if (out.length >= 12) break;
   }
-  return out.slice(0, 8);
+  return out;
 }
 function betStack(amount) {
   const wrap = document.createElement('div');
   wrap.className = 'bet-stack';
   wrap.setAttribute('aria-hidden', 'true');
-  breakChips(amount).forEach((d, i) => {
+  const all = breakChips(amount);
+  const MAXV = 5;
+  const shown = all.slice(0, MAXV);
+  const overflow = all.length - shown.length;
+  wrap.style.setProperty('--stack-n', Math.max(shown.length, 1));
+  shown.forEach((d, i) => {
     const c = document.createElement('div');
-    c.className = 'mini-chip';
-    c.style.background = CHIP_COLORS[d];
+    c.className = 'mini-chip' + (i === shown.length - 1 ? ' top' : '');
+    c.style.setProperty('--chip', CHIP_COLORS[d] || '#333');
     c.style.animationDelay = (i * 90) + 'ms'; // land on the felt one by one
-    c.style.bottom = (i * 6) + 'px';
-    c.style.marginLeft = ((i % 2) ? 4 : -4) + 'px';
-    c.textContent = d;
+    c.style.bottom = (i * 8) + 'px';
+    c.style.zIndex = String(i + 1);
+    c.style.setProperty('--shift', (((i * 5) % 9) - 4) + 'px');
+    c.style.setProperty('--tilt', ((i % 2 ? 1 : -1) * (3 + (i % 3) * 2)) + 'deg');
+    c.innerHTML = `<i>${d}</i>`;
     wrap.appendChild(c);
   });
+  if (overflow > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'stack-count';
+    badge.textContent = `+${overflow}`;
+    badge.title = `${overflow} more chip${overflow > 1 ? 's' : ''}`;
+    wrap.appendChild(badge);
+  }
   return wrap;
 }
 
@@ -827,9 +843,9 @@ function paintTray() {
     pendingStack.slice(-10).forEach((d, i) => {
       const s = document.createElement('span');
       s.className = 'pv-chip';
-      s.style.background = CHIP_COLORS[d];
+      s.style.setProperty('--chip', CHIP_COLORS[d] || '#333');
       s.style.animationDelay = (i * 70) + 'ms';
-      s.textContent = `+${d}`;
+      s.innerHTML = `<i>+${d}</i>`;
       pv.appendChild(s);
     });
   }

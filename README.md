@@ -1,73 +1,97 @@
-<div align="center">
-  <img src="public/favicon.svg" alt="Black-Jack.io 21 logo" width="88" height="88">
-  <h1>black-jack.io</h1>
-  <p>Browser-based multiplayer Blackjack to play with friends.</p>
-  <p><strong>Private rooms · Live multiplayer · Virtual chips</strong></p>
-</div>
+# Blackjack
 
-Create a private table and share its invite link, or join a public table. Players join with a nickname and avatar; no account or download is required.
-
-The game uses virtual chips and is intended for casual play. It does not support real-money betting.
+A real-time multiplayer Blackjack game built with Node.js, Express and Socket.IO.
 
 ## Features
 
-- Private rooms with shareable invite links and public matchmaking
-- Live multiplayer tables with chat, emotes, and host controls
-- Configurable table settings, including player limit, starting chips, rounds, timers, deck count, and dealer rules
-- Blackjack actions: hit, stand, double down, split, and surrender
-- Optional strategy hints and hit bust-percentage estimates
-- Round summaries, chip standings, and a winner screen
-- Responsive browser interface with sound controls
+- Real-time multiplayer Blackjack
+- Private game rooms
+- Room codes
+- Real-time player synchronization
+- Browser-based gameplay
+- Server-authoritative game state
 
-## Getting started
+## Tech Stack
+
+- Node.js
+- Express
+- Socket.IO
+- JavaScript
+- HTML
+- CSS
+
+## Getting Started
 
 ### Requirements
 
 - Node.js 18 or newer
 - npm
 
+### Installation
+
+```bash
+git clone <repository-url>
+cd black-jack
+npm install
+```
+
 ### Run locally
 
 ```bash
-npm install
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. To invite someone to a private room, create a room in the app and share its generated link.
+Then open:
 
-For local development, `npm run dev` starts the same server.
+http://localhost:3000
 
-## How to play
-
-Each player plays their hand against the dealer. The goal is to finish closer to 21 than the dealer without exceeding 21. A hand over 21 busts. A tie returns the wager.
-
-Card values follow standard Blackjack rules: number cards count at face value, face cards count as 10, and an ace counts as 1 or 11 as appropriate. A natural Blackjack is an ace and a 10-value card in the initial two cards.
-
-Players place bets, then act when their turn begins. Depending on the table settings and hand, they can hit, stand, double down, split a pair, or surrender. The dealer follows fixed rules and does not make player choices. By default, the dealer stands on soft 17, and a natural Blackjack pays 3:2.
-
-## Table settings
-
-The host can configure the number of players, starting chips, rounds, betting and turn timers, and number of decks. The host can also choose whether the dealer hits soft 17, select a 3:2 or 6:5 natural Blackjack payout, and enable or disable double down, splitting, surrender, and strategy coaching.
-
-Default settings are five players, 1,000 starting chips, eight rounds, six decks, a 20-second betting timer, a 20-second turn timer, stand on soft 17, and 3:2 Blackjack payouts.
-
-## Technology
-
-- Node.js and Express serve the web application.
-- Socket.IO synchronizes rooms, player actions, chat, and game state in real time.
-- The Blackjack rules engine is in `game/engine.js`.
-- The browser client and static assets are in `public/`.
-
-Room and game state are held in server memory. Restarting the server clears active rooms and their game state.
-
-## Project structure
+## Project Structure
 
 ```text
-game/       Blackjack rules engine
-public/     Browser client, styles, and static assets
-server.js   Express server and Socket.IO room/game handling
+black-jack/
+├── game/
+│   └── engine.js        # Pure Blackjack rules engine (cards, hand values,
+│                        # dealer logic, payouts). No sockets or I/O here.
+├── public/
+│   ├── index.html       # App markup (landing, table, sidebar, modals)
+│   ├── client.js        # Browser client: Socket.IO wiring and table rendering
+│   ├── styles.css       # All styling for the landing page and game table
+│   ├── avatars.js       # Avatar generation helpers
+│   ├── sounds.js        # Web Audio sound effects
+│   ├── fx.js            # Canvas/confetti and visual effects
+│   └── favicon.svg      # App icon
+├── server.js            # Express static server + Socket.IO rooms and game flow
+├── package.json         # Scripts and dependencies
+├── package-lock.json    # Locked dependency tree
+├── README.md            # This file
+├── .gitignore           # Ignored files (node_modules, env files, logs, OS files)
+└── LICENSE              # MIT License
 ```
+
+`server.js` is the entry point: it serves the `public/` folder over HTTP and runs the Socket.IO server on the same port. All room state, betting, turns and payouts are decided on the server; the browser client only renders what the server sends.
+
+## Deployment
+
+The application can be deployed as a Node.js web service on platforms such as Render or Railway.
+
+Build command:
+
+```text
+npm install
+```
+
+Start command:
+
+```text
+npm start
+```
+
+The server listens on the `PORT` environment variable (falling back to `3000` locally), so no extra configuration is needed. Make sure the platform exposes the web service port and keeps the process running.
+
+## Important Notes
+
+The current multiplayer room/game state is stored in server memory. Therefore active rooms may disappear if the server restarts or the deployment is restarted.
 
 ## License
 
-This project is licensed under the MIT License. See the `package.json` license field.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
