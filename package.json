@@ -1,18 +1,17 @@
 {
   "name": "black-jack-io",
   "version": "2.1.0",
-  "description": "Multiplayer online Blackjack party game like skribbl.io — private rooms, live table, fun chips",
-  "main": "server.js",
-  "engines": {
-    "node": ">=18"
-  },
+  "description": "Multiplayer online Blackjack party game — private rooms, live table, fun chips. Cloudflare Workers + Durable Objects + WebSockets.",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "wrangler types && tsc --noEmit"
   },
-  "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
-  },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261003.1",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.147.0"
+  }
 }

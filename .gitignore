@@ -8,3 +8,7 @@ Thumbs.db
 
 *.log
 npm-debug.log*
+
+# Cloudflare / Wrangler
+.wrangler/
+worker-configuration.d.ts
