@@ -1,5 +1,8 @@
 // Pure Blackjack engine — no sockets, no state. Shared rules for black-jack.io.
 // Default table: 6 decks, S17, Blackjack pays 3:2, dealer peeks.
+//
+// Runs both in the browser bundle and in the Cloudflare Worker/Durable Object
+// (ES module, no Node-only APIs).
 
 function cardValue(rank) {
   if (rank === 'A') return 11;
@@ -115,4 +118,4 @@ function settleBet(playerCards, dealerCards, bet, opts = {}) {
   return { outcome: 'push', payout: bet };
 }
 
-module.exports = { cardValue, handValue, createShoe, isBlackjack, dealerShouldHit, bustChance, coachHint, settleBet, RANKS, SUITS };
+export { cardValue, handValue, createShoe, isBlackjack, dealerShouldHit, bustChance, coachHint, settleBet, RANKS, SUITS };
