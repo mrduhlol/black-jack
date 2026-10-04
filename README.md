@@ -1,72 +1,61 @@
-# Blackjack
+<div align="center">
+  <img src="public/favicon.svg" alt="Black-Jack.io logo" width="88" height="88">
+  <h1>BLACK-JACK.IO</h1>
+  <p>Multiplayer Blackjack, played with friends. No account, no real money.</p>
+  <p><a href="https://black-jack.abhishek-a.in"><strong>PLAY HERE</strong></a></p>
+</div>
 
-Real-time multiplayer Blackjack game.
+![Black-Jack.io gameplay preview](docs/preview.png)
 
-## Features
+## About this website
 
-- Real-time multiplayer Blackjack
-- Private game rooms with shareable room codes
-- Public matchmaking ("Play now" finds a lobby table with a free seat)
-- Real-time player synchronization over WebSockets
-- Browser-based gameplay, no account required
-- Server-authoritative game state and results
+Black-Jack.io is a browser-based multiplayer Blackjack game. Create a private table and share its invite link, or join a public table. Players join with a nickname and avatar. Everything runs on virtual chips.
 
-## Tech Stack
+## How to play
 
-- Cloudflare Workers (HTTP + WebSocket front door, static frontend hosting)
-- Cloudflare Durable Objects (one `GameRoom` instance per room code, plus a `LobbyDirectory` for matchmaking)
-- Native WebSockets (browser ↔ Worker ↔ Durable Object)
-- TypeScript (Worker and Durable Objects), JavaScript + HTML + CSS frontend
-- Wrangler (local dev, types, deployment)
+1. Open the website and pick a nickname (optionally customize your avatar style and background).
+2. Join a table:
+   - **Play now** joins a public table with free seats.
+   - Enter a **room code** and choose **Join room** to join a friend's private table.
+   - **Create a private room** to start your own table, then share the invite link or room code.
+3. Place your bet by tapping chips, then choose **Place bet**.
+4. When your turn starts, choose **Hit**, **Stand**, **Double**, **Split**, or **Surrender** (availability depends on your hand and the table settings).
+5. The host can start the game from the lobby and change table settings before starting.
+6. After the set number of rounds, the player with the most chips wins.
 
-## Architecture
+## Rules
 
-```text
-Browser ──HTTPS/WSS──▶ Cloudflare Worker ──▶ GameRoom Durable Object ──▶ Game Room
-   │                          │                    (WebSocket, authoritative
-   │                          │                     cards / turns / payouts)
-   │                          └──────────────▶ LobbyDirectory Durable Object
-   │                                           (public matchmaking, room codes)
-   └── static frontend served from ./public ──▶ index.html / client.js / styles.css
-```
+### Goal
 
-- The **Worker** (`src/index.ts`) serves the frontend, exposes `/health` and the `/api/*` room endpoints, and forwards `/room/:code/socket` WebSocket upgrades to the correct Durable Object.
-- Each room code maps deterministically to one **GameRoom** instance (`GAME_ROOM.idFromName('room:' + code)`), so all players in a room always share the same authoritative state. Room state is also persisted to Durable Object storage, so a table survives instance restarts.
-- Public matchmaking is coordinated by a single **LobbyDirectory** instance that tracks lobby occupancy reported by rooms.
-- There is no database, no Redis, and no external WebSocket server. The old Node.js/Express/Socket.IO server has been removed; there is no always-on Node process in production.
+Get as close to 21 as you can without going over. Each player competes against the dealer, not against other players.
 
-### WebSocket protocol
+### Card values
 
-Client → server (JSON, `{ t, ... }`):
+- Number cards count at face value.
+- Jacks, queens, and kings count as 10.
+- An ace counts as 1 or 11, whichever keeps your hand at 21 or less.
+- An ace and a 10-value card in your first two cards is a natural Blackjack.
 
-| message        | payload                                              |
-| -------------- | ---------------------------------------------------- |
-| `join`         | `{ playerId, name, avatar, create }`                 |
-| `leave`        | —                                                    |
-| `set_settings` | table settings patch (host, lobby only)              |
-| `start_game`   | — (host)                                             |
-| `place_bet`    | `{ amount }`                                         |
-| `action`       | `{ kind: hit \| stand \| double \| split \| surrender }` |
-| `chat`         | `{ text }`                                           |
-| `emote`        | `{ emoji }`                                          |
-| `kick`         | `{ targetId }` (host)                                |
-| `rematch`      | — (host)                                             |
+### Your moves
 
-Server → client:
+- **Hit**: take another card. Go over 21 and your hand busts.
+- **Stand**: keep your current total.
+- **Double down**: double your bet, take exactly one more card, then stand.
+- **Split**: with a pair, split into two hands (each with its own bet).
+- **Surrender**: give up the hand and get half your bet back.
 
-| message        | payload                                              |
-| -------------- | ---------------------------------------------------- |
-| `room`         | full room snapshot (personalized `isYou` per player) |
-| `phase`        | `{ phase, round, endsIn }`                           |
-| `your_turn`    | `{ handIndex, cards, dealerUp, hint, bustChance, endsIn }` |
-| `action_error` | `{ message }`                                        |
-| `chat` / `emote` | table chat / reactions                             |
-| `settle`       | `{ dealer, dealerTotal, dealerBust, results, note }` |
-| `gameover`     | `{ board }`                                          |
-| `error`        | `{ message }` (e.g. room not found, room full)       |
-| `kicked`       | `{ text }`                                           |
+The dealer plays after everyone finishes and follows fixed rules instead of making choices.
 
-## Local Development
+### Beating the dealer
+
+- A higher total than the dealer without busting wins.
+- If the dealer busts, all remaining hands win.
+- Equal totals push and your bet is returned.
+- By default, the dealer stands on soft 17, a regular win pays 1:1, and a natural Blackjack pays 3:2.
+
+The host can adjust the table: number of players, starting chips, rounds, timers, decks, soft-17 rule, Blackjack payout (3:2 or 6:5), and which actions are allowed. All chips are virtual.
+
+## Run it yourself
 
 Requirements: Node.js 18 or newer, npm.
 
@@ -77,65 +66,15 @@ npm install
 npm run dev
 ```
 
-Then open the URL Wrangler prints (usually http://localhost:8787).
+Then open the URL shown in the terminal (usually http://localhost:8787).
 
-The browser connects with `ws://` locally and `wss://` in production, derived from the current page origin — no hardcoded hosts.
-
-Useful scripts:
-
-```bash
-npm run dev        # local Worker + Durable Objects (workerd)
-npm run deploy     # deploy to Cloudflare (after login)
-npm run typecheck  # wrangler types + tsc --noEmit
-```
-
-## Deployment
+To deploy your own copy on Cloudflare:
 
 ```bash
 npx wrangler login
 npm run deploy
 ```
 
-This publishes the Worker, the `GameRoom` + `LobbyDirectory` Durable Objects, and the `./public` frontend to your Cloudflare account. Nothing has been deployed yet — these commands deploy it for the first time.
-
-## Custom Domain
-
-After deployment, connect your own Cloudflare-managed domain in the Cloudflare dashboard:
-
-1. Make sure the domain's DNS is managed by Cloudflare (nameservers pointing at Cloudflare).
-2. Go to **Workers & Pages → your Worker → Settings → Domains & Routes** (or **Custom Domains**).
-3. Add your domain (e.g. `blackjack.example.com`) as a custom domain / route for the Worker.
-4. Cloudflare provisions TLS automatically; the game then runs at `https://your-domain` with `wss://` sockets derived from the page origin — no code changes needed.
-
-## Game State
-
-Multiplayer room state is managed by Durable Objects: one `GameRoom` instance per room code holds players, hands, shoe, turns, timers (via alarms) and history, and persists snapshots to its own storage. If the instance restarts, the next request or socket event reloads the table from storage. Like any in-memory-ish store, a catastrophic loss of the instance's storage would drop the room — players can simply create a new one.
-
-## Security
-
-The `GameRoom` Durable Object is authoritative for room membership, cards, turns, bets, actions and results. Clients only send intent (`hit`, `stand`, `place_bet`, …); all validation, dealing, timers and payouts happen server-side, and every client renders the snapshots the server broadcasts. Do not trust anything the browser claims about game outcomes — the browser never decides them.
-
-## Project Structure
-
-```text
-black-jack/
-├── game/
-│   └── engine.js + engine.d.ts  # pure Blackjack rules (shared by Worker; no Node APIs)
-├── public/
-│   ├── index.html               # app markup
-│   ├── client.js                # browser UI + native WebSocket net layer
-│   ├── styles.css               # all styling
-│   ├── avatars.js / sounds.js / fx.js / favicon.svg
-├── src/
-│   ├── index.ts                 # Worker: assets, /health, /api/*, WS routing
-│   ├── game-room.ts             # GameRoom Durable Object (authoritative table)
-│   └── directory.ts             # LobbyDirectory Durable Object (matchmaking)
-├── wrangler.jsonc               # Worker config, assets, DO bindings, migrations
-├── tsconfig.json
-├── package.json
-└── LICENSE
-```
-
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
