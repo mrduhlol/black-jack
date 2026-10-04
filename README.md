@@ -68,13 +68,4 @@ npm run dev
 
 Then open the URL shown in the terminal (usually http://localhost:8787).
 
-To deploy your own copy on Cloudflare:
-
-```bash
-npx wrangler login
-npm run deploy
-```
-
-## License
-
 MIT. See [LICENSE](LICENSE).
