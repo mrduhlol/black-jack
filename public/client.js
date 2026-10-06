@@ -311,6 +311,16 @@ function paintModePicker() {
 if ($('modeBjBtn')) $('modeBjBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'blackjack'; paintModePicker(); };
 if ($('modeLiarBtn')) $('modeLiarBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'liars'; paintModePicker(); };
 paintModePicker();
+// Bottom promo section: jump into Liar's Bar setup.
+if ($('liarPlayHereBtn')) $('liarPlayHereBtn').onclick = () => {
+  Sound.unlock(); Sound.click();
+  selectedMode = 'liars';
+  paintModePicker();
+  const card = $('setupCard');
+  if (card) card.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+  const name = $('nameInput');
+  if (name) setTimeout(() => name.focus({ preventScroll: true }), 450);
+};
 // auto-fill invite code from ?XXXXXX like skribbl.io
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
