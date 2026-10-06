@@ -798,3 +798,42 @@ html:not(.advanced-mode) #fx,html:not(.advanced-mode) #cursorGlow,html:not(.adva
 .liar-play-here{margin-top:20px;background:linear-gradient(180deg,#ecd9a8,#c9a35c);color:#241a08;border:0;border-radius:999px;padding:14px 44px;font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px rgba(201,163,92,.28);transition:transform var(--transition),box-shadow var(--transition)}
 .liar-play-here:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,163,92,.4)}
 @media(max-width:600px){.liar-promo-inner{padding:28px 18px 24px}.liar-steps{gap:6px}}
+
+/* ===== mobile table fit: circular felt, no-scroll actions, chat FAB sheet =====
+   Small portrait phones AND compact landscape phones share one overlay model:
+   chat lives in a bottom-left FAB and opens as a bottom sheet, so the table
+   and Hit/Stand/Double/Split/Surrender fit without page scrolling. */
+.chat-fab,.chat-sheet-backdrop,.chat-sheet-close{display:none}
+@media(max-width:760px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
+  /* circular casino table: elliptical rail the seats wrap around */
+  #game:not(.hidden) .felt{border-radius:22px 22px 46% 46%/22px 22px 5% 5%}
+  #game:not(.hidden) .dealer-zone{border-radius:0 0 50% 50%/0 0 14% 14%}
+  /* seats ride the arc as a horizontal snap rail (internal scroll, no page scroll) */
+  #game:not(.hidden) .seats{flex-wrap:nowrap;justify-content:flex-start;align-items:flex-start;gap:10px;overflow-x:auto;overflow-y:hidden;padding:6px 2px 12px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+  #game:not(.hidden) .seat{flex:0 0 min(208px,64vw);max-width:min(208px,64vw);scroll-snap-align:start}
+  #game:not(.hidden) .seat.me{order:0;flex-basis:auto}
+  #game:not(.hidden) .seat:nth-child(even){margin-top:10px}
+  /* actions stay visible: compact 3+2 grid, sticky above the tab bar */
+  #game:not(.hidden) .action-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  #game:not(.hidden) .action-row .btn.action{min-height:52px;font-size:15px}
+  #game:not(.hidden) #surrenderBtn{grid-column:auto;min-height:52px;font-size:13px}
+  /* chat leaves the flow: FAB bottom-left, sheet on demand */
+  #game:not(.hidden) .side .chat-card{display:none}
+  #game:not(.hidden) .chat-fab{display:grid;place-items:center;position:fixed;left:calc(12px + env(safe-area-inset-left));bottom:calc(72px + env(safe-area-inset-bottom));z-index:40;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,212,71,.55);background:rgba(8,15,12,.94);color:var(--gold-hi);cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.55),0 0 18px rgba(255,212,71,.25)}
+  #game:not(.hidden) .chat-fab:hover{filter:brightness(1.15)}
+  #game:not(.hidden) .chat-fab:active{transform:scale(.94)}
+  body.chat-open #game:not(.hidden) .chat-fab{display:none}
+  .chat-fab-badge{position:absolute;right:-4px;top:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--danger);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .chat-fab-badge.hidden{display:none}
+  body.chat-open .chat-sheet-backdrop{display:block;position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.55)}
+  body.chat-open #game:not(.hidden) .side .chat-card{display:block;position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:39;max-height:min(54dvh,400px);overflow-y:auto;margin:0}
+  body.chat-open #game:not(.hidden) .side .chat-card .chat{height:180px;max-height:30dvh}
+  #game:not(.hidden) .chat-sheet-close{display:none}
+  body.chat-open #game:not(.hidden) .chat-sheet-close{display:grid;place-items:center;position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:#fff;color:#333;font-size:15px;cursor:pointer}
+}
+@media(pointer:coarse) and (orientation:landscape) and (max-height:520px){
+  /* landscape already fits side-by-side: keep all five actions in one row */
+  #game:not(.hidden) .action-row{grid-template-columns:repeat(5,minmax(0,1fr))}
+  #game:not(.hidden) .action-row .btn.action{min-height:39px;font-size:12px}
+  #game:not(.hidden) #surrenderBtn{min-height:39px;font-size:11px}
+}
