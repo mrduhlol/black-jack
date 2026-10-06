@@ -420,12 +420,35 @@ function initSoundUI() {
   btn.ondblclick = () => { Sound.toggle(); paint(); };
 }
 
-// --- mobile tabs: Table / Players / Chat ---
+// --- mobile tabs: Table / Players / Chat (chat opens as a bottom sheet) ---
+function isChatSheetOpen() {
+  return document.body.classList.contains('chat-open');
+}
+function setChatSheet(open) {
+  const fab = $('chatFab');
+  const backdrop = $('chatSheetBackdrop');
+  document.body.classList.toggle('chat-open', !!open);
+  if (fab) fab.setAttribute('aria-expanded', String(!!open));
+  if (backdrop) backdrop.classList.toggle('hidden', !open);
+  const det = document.querySelector('.chat-card');
+  if (det && open && !det.open) det.open = true;
+  if (open) {
+    chatUnread = 0;
+    paintChatBadge();
+    setTimeout(() => { const box = $('chatBox'); if (box) box.scrollTop = box.scrollHeight; }, 60);
+  }
+}
 function initMobileTabs() {
   const side = $('sidePanel');
   if (!side) return;
   side.dataset.mobileView = 'table';
   const set = (view) => {
+    if (view === 'chat') {
+      Sound.click();
+      setChatSheet(true);
+      return;
+    }
+    setChatSheet(false);
     side.dataset.mobileView = view;
     [['tabTable', 'table'], ['tabPlayers', 'players'], ['tabChat', 'chat']].forEach(([id, v]) => {
       const b = $(id);
@@ -434,26 +457,30 @@ function initMobileTabs() {
       b.classList.toggle('sel', sel);
       b.setAttribute('aria-pressed', String(sel));
     });
-    if (view === 'chat') {
-      chatUnread = 0;
-      paintChatBadge();
-      const det = document.querySelector('.chat-card');
-      if (det && !det.open) det.open = true;
-      setTimeout(() => { const inp = $('chatInput'); if (inp && window.innerWidth <= 760) { /* keep keyboard closed until tap */ } }, 50);
-    }
   };
   if ($('tabTable')) $('tabTable').onclick = () => { Sound.click(); set('table'); };
   if ($('tabPlayers')) $('tabPlayers').onclick = () => { Sound.click(); set('players'); };
   if ($('tabChat')) $('tabChat').onclick = () => { Sound.click(); set('chat'); };
+  if ($('chatFab')) $('chatFab').onclick = () => { Sound.unlock(); Sound.click(); setChatSheet(!isChatSheetOpen()); };
+  if ($('chatSheetBackdrop')) $('chatSheetBackdrop').onclick = () => setChatSheet(false);
+  if ($('chatSheetClose')) $('chatSheetClose').onclick = (e) => { e.stopPropagation(); Sound.click(); setChatSheet(false); };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isChatSheetOpen()) setChatSheet(false);
+  });
 }
 function paintChatBadge() {
   const badge = $('chatBadge');
   const dot = $('chatDot');
+  const fabBadge = $('chatFabBadge');
   if (badge) {
     badge.textContent = chatUnread > 0 ? String(Math.min(99, chatUnread)) : '';
     badge.classList.toggle('hidden', chatUnread <= 0);
   }
   if (dot) dot.classList.toggle('hidden', chatUnread <= 0);
+  if (fabBadge) {
+    fabBadge.textContent = chatUnread > 0 ? String(Math.min(99, chatUnread)) : '';
+    fabBadge.classList.toggle('hidden', chatUnread <= 0);
+  }
 }
 
 Net.on('error', ({ message }) => toast(String(message || 'Could not join room'), 'bad'));
@@ -1240,10 +1267,11 @@ function addChat({ name, avatar: av, text, sys }) {
   box.appendChild(div);
   while (box.children.length > 80) box.firstChild.remove();
   if (stick) box.scrollTop = box.scrollHeight;
-  // unread badge when chat panel is hidden on mobile
-  const side = $('sidePanel');
+  // unread badge while the chat sheet is closed on small screens
+  const smallScreen = window.innerWidth <= 760
+    || (window.matchMedia('(pointer: coarse) and (orientation: landscape)').matches && window.innerHeight <= 520);
   if (!sys || true) {
-    if (side && side.dataset.mobileView !== 'chat' && window.innerWidth <= 760) {
+    if (!isChatSheetOpen() && (smallScreen || document.hidden)) {
       chatUnread += 1;
       paintChatBadge();
     } else if (document.hidden) {
