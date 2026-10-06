@@ -298,6 +298,19 @@ buildAvatarPicker();
 buildChipTray();
 initSoundUI();
 initMobileTabs();
+// --- game-mode picker (blackjack vs liar's bar; blackjack stays default) ---
+let selectedMode = 'blackjack';
+function paintModePicker() {
+  const bj = $('modeBjBtn'), liar = $('modeLiarBtn');
+  if (!bj || !liar) return;
+  bj.classList.toggle('sel', selectedMode === 'blackjack');
+  bj.setAttribute('aria-pressed', String(selectedMode === 'blackjack'));
+  liar.classList.toggle('sel', selectedMode === 'liars');
+  liar.setAttribute('aria-pressed', String(selectedMode === 'liars'));
+}
+if ($('modeBjBtn')) $('modeBjBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'blackjack'; paintModePicker(); };
+if ($('modeLiarBtn')) $('modeLiarBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'liars'; paintModePicker(); };
+paintModePicker();
 // auto-fill invite code from ?XXXXXX like skribbl.io
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
@@ -305,6 +318,13 @@ if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
 $('playBtn').onclick = async () => {
   Sound.unlock(); Sound.click();
   try {
+    if (selectedMode === 'liars') {
+      const res = await fetch('/api/liar-public-room', { method: 'POST' });
+      if (!res.ok) throw new Error('no room');
+      const { code } = await res.json();
+      await LbNet.joinRoom(code, true);
+      return;
+    }
     const res = await fetch('/api/public-room', { method: 'POST' });
     if (!res.ok) throw new Error('no room');
     const { code } = await res.json();
@@ -314,6 +334,13 @@ $('playBtn').onclick = async () => {
 $('createBtn').onclick = async () => {
   Sound.unlock(); Sound.click();
   try {
+    if (selectedMode === 'liars') {
+      const res = await fetch('/api/liar-create-room', { method: 'POST' });
+      if (!res.ok) throw new Error('no room');
+      const { code } = await res.json();
+      await LbNet.joinRoom(code, true);
+      return;
+    }
     const res = await fetch('/api/create-room', { method: 'POST' });
     if (!res.ok) throw new Error('no room');
     const { code } = await res.json();
@@ -323,9 +350,21 @@ $('createBtn').onclick = async () => {
 $('joinBtn').onclick = async () => {
   Sound.unlock(); Sound.click();
   try {
-    await Net.joinRoom($('codeInput').value.trim(), false);
+    const code = $('codeInput').value.trim();
+    // Invite links work for both modes — ask the directory which table this is.
+    let mode = selectedMode;
+    try {
+      const res = await fetch(`/api/room-mode?code=${encodeURIComponent(code)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && (data.mode === 'liars' || data.mode === 'blackjack')) mode = data.mode;
+      }
+    } catch (e) { /* fall back to the picked mode */ }
+    if (mode === 'liars') await LbNet.joinRoom(code, false);
+    else await Net.joinRoom(code, false);
   } catch (e) { toast('Could not join room — check the code', 'bad'); }
 };
+if ($('lbLeaveBtn')) $('lbLeaveBtn').onclick = () => lbLeave();
 
 // --- sound settings UI (mute + volume, persisted in sounds.js) ---
 function initSoundUI() {

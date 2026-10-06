@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="liars.css" />
 </head>
 <body>
   <section id="orientationGate" class="orientation-gate hidden" role="dialog" aria-modal="true" aria-labelledby="orientationTitle" aria-live="polite">
@@ -149,7 +150,16 @@
         <div id="colorRow" class="color-row" role="group" aria-label="Avatar background"></div>
 
         <div class="join-box">
-          <div class="step-line"><span class="step-no sm">02</span><span>Get in the game</span></div>
+          <div class="step-line"><span class="step-no sm">02</span><span>Choose your game</span></div>
+          <div class="mode-row" role="group" aria-label="Game mode">
+            <button id="modeBjBtn" class="mode-card sel" type="button" aria-pressed="true">
+              <b>Blackjack</b><span>Beat the dealer to 21.</span>
+            </button>
+            <button id="modeLiarBtn" class="mode-card liar" type="button" aria-pressed="false">
+              <b>Liar&rsquo;s Bar</b><span>Bluff. Challenge. Survive.</span>
+            </button>
+          </div>
+          <div class="step-line"><span class="step-no sm">03</span><span>Get in the game</span></div>
           <div class="primary-row">
             <button id="playBtn" class="btn primary play magnetic">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
@@ -359,6 +369,42 @@
     </div>
   </main>
 
+  <!-- LIAR'S BAR -->
+  <main id="liarGame" class="hidden">
+    <div class="lb-top">
+      <div class="lb-brand"><span class="lb-mark" aria-hidden="true">♠</span><span>LIAR&rsquo;S BAR</span></div>
+      <div class="lb-room">ROOM <b id="lbRoomCode">—</b> · <span id="lbRoundLabel">Lobby</span></div>
+      <button id="lbLeaveBtn" class="lb-leave" type="button">Leave</button>
+    </div>
+
+    <div id="lbLobby" class="lb-lobby"></div>
+
+    <div id="lbTableWrap" class="lb-room-wrap hidden">
+      <div id="lbTableZone" class="lb-table-zone" aria-label="Liar's Bar round table">
+        <div class="lb-table" aria-hidden="true"></div>
+        <div class="lb-hub">
+          <p class="lb-rank" id="lbTableRank"></p>
+          <div class="lb-declare" id="lbDeclare" aria-live="polite"></div>
+          <div class="lb-pile">
+            <div class="lb-pile-stack" id="lbPileStack" aria-hidden="true"></div>
+          </div>
+          <div class="lb-pile-count" id="lbPileCount"></div>
+          <div class="lb-turn-note" id="lbTurnNote" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div id="lbSelf" class="lb-self">
+        <div id="lbHand" class="lb-hand" role="group" aria-label="Your cards"></div>
+        <div id="lbActions" class="lb-actions"></div>
+        <div id="lbHint" class="lb-hintline" aria-live="polite"></div>
+      </div>
+
+      <div id="lbHistory" class="lb-history hidden"></div>
+    </div>
+
+    <div id="lbToasts" class="lb-toasts" aria-live="polite"></div>
+  </main>
+
   <!-- WINNER -->
   <div id="winnerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="winnerTitle">
     <div class="modal-card">
@@ -386,5 +432,6 @@
   <script src="sounds.js"></script>
   <script src="fx.js"></script>
   <script src="client.js"></script>
+  <script src="liars.js"></script>
 </body>
 </html>

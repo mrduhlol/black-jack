@@ -13,6 +13,7 @@
 
 interface RoomEntry {
   code: string;
+  mode: string; // 'blackjack' | 'liars'
   isPrivate: boolean;
   seats: number;
   connected: number;
@@ -48,6 +49,11 @@ export class LobbyDirectory {
     this.ctx.waitUntil(this.ctx.storage.put('rooms', [...this.rooms.values()]));
   }
 
+  private roomMode(code: string): string | null {
+    const entry = this.rooms.get((code || '').toUpperCase());
+    return entry ? entry.mode || 'blackjack' : null;
+  }
+
   private mint(exclude: Set<string>): string {
     let code = makeCode();
     while (exclude.has(code)) code = makeCode();
@@ -64,22 +70,38 @@ export class LobbyDirectory {
       });
 
     if (url.pathname === '/find-public' && request.method === 'POST') {
+      let mode = 'blackjack';
+      try {
+        const body = (await request.json()) as { mode?: string };
+        if (body && (body.mode === 'liars' || body.mode === 'blackjack')) mode = body.mode;
+      } catch {
+        // no body — default matchmaking pool
+      }
       for (const room of this.rooms.values()) {
-        if (!room.isPrivate && room.state === 'lobby' && room.seats < room.max && room.connected > 0) {
-          return json({ code: room.code });
+        if (room.mode === mode && !room.isPrivate && room.state === 'lobby' && room.seats < room.max && room.connected > 0) {
+          return json({ code: room.code, mode });
         }
       }
       const code = this.mint(new Set(this.rooms.keys()));
-      this.rooms.set(code, { code, isPrivate: false, seats: 0, connected: 0, max: 5, state: 'lobby' });
+      const max = mode === 'liars' ? 6 : 5;
+      this.rooms.set(code, { code, mode, isPrivate: false, seats: 0, connected: 0, max, state: 'lobby' });
       this.save();
-      return json({ code });
+      return json({ code, mode });
     }
 
     if (url.pathname === '/mint-private' && request.method === 'POST') {
+      let mode = 'blackjack';
+      try {
+        const body = (await request.json()) as { mode?: string };
+        if (body && (body.mode === 'liars' || body.mode === 'blackjack')) mode = body.mode;
+      } catch {
+        // no body — default pool
+      }
       const code = this.mint(new Set(this.rooms.keys()));
-      this.rooms.set(code, { code, isPrivate: true, seats: 0, connected: 0, max: 5, state: 'lobby' });
+      const max = mode === 'liars' ? 6 : 5;
+      this.rooms.set(code, { code, mode, isPrivate: true, seats: 0, connected: 0, max, state: 'lobby' });
       this.save();
-      return json({ code });
+      return json({ code, mode });
     }
 
     if (url.pathname === '/report' && request.method === 'POST') {
@@ -99,6 +121,7 @@ export class LobbyDirectory {
         const prev = this.rooms.get(code);
         this.rooms.set(code, {
           code,
+          mode: typeof body.mode === 'string' && body.mode ? String(body.mode) : prev?.mode || 'blackjack',
           isPrivate: prev ? prev.isPrivate : true,
           seats: Number(body.seats) || 0,
           connected: Number(body.connected) || 0,
@@ -108,6 +131,12 @@ export class LobbyDirectory {
       }
       this.save();
       return json({ ok: true });
+    }
+
+    if (url.pathname === '/room-mode' && request.method === 'GET') {
+      const look = await this.roomMode(url.searchParams.get('code') || '');
+      if (!look) return json({ mode: null }, 404);
+      return json({ mode: look });
     }
 
     if (url.pathname === '/stats' && request.method === 'GET') {
