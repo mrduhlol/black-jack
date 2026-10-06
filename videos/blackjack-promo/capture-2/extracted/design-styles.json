@@ -1,0 +1,359 @@
+{
+  "typography": [
+    {
+      "role": "display",
+      "fontFamily": "Playfair Display",
+      "fontSize": "32px",
+      "fontWeight": "700",
+      "lineHeight": "31.36px",
+      "letterSpacing": "normal",
+      "color": "#F4F0E6",
+      "sampleText": "BLACK-JACK WILD.NIGHT.21."
+    },
+    {
+      "role": "heading",
+      "fontFamily": "Playfair Display",
+      "fontSize": "30px",
+      "fontWeight": "700",
+      "lineHeight": "43.5px",
+      "letterSpacing": "-1.05px",
+      "color": "#E9DDC3",
+      "sampleText": "Blackjack rules"
+    },
+    {
+      "role": "heading-2",
+      "fontFamily": "Playfair Display",
+      "fontSize": "19px",
+      "fontWeight": "700",
+      "lineHeight": "27.55px",
+      "letterSpacing": "0.38px",
+      "color": "#F4F0E6",
+      "sampleText": "Choose your seat"
+    },
+    {
+      "role": "heading-3",
+      "fontFamily": "Playfair Display",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "lineHeight": "23.2px",
+      "letterSpacing": "normal",
+      "color": "#E9DDC3",
+      "sampleText": "Know your cards"
+    },
+    {
+      "role": "link",
+      "fontFamily": "DM Sans",
+      "fontSize": "16px",
+      "fontWeight": "800",
+      "lineHeight": "23.2px",
+      "letterSpacing": "normal",
+      "color": "#0B1118",
+      "sampleText": "Skip to player setup"
+    },
+    {
+      "role": "body",
+      "fontFamily": "DM Sans",
+      "fontSize": "14.5px",
+      "fontWeight": "400",
+      "lineHeight": "21.025px",
+      "letterSpacing": "normal",
+      "color": "#C3CCD6",
+      "sampleText": "Take a seat, invite your friends, and play a hand together. "
+    }
+  ],
+  "spacing": {
+    "observed": [
+      1,
+      2,
+      4,
+      6,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      20
+    ],
+    "baseUnit": 4
+  },
+  "radius": [
+    "8px",
+    "12px",
+    "14px",
+    "50%",
+    "999px"
+  ],
+  "shadows": [
+    {
+      "value": "rgba(0, 0, 0, 0.5) 0px 18px 50px 0px, rgba(255, 255, 255, 0.06) 0px 0px 0px 4px inset",
+      "count": 5
+    },
+    {
+      "value": "rgba(0, 0, 0, 0.6) 0px 16px 40px 0px",
+      "count": 4
+    },
+    {
+      "value": "rgba(0, 0, 0, 0.45) 0px 6px 16px 0px",
+      "count": 3
+    },
+    {
+      "value": "rgba(255, 212, 71, 0.4) 0px 0px 0px 2px, rgba(0, 0, 0, 0.65) 0px 18px 44px 0px, rgba(255, 212, 71, 0.35) 0px 0px 34px 0px",
+      "count": 1
+    },
+    {
+      "value": "rgba(255, 212, 71, 0.4) 0px 6px 20px 0px",
+      "count": 1
+    }
+  ],
+  "buttons": [
+    {
+      "label": "Advanced mode",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#A5AAA1",
+      "padding": "6px 10px",
+      "borderRadius": "999px",
+      "border": "1px solid rgba(255, 255, 255, 0.12)",
+      "boxShadow": "none",
+      "fontSize": "11px",
+      "fontWeight": "600",
+      "height": "42px"
+    },
+    {
+      "label": "button",
+      "background": "#FFFFFF",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#E9DDC3",
+      "padding": "1px 6px",
+      "borderRadius": "50%",
+      "border": "1px solid rgba(255, 255, 255, 0.12)",
+      "boxShadow": "none",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "44px"
+    },
+    {
+      "label": "button",
+      "background": "transparent",
+      "backgroundImage": "linear-gradient(rgb(240, 221, 169), rgb(215, 182, 108))",
+      "backdropFilter": "",
+      "color": "#2E2004",
+      "padding": "1px 6px",
+      "borderRadius": "50%",
+      "border": "1px solid rgba(0, 0, 0, 0.2)",
+      "boxShadow": "rgba(255, 212, 71, 0.5) 0px 6px 18px 0px",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "44px"
+    },
+    {
+      "label": "Adventurer",
+      "background": "#FFD447",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#F0DDA9",
+      "padding": "9px 14px",
+      "borderRadius": "999px",
+      "border": "1px solid rgb(215, 182, 108)",
+      "boxShadow": "rgba(255, 212, 71, 0.3) 0px 0px 0px 2px, rgba(255, 212, 71, 0.25) 0px 4px 14px 0px",
+      "fontSize": "13px",
+      "fontWeight": "700",
+      "height": "40px"
+    },
+    {
+      "label": "button",
+      "background": "#FFD54F",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#000000",
+      "padding": "1px 6px",
+      "borderRadius": "50%",
+      "border": "2px solid rgb(240, 221, 169)",
+      "boxShadow": "rgba(255, 212, 71, 0.35) 0px 0px 0px 3px, rgba(255, 212, 71, 0.5) 0px 0px 16px 0px",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "36px"
+    },
+    {
+      "label": "button",
+      "background": "#FF8A80",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#000000",
+      "padding": "1px 6px",
+      "borderRadius": "50%",
+      "border": "2px solid rgba(255, 255, 255, 0.25)",
+      "boxShadow": "none",
+      "fontSize": "13.3333px",
+      "fontWeight": "400",
+      "height": "36px"
+    }
+  ],
+  "cards": [
+    {
+      "label": "card",
+      "background": "transparent",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#F4F0E6",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "border": "0px none rgb(244, 240, 230)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "1080px"
+    },
+    {
+      "label": "card",
+      "background": "transparent",
+      "backgroundImage": "linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05))",
+      "backdropFilter": "",
+      "color": "#F5EAD2",
+      "padding": "0px",
+      "borderRadius": "12px",
+      "border": "1px solid rgba(255, 255, 255, 0.16)",
+      "boxShadow": "rgba(0, 0, 0, 0.5) 0px 18px 50px 0px, rgba(255, 255, 255, 0.06) 0px 0px 0px 4px inset",
+      "fontSize": "22px",
+      "fontWeight": "900",
+      "height": "128px"
+    },
+    {
+      "label": "card",
+      "background": "transparent",
+      "backgroundImage": "linear-gradient(rgb(255, 253, 246), rgb(233, 221, 192))",
+      "backdropFilter": "",
+      "color": "#1C1C1C",
+      "padding": "0px",
+      "borderRadius": "12px",
+      "border": "1px solid rgba(255, 212, 71, 0.55)",
+      "boxShadow": "rgba(0, 0, 0, 0.6) 0px 16px 40px 0px",
+      "fontSize": "17px",
+      "fontWeight": "900",
+      "height": "118px"
+    },
+    {
+      "label": "card",
+      "background": "transparent",
+      "backgroundImage": "linear-gradient(rgba(20, 30, 44, 0.92), rgba(7, 12, 20, 0.96))",
+      "backdropFilter": "blur(12px)",
+      "color": "#F4F0E6",
+      "padding": "20px",
+      "borderRadius": "22px",
+      "border": "1px solid rgba(255, 212, 71, 0.35)",
+      "boxShadow": "rgba(0, 0, 0, 0.6) 0px 24px 70px 0px, rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "701.328px"
+    }
+  ],
+  "nav": {
+    "label": "navigation",
+    "background": "transparent",
+    "backgroundImage": "",
+    "backdropFilter": "",
+    "color": "#F4F0E6",
+    "padding": "14px 20px",
+    "borderRadius": "0px",
+    "border": "0px none rgb(244, 240, 230)",
+    "boxShadow": "none",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "height": "72px"
+  },
+  "chips": [
+    {
+      "label": "21",
+      "background": "transparent",
+      "color": "#2E2004",
+      "padding": "0px",
+      "borderRadius": "50%",
+      "border": "3px solid rgb(255, 255, 255)",
+      "boxShadow": "rgb(215, 182, 108) 0px 0px 0px 2px, rgba(255, 212, 71, 0.45) 0px 6px 18px 0px",
+      "fontSize": "13px",
+      "fontWeight": "900",
+      "height": "38px"
+    },
+    {
+      "label": "PRIVATE TABLES",
+      "background": "#FFD447",
+      "color": "#F0DDA9",
+      "padding": "8px 14px",
+      "borderRadius": "999px",
+      "border": "1px solid rgba(255, 212, 71, 0.45)",
+      "boxShadow": "none",
+      "fontSize": "11px",
+      "fontWeight": "800",
+      "height": "33.9375px"
+    },
+    {
+      "label": "No account needed",
+      "background": "#FFFFFF",
+      "color": "#A5AAA1",
+      "padding": "8px 14px",
+      "borderRadius": "999px",
+      "border": "1px solid rgba(255, 255, 255, 0.12)",
+      "boxShadow": "none",
+      "fontSize": "11px",
+      "fontWeight": "800",
+      "height": "33.9375px"
+    },
+    {
+      "label": "$500",
+      "background": "#B32335",
+      "color": "#FFFFFF",
+      "padding": "8px 10px",
+      "borderRadius": "50%",
+      "border": "2px dashed rgba(255, 255, 255, 0.85)",
+      "boxShadow": "rgba(0, 0, 0, 0.5) 0px 6px 16px 0px",
+      "fontSize": "10px",
+      "fontWeight": "900",
+      "height": "34.5px"
+    }
+  ],
+  "statCells": [],
+  "tabs": [],
+  "backgrounds": [
+    {
+      "value": "radial-gradient(900px 480px at 15% 0%, rgba(61, 113, 75, 0.16), rgba(0, 0, 0, 0) 60%), radial-gradient(1000px 520px at 85% 8%, rgba(215, 182, 108, 0.09), rgba(0, 0, 0, 0) 60%), radial-gradient(1200px 700px at 50% 100%, rgba(61, 113, 75, 0.08), rgba(0, 0, 0, 0) 60%)",
+      "area": 2963130
+    },
+    {
+      "value": "radial-gradient(1200px 620px at 50% -10%, rgb(18, 63, 44) 0%, rgb(8, 14, 11) 62%), linear-gradient(rgb(7, 12, 20), rgb(5, 7, 13))",
+      "area": 2073600
+    },
+    {
+      "value": "linear-gradient(rgba(255, 255, 255, 0.043) 1px, rgba(0, 0, 0, 0) 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.043) 1px, rgba(0, 0, 0, 0) 1px)",
+      "area": 2073600
+    },
+    {
+      "value": "radial-gradient(at 50% 38%, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, 0.62) 100%)",
+      "area": 2073600
+    },
+    {
+      "value": "radial-gradient(circle, rgba(23, 168, 98, 0.42), rgba(0, 0, 0, 0) 65%)",
+      "area": 384400
+    },
+    {
+      "value": "radial-gradient(rgba(255, 212, 71, 0.18), rgba(0, 0, 0, 0) 70%)",
+      "area": 280000
+    }
+  ],
+  "glass": [
+    {
+      "backdropFilter": "blur(12px)",
+      "background": "linear-gradient(rgba(20, 30, 44, 0.92), rgba(7, 12, 20, 0.96))",
+      "border": "1px solid rgba(255, 212, 71, 0.35)",
+      "borderRadius": "22px",
+      "boxShadow": "rgba(0, 0, 0, 0.6) 0px 24px 70px 0px, rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset",
+      "area": 338106
+    }
+  ]
+}

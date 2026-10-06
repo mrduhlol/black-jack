@@ -1,0 +1,121 @@
+{
+  "files": [
+    {
+      "file": "nuFiD-vYSZviVYUb_rj3ij__anPXDTjYgEM86xRbPQ.woff2",
+      "family": "Playfair Display",
+      "rawFamily": "Playfair Display",
+      "subfamily": "Regular",
+      "postscript": "PlayfairDisplay-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    },
+    {
+      "file": "nuFiD-vYSZviVYUb_rj3ij__anPXDTLYgEM86xRbPQ.woff2",
+      "family": "Playfair Display",
+      "rawFamily": "Playfair Display",
+      "subfamily": "Regular",
+      "postscript": "PlayfairDisplay-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    },
+    {
+      "file": "nuFiD-vYSZviVYUb_rj3ij__anPXDTPYgEM86xRbPQ.woff2",
+      "family": "Playfair Display",
+      "rawFamily": "Playfair Display",
+      "subfamily": "Regular",
+      "postscript": "PlayfairDisplay-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    },
+    {
+      "file": "nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2",
+      "family": "Playfair Display",
+      "rawFamily": "Playfair Display",
+      "subfamily": "Regular",
+      "postscript": "PlayfairDisplay-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    },
+    {
+      "file": "rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2",
+      "family": "DM Sans 9pt",
+      "rawFamily": "DM Sans 9pt",
+      "subfamily": "Regular",
+      "postscript": "DMSans9pt-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    },
+    {
+      "file": "rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu6-K6z9mXgjU0.woff2",
+      "family": "DM Sans 9pt",
+      "rawFamily": "DM Sans 9pt",
+      "subfamily": "Regular",
+      "postscript": "DMSans9pt-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    }
+  ],
+  "families": [
+    {
+      "family": "DM Sans 9pt",
+      "weights": [
+        400
+      ],
+      "variable": true,
+      "fileCount": 2,
+      "files": [
+        "rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2",
+        "rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu6-K6z9mXgjU0.woff2"
+      ]
+    },
+    {
+      "family": "Playfair Display",
+      "weights": [
+        400
+      ],
+      "variable": true,
+      "fileCount": 4,
+      "files": [
+        "nuFiD-vYSZviVYUb_rj3ij__anPXDTLYgEM86xRbPQ.woff2",
+        "nuFiD-vYSZviVYUb_rj3ij__anPXDTPYgEM86xRbPQ.woff2",
+        "nuFiD-vYSZviVYUb_rj3ij__anPXDTjYgEM86xRbPQ.woff2",
+        "nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2"
+      ]
+    }
+  ],
+  "unidentified": [],
+  "meta": {
+    "generatedAt": "2026-10-05T19:08:59.228Z",
+    "tool": "fontkit"
+  }
+}

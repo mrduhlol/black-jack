@@ -1,0 +1,108 @@
+[p] A better view of the table
+[h1] Ready to play in landscape
+[p] Enter full screen for an immersive table. Your browser controls will be hidden when supported.
+[p] You can change your phone orientation lock in Control Center or Quick Settings.
+[a] Skip to player setup
+[span] BLACK-JACK
+[span] .IO
+[span] Neon Casino
+[span] Free play · virtual chips
+[span] Advanced mode
+[span] Sound on
+[button] Mute
+[label] Volume
+[p] Sounds start after your first tap. Mute persists for this session.
+[span] PRIVATE TABLES
+[span] No account needed
+[span] $500
+[span] $100
+[span] BLACK-JACK
+[span] WILD
+[span] NIGHT
+[p] Multiplayer blackjack, played with friends
+[p] Take a seat, invite your friends, and play a hand together. No account or real money required.
+[span] ★ 21
+[span] ⚡ instant deals
+[b] 3:2
+[span] blackjack payout
+[b] Free
+[span] virtual chips
+[b] Private
+[span] invite links
+[h2] Choose your seat
+[p] Pick a nickname and you’re ready to play.
+[label] Nickname
+[p] Avatar style
+[button] Adventurer
+[button] Robot
+[button] Lorelei
+[button] Micah
+[button] Persona
+[button] Croodle
+[p] Avatar background
+[span] Get in the game
+[span] Play now
+[button] Join room
+[span] Create a private room
+[p] Share the invite link so your friends can take a seat.
+[b] Make a table
+[span] Start a public game or create a private room for your group.
+[b] Play your hand
+[span] Bet, hit, stand, double, or split against the dealer.
+[b] Keep the chips
+[span] Virtual chips track your run. There’s no cash betting.
+[span] Pick a nickname
+[span] Play or create a room
+[span] Beat the dealer
+[p] At the table
+[h2] Blackjack rules
+[p] Get as close to 21 as you can without going over. Each player competes against the dealer.
+[h3] Know your cards
+[p] Number cards count at face value. Jacks, queens, and kings count as 10. An ace counts as 1 or 11, whichever keeps your hand at 21 or less.
+[p] An ace and a 10-value card in your first two cards is a natural Blackjack.
+[h3] Choose your move
+[p] After placing a bet, choose to hit for another card or stand with your total. When allowed, you can also double down, split a pair, or surrender half your bet.
+[p] Go over 21 and your hand busts. The dealer plays after everyone finishes.
+[h3] Beat the dealer
+[p] Higher than the dealer without busting wins. If the dealer busts, remaining hands win. Equal totals push and return your bet.
+[p] By default, the dealer stands on soft 17. A regular win pays 1:1; a natural Blackjack pays 3:2.
+[p] Table settings can change the dealer’s soft 17 rule, Blackjack payout, and available actions. All chips are virtual.
+[span] ♠ ♥ Blackjack pays 3:2
+[span] Dealer stands on 17
+[span] Made for game nights
+[b] Round 0
+[span] lobby
+[span] Invite
+[button] Leave
+[h3] Lobby
+[span] Room
+[p] Waiting for players. The host can tune the table, then start.
+[div] Blackjack pays 3 to 2  •  Dealer must stand on 17  •  Insure? Nah — send it
+[b] Lobby
+[span] Waiting for players.
+[span] Dealer
+[span] Current bet
+[span] Tap chips to build your bet
+[span] Current balance
+[p] Available chip values
+[button] 100
+[button] 250
+[button] 500
+[button] Undo
+[button] Clear
+[button] Place bet
+[b] Your turn
+[button] Hit
+[button] Stand
+[button] Double
+[button] Split
+[button] Surrender
+[h3] Players
+[h3] Room
+[button] Copy invite
+[p] Share the code or the invite link to fill the table.
+[summary] Table chat
+[p] Game over
+[h2] Winner!
+[button] Close
+[button] Return home

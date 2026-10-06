@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta name="hf-scene-parts" content="{&quot;shared&quot;:&quot;031d1eb92e3ef226&quot;,&quot;scenes&quot;:{&quot;blackjack-promo&quot;:&quot;ff0274a0b60a0a81&quot;}}"><script data-hf-gsap-fallback>
+(function(){
+  var cdnBase="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/";
+  var loaded={};
+  function loadFallback(file){
+    if(loaded[file])return loaded[file];
+    return loaded[file]=new Promise(function(ok,fail){
+      var s=document.createElement("script");
+      s.src=cdnBase+file;s.onload=ok;s.onerror=fail;
+      document.head.appendChild(s);
+    });
+  }
+  document.addEventListener("error",function(e){
+    var t=e.target;
+    if(!t||t.tagName!=="SCRIPT"||!t.src)return;
+    var m=t.src.match(/gsap[^/]*\/dist\/(.+\.js)/);
+    if(m)loadFallback(m[1]);
+  },true);
+})();
+</script>
+<meta name="hyperframes-studio-preview">
+<base href="/api/projects/blackjack-promo/preview/"><style data-hyperframes-text-rendering="true">html,body,*{text-rendering:geometricPrecision}</style><script data-hf-after-fonts-fallback="">document.addEventListener("DOMContentLoaded", function () {
+  if (window.__hfAfterFontsClaimed) return;
+  var T = "text/hf-after-fonts";
+  var all = [].slice.call(document.querySelectorAll('script[type="text/hf-after-fonts"], script[type="text/hf-after-fonts+module"]'));
+  if (!all.length) return;
+  console.warn("[hyperframes] the runtime has no web-font gate; composition scripts run without waiting for fonts");
+  var late = function (el) { return el.type !== T || el.matches('[defer][src], [defer][data-hf-inlined-src]'); };
+  var queue = all.filter(function (el) { return !late(el); }).concat(all.filter(late));
+  (function next() {
+    var el = queue.shift();
+    if (!el) return;
+    var s = document.createElement("script");
+    for (var i = 0; i < el.attributes.length; i++) s.setAttribute(el.attributes[i].name, el.attributes[i].value);
+    if (el.type === T) s.removeAttribute("type"); else s.type = "module";
+    s.async = el.hasAttribute("async");
+    s.text = el.text;
+    var waits = s.type !== "module" && s.hasAttribute("src") && !s.async && !s.noModule;
+    if (waits) { s.addEventListener("load", next); s.addEventListener("error", next); }
+    el.replaceWith(s);
+    if (!waits) next();
+  })();
+});</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #sub {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }</style><style data-hf-scene="blackjack-promo">@font-face{
+    font-family:"Playfair Display";
+    src:url("assets/capture/fonts/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2") format("woff2");
+    font-weight:100 900; font-style:normal; font-display:swap;
+  }
+  @font-face{
+    font-family:"DM Sans";
+    src:url("assets/capture/fonts/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2") format("woff2");
+    font-weight:100 900; font-style:normal; font-display:swap;
+  }
+  /* Caveat ships with hw-callout-circle (assets/fonts) — handwritten callout labels */
+  @font-face{
+    font-family:"Caveat";
+    src:url("assets/fonts/Caveat-700-latin.woff2") format("woff2");
+    font-weight:700; font-style:normal; font-display:swap;
+  }
+  [data-composition-id="blackjack-promo"]:not(:has([data-hf-inner-root])), [data-composition-id="blackjack-promo"] > [data-hf-inner-root]{
+    --bg:#080E0B; --felt:#0B6B41; --felt-hi:#17A862;
+    --gold:#D7B66C; --gold-hi:#F0DDA9; --cream:#F4F0E6;
+    --ink:#0B1118;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  [data-composition-id="blackjack-promo"]:not(:has([data-hf-inner-root])), [data-composition-id="blackjack-promo"] > [data-hf-inner-root],[data-composition-id="blackjack-promo"]:not(:has([data-hf-inner-root])), [data-composition-id="blackjack-promo"] > [data-hf-inner-root]{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
+  /* Root: sized per builder-contract */
+  [data-composition-id="blackjack-promo"] [data-hf-authored-id="stage"]{
+    position:relative;width:1920px;height:1080px;overflow:hidden;
+    background:#000;font-family:"DM Sans",system-ui,sans-serif;
+  }
+  [data-composition-id="blackjack-promo"] #scene{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+  /* ---- scroll-camera-story base layer ---- */
+  [data-composition-id="blackjack-promo"] #viewport{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
+  [data-composition-id="blackjack-promo"] #pageLayer{position:absolute;top:0;left:0;width:1920px;height:1670px;will-change:transform}
+  [data-composition-id="blackjack-promo"] #pageLayer img{display:block;width:1920px;height:1670px}
+  /* ---- locator frames (gold borders only — the dim is yt-feather-highlight) ---- */
+  [data-composition-id="blackjack-promo"] .spot{position:absolute;pointer-events:none}
+  [data-composition-id="blackjack-promo"] .spot-frame{
+    position:absolute;inset:0;border-radius:18px;
+    border:3px solid var(--gold-hi);
+    box-shadow:0 0 42px 6px rgba(215,182,108,.55),
+      inset 0 0 30px rgba(240,221,169,.28);
+    opacity:0;visibility:hidden;
+  }
+  [data-composition-id="blackjack-promo"] .spot-soft .spot-frame{border-radius:26px;border-width:2px}
+  /* ---- yt-feather-highlight (registry component, verbatim) ------------------
+     Spotlight part of the frame: a dim layer with a feathered ellipse hole.
+     The hole's position/size are CSS variables; the helpers tween them.
+     Mounted inside #pageLayer so the hole scroll-tracks the page. */
+  [data-composition-id="blackjack-promo"] .yt-hl{
+    --yt-hl-x:50%; --yt-hl-y:16.5%; --yt-hl-rx:15%; --yt-hl-ry:10%;
+    --yt-hl-dim:0.72;
+    position:absolute; inset:0; pointer-events:none; opacity:0;
+    background:rgba(6,8,12,var(--yt-hl-dim));
+    -webkit-mask-image:radial-gradient(ellipse var(--yt-hl-rx) var(--yt-hl-ry) at var(--yt-hl-x) var(--yt-hl-y),transparent 0%,transparent 52%,black 88%);
+    mask-image:radial-gradient(ellipse var(--yt-hl-rx) var(--yt-hl-ry) at var(--yt-hl-x) var(--yt-hl-y),transparent 0%,transparent 52%,black 88%);
+  }
+  /* ---- hw-callout-circle (registry component CSS, verbatim; font URL
+     repointed to the project-local copy this host owns) ---------------------
+     Wobbled ellipse outline draws around a target, scribble hatch sketches
+     in, curved connector leads to a handwritten label that pops with
+     momentum. Wrapper rules: boil owns x/y/rotation of .hw-co-boil; squash
+     deforms .hw-co-deform; label rides uniform-scale .hw-co-pop. */
+  [data-composition-id="blackjack-promo"] .hw-callout{position:absolute;pointer-events:none}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-boil,
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-deform,
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-conn-layer,
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-pop{position:absolute;inset:0}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-pop{opacity:0}
+  [data-composition-id="blackjack-promo"] .hw-callout svg{width:100%;height:100%;overflow:visible}
+  [data-composition-id="blackjack-promo"] .hw-callout path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-outline{stroke:var(--hw-co-ink,var(--hw-ink,#f4f2ec));stroke-width:var(--hw-co-w,6)}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-scribble{stroke:var(--hw-co-accent,var(--hw-accent,#ffb020));stroke-width:3;opacity:.42}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-connector{stroke:var(--hw-co-ink,var(--hw-ink,#f4f2ec));stroke-width:4}
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-label{position:absolute;font-family:var(--hw-font-print,"Caveat",cursive);
+    font-weight:700;font-size:54px;color:var(--hw-co-ink,var(--hw-ink,#f4f2ec));
+    white-space:nowrap;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+  /* host customization (content): promo-sized labels in the casino palette */
+  [data-composition-id="blackjack-promo"] .hw-callout .hw-co-label{font-size:48px}
+  /* ---- promo pills (fast UI annotations: Play now + setup card) ---- */
+  [data-composition-id="blackjack-promo"] .pill{
+    position:absolute;white-space:nowrap;
+    background:rgba(11,17,24,.95);border:2px solid var(--gold);
+    border-radius:999px;color:var(--cream);
+    font-size:31px;font-weight:700;letter-spacing:.01em;
+    padding:16px 30px 16px 26px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 30px rgba(215,182,108,.35);
+    display:flex;align-items:center;gap:14px;
+    opacity:0;visibility:hidden;
+  }
+  [data-composition-id="blackjack-promo"] .pill::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--gold-hi);
+    box-shadow:0 0 14px var(--gold-hi);flex:none}
+  [data-composition-id="blackjack-promo"] .pill::after{
+    content:"";position:absolute;left:50%;bottom:-14px;width:4px;height:16px;
+    background:linear-gradient(var(--gold),transparent);
+  }
+  /* ---- oversized cursor + press-ripple ---- */
+  [data-composition-id="blackjack-promo"] #cursor{
+    position:absolute;top:0;left:0;width:120px;height:120px;z-index:40;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.65));will-change:transform;
+    opacity:0;visibility:hidden;
+  }
+  [data-composition-id="blackjack-promo"] #cursor .halo{
+    position:absolute;inset:14px;border-radius:50%;
+    border:3px solid rgba(240,221,169,.75);
+    box-shadow:0 0 18px rgba(215,182,108,.6);
+  }
+  [data-composition-id="blackjack-promo"] .ripple{
+    position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
+    border:6px solid var(--gold-hi);
+    box-shadow:0 0 30px rgba(240,221,169,.9),inset 0 0 20px rgba(240,221,169,.5);
+    z-index:39;pointer-events:none;
+    opacity:0;visibility:hidden;
+  }
+  /* ---- hook veil (scale_punch title) ---- */
+  [data-composition-id="blackjack-promo"] #veil{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:28px;
+    background:radial-gradient(1200px 700px at 50% 42%,#0e2a1e 0%,var(--bg) 62%,#040705 100%)}
+  [data-composition-id="blackjack-promo"] #veilKicker{font-size:34px;font-weight:700;letter-spacing:.55em;color:var(--gold);text-indent:.55em;
+    opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #veilTitle{font-family:"Playfair Display",serif;font-weight:900;font-size:190px;line-height:1;
+    color:var(--cream);letter-spacing:.01em;opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #veilTitle .n21{color:var(--gold-hi);text-shadow:0 0 70px rgba(240,221,169,.65)}
+  [data-composition-id="blackjack-promo"] #veilSub{font-size:30px;font-weight:600;letter-spacing:.28em;color:#a5aaa1;text-indent:.28em;
+    opacity:0;visibility:hidden}
+  /* ---- logo-outro end card ---- */
+  [data-composition-id="blackjack-promo"] #endcard{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:30px;
+    background:radial-gradient(1300px 760px at 50% 40%,#10402a 0%,var(--bg) 58%,#030604 100%);
+    opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #chip{width:170px;height:170px;border-radius:50%;position:relative;
+    background:radial-gradient(circle,#F0DDA9 0 30%,#D7B66C 30% 55%,#0B6B41 55% 72%,#052e1d 72% 100%);
+    box-shadow:0 0 80px rgba(215,182,108,.5),0 24px 60px rgba(0,0,0,.6);
+    opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #chip::before{content:"";position:absolute;inset:14px;border-radius:50%;
+    border:10px dashed rgba(244,240,230,.92)}
+  [data-composition-id="blackjack-promo"] #chip::after{content:"21";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:"Playfair Display",serif;font-weight:900;font-size:64px;color:#0B1118}
+  [data-composition-id="blackjack-promo"] #wordmark{font-family:"Playfair Display",serif;font-weight:900;font-size:118px;
+    letter-spacing:.06em;color:var(--cream);line-height:1;opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #wordmark .dash{color:var(--gold)}
+  [data-composition-id="blackjack-promo"] #tagline{font-size:40px;font-weight:700;letter-spacing:.5em;text-indent:.5em;color:var(--gold);
+    opacity:0;visibility:hidden}
+  [data-composition-id="blackjack-promo"] #urlpill{
+    margin-top:14px;font-size:42px;font-weight:800;letter-spacing:.04em;color:#0B1118;
+    background:linear-gradient(180deg,#F0DDA9,#D7B66C);
+    border-radius:999px;padding:22px 64px;
+    box-shadow:0 0 0 3px rgba(240,221,169,.35),0 14px 50px rgba(0,0,0,.55);
+    opacity:0;visibility:hidden;
+  }
+  [data-composition-id="blackjack-promo"] #outroblack{position:absolute;inset:0;background:#000;z-index:70;pointer-events:none;
+    opacity:0;visibility:hidden}</style>
+  
+<script data-hyperframes-preview-runtime="1" src="/api/runtime.js"></script>
+<meta name="hyperframes-project-signature" content="7a565cc13ac03dabba474673">
+</head>
+  <body>
+    <div data-hf-id="hf-ab2m" id="stage" data-composition-id="blackjack-promo" data-start="0" data-duration="14" data-fps="30" data-width="1920" data-height="1080">
+      <div data-hf-scene-no-swap="a script outside the scene selects #sub" data-composition-file="compositions/index.html" data-height="1080" data-width="1920" data-hf-scene="blackjack-promo" data-hf-id="hf-xopf" id="sub" class="clip" data-start="0" data-duration="14" data-track-index="0" data-composition-id="blackjack-promo"><div style="width:1920px;height:1080px" data-hf-inner-root="true" data-hf-authored-id="stage" data-hf-id="hf-ab2m" data-fps="30" data-width="1920" data-height="1080">
+  <div data-hf-id="hf-ns0h" id="scene" class="clip" data-start="0" data-duration="14" data-track-index="0">
+    <div data-hf-id="hf-wud3" id="viewport">
+      <div data-hf-id="hf-urmg" id="pageLayer" data-layout-allow-overflow="true">
+        <img data-hf-id="hf-ir99" src="assets/capture/screenshots/full-page.png" alt="Neon Casino blackjack site">
+        <div data-hf-id="hf-40vy" class="yt-hl" id="hl"></div>
+        <!-- highlight 1: hero chip fan — hw-callout-circle (wobble ring + handwritten label) -->
+        <div data-hf-id="hf-ss49" class="hw-callout" id="hwFan" data-layout-allow-overflow="true" style="left:770px;top:155px;width:380px;height:242px;--hw-co-ink:#F0DDA9;--hw-co-accent:#D7B66C">
+          <div data-hf-id="hf-ineh" class="hw-co-boil">
+            <div data-hf-id="hf-tgwk" class="hw-co-deform">
+              <svg data-hf-id="hf-zv7a" viewBox="0 0 380 242">
+                <path data-hf-id="hf-xz6p" class="hw-co-scribble" />
+                <path data-hf-id="hf-z47l" class="hw-co-outline" />
+              </svg>
+            </div>
+            <svg data-hf-id="hf-u4xq" class="hw-co-conn-layer" viewBox="0 0 380 242">
+              <path data-hf-id="hf-08s6" class="hw-co-connector" />
+            </svg>
+            <div data-hf-id="hf-pm94" class="hw-co-pop">
+              <div data-hf-id="hf-4raa" class="hw-co-label" data-layout-allow-overflow="true"></div>
+            </div>
+          </div>
+        </div>
+        <!-- highlight 2: Play now (measured: x.552 y.389 w.094 h.039 of page) -->
+        <div data-hf-id="hf-zjdo" class="spot" id="spotPlay" style="left:1060px;top:650px;width:180px;height:65px">
+          <div data-hf-id="hf-panw" class="spot-frame" id="spotPlayFrame" data-layout-allow-overflow="true"></div>
+          <div data-hf-id="hf-8sq3" class="pill" id="pillPlay" data-layout-allow-overflow="true" style="left:-180px;top:-108px">Play now — one tap to the table</div>
+        </div>
+        <!-- highlight 3: live table setup card (measured: x.542 y.067 w.251 h.454 of page) -->
+        <div data-hf-id="hf-67bs" class="spot spot-soft" id="spotSetup" style="left:1041px;top:112px;width:482px;height:758px">
+          <div data-hf-id="hf-w34x" class="spot-frame" id="spotSetupFrame" data-layout-allow-overflow="true"></div>
+          <div data-hf-id="hf-tjlp" class="pill" id="pillSetup" data-layout-allow-overflow="true" style="left:-560px;top:390px">Live table setup — choose your seat</div>
+        </div>
+        <!-- highlight 4: rules — hw-callout-circle (wobble ring + handwritten label) -->
+        <div data-hf-id="hf-e68n" class="hw-callout" id="hwRules" data-layout-allow-overflow="true" style="left:357px;top:1112px;width:1203px;height:466px;--hw-co-ink:#F0DDA9;--hw-co-accent:#D7B66C">
+          <div data-hf-id="hf-5rd9" class="hw-co-boil">
+            <div data-hf-id="hf-f018" class="hw-co-deform">
+              <svg data-hf-id="hf-u2d9" viewBox="0 0 1203 466">
+                <path data-hf-id="hf-45f9" class="hw-co-scribble" />
+                <path data-hf-id="hf-usn9" class="hw-co-outline" />
+              </svg>
+            </div>
+            <svg data-hf-id="hf-r0w5" class="hw-co-conn-layer" viewBox="0 0 1203 466">
+              <path data-hf-id="hf-j1zu" class="hw-co-connector" />
+            </svg>
+            <div data-hf-id="hf-6l7k" class="hw-co-pop">
+              <div data-hf-id="hf-5wcm" class="hw-co-label" data-layout-allow-overflow="true"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-hf-id="hf-aecq" id="cursor" data-layout-allow-overflow="true">
+      <svg data-hf-id="hf-e5d2" viewBox="0 0 72 72" width="72" height="72">
+        <path data-hf-id="hf-btiw" d="M18 8 L18 54 L30 43 L37 59 L44 56 L37 40 L50 40 Z" fill="#F4F0E6" stroke="#0B1118" stroke-width="3" stroke-linejoin="round" />
+      </svg>
+      <div data-hf-id="hf-d1uq" class="halo"></div>
+    </div>
+    <div data-hf-id="hf-p0ix" class="ripple" id="ripple1" style="left:1150px;top:442px"></div>
+    <div data-hf-id="hf-gpc6" class="ripple" id="ripple2" style="left:1150px;top:442px"></div>
+
+    <div data-hf-id="hf-fqxx" id="veil">
+      <div data-hf-id="hf-is9q" id="veilKicker">MULTIPLAYER BLACKJACK</div>
+      <div data-hf-id="hf-v7zt" id="veilTitle">WILD.NIGHT.<span data-hf-id="hf-vt73" class="n21">21.</span></div>
+      <div data-hf-id="hf-wgqa" id="veilSub">NO ACCOUNT NEEDED</div>
+    </div>
+
+    <div data-hf-id="hf-3q5y" id="endcard">
+      <div data-hf-id="hf-ov2n" id="chip"></div>
+      <div data-hf-id="hf-q8wy" id="wordmark">BLACK<span data-hf-id="hf-5yj8" class="dash">-</span>JACK</div>
+      <div data-hf-id="hf-2ma2" id="tagline">WILD.NIGHT.21.</div>
+      <div data-hf-id="hf-vwfs" id="urlpill">black-jack.abhishek-a.in</div>
+    </div>
+    <div data-hf-id="hf-e173" id="outroblack"></div>
+  </div>
+</div></div>
+    </div>
+    
+  <script type="text/hf-after-fonts">window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+tl.to("#sub", { duration: 14 }, 0);
+window.__timelines["blackjack-promo"] = tl;
+tl.seek(0);</script><script type="text/hf-after-fonts" data-hf-scene="blackjack-promo">(function(){
+  var __hfCompId = "blackjack-promo";
+  var __hfTimelineCompId = "blackjack-promo";
+  var __hfErrorLabel = "[HyperFrames] composition script error:";
+  var __hfAuthoredRootId = "stage";
+  var __hfCompositionSrc = "compositions/index.html";
+  var __hfAuthoredRootAttr = "data-hf-authored-id";
+  var __hfEscapeAttr = function(value) {
+    return (value + "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+  };
+  var __hfRootSelector = "[data-composition-id=\"blackjack-promo\"]" || (__hfCompId
+    ? '[data-composition-id="' + __hfEscapeAttr(__hfCompId) + '"]'
+    : "");
+  var __hfRoot = null;
+  var __hfRootSelectorPattern = "\\[\\s*data-composition-id\\s*=\\s*(?:\"blackjack-promo\"|'blackjack-promo')\\s*\\]";
+  var __hfTimingSelectorPattern = "\\s*\\[\\s*data-(?:start|duration)\\s*=\\s*(?:\"[^\"]*\"|'[^']*')\\s*\\]";
+  var __hfAuthoredRootSelector = __hfAuthoredRootId
+    ? "[" + __hfAuthoredRootAttr + '="' + __hfEscapeAttr(__hfAuthoredRootId) + '"]'
+    : "";
+  var __hfCssEscape = function(value) {
+    var text = value + "";
+    if (typeof CSS !== "undefined" && CSS && typeof CSS.escape === "function") {
+      try { return CSS.escape(text); } catch {}
+    }
+    return text.replace(/[^a-zA-Z0-9_-]/g, function(char) { return "\\" + char; });
+  };
+  // Decode complete CSS identifiers before comparing authored ids.
+  var __hfRewriteIdSelectors = function(selector, entries) {
+    if (!entries || !entries.length || typeof selector !== "string" || selector.indexOf("#") === -1) {
+      return selector;
+    }
+    var result = "";
+    var bracketDepth = 0;
+    var quote = null;
+    for (var index = 0; index < selector.length; index += 1) {
+      var char = selector[index];
+      if (char === "\\") {
+        var escape = selector.slice(index).match(/^\\(?:[0-9a-fA-F]{1,6}(?:\r\n|[ \t\r\n\f])?|[\s\S])/);
+        if (escape) {
+          result += escape[0];
+          index += escape[0].length - 1;
+          continue;
+        }
+      }
+      if (quote) {
+        result += char;
+        if (char === quote) {
+          quote = null;
+        }
+        continue;
+      }
+      if (char === '"' || char === "'") {
+        quote = char;
+        result += char;
+        continue;
+      }
+      if (char === "[") {
+        bracketDepth += 1;
+        result += char;
+        continue;
+      }
+      if (char === "]") {
+        bracketDepth = Math.max(0, bracketDepth - 1);
+        result += char;
+        continue;
+      }
+      if (char === "#" && bracketDepth === 0) {
+        var token = selector.slice(index + 1).match(/^(?:[\w\u0080-\uffff-]|\\(?:[0-9a-fA-F]{1,6}(?:\r\n|[ \t\r\n\f])?|[^\r\n\f]))+/);
+        if (token) {
+          var decoded = token[0].replace(/\\([0-9a-fA-F]{1,6})(?:\r\n|[ \t\r\n\f])?|\\([^\r\n\f])/g, function(_, hex, escaped) {
+            if (!hex) return escaped;
+            var code = parseInt(hex, 16);
+            return String.fromCodePoint(!code || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff) ? 0xfffd : code);
+          });
+          var matched = entries.find(function(entry) { return entry.id === decoded; });
+          result += matched ? matched.replacement : "#" + token[0];
+          index += token[0].length;
+          continue;
+        }
+      }
+      result += char;
+    }
+    return result;
+  };
+  var __hfAuthoredRootEntries = __hfAuthoredRootSelector
+    ? [{ id: __hfAuthoredRootId, replacement: __hfAuthoredRootSelector }]
+    : [];
+  // Include both renamed and untouched instances. Each wrapper refreshes this
+  // document-wide cache because preview scene swaps can introduce new ids.
+  var __hfRenamedIdEntries = function() {
+    if (window.__hfRenamedIdSelectorEntries) return window.__hfRenamedIdSelectorEntries;
+    var entries = [];
+    var seen = Object.create(null);
+    var nodes;
+    try {
+      nodes = window.document.querySelectorAll("[" + __hfAuthoredRootAttr + "][id]");
+    } catch {
+      nodes = [];
+    }
+    for (var i = 0; i < nodes.length; i += 1) {
+      var authored = nodes[i].getAttribute(__hfAuthoredRootAttr);
+      if (!authored || seen[authored] || authored === nodes[i].id) continue;
+      seen[authored] = true;
+      var escaped = __hfCssEscape(authored);
+      entries.push({
+        id: authored,
+        replacement: ":is(#" + escaped + ", [" + __hfAuthoredRootAttr + '="' + __hfEscapeAttr(authored) + '"])',
+      });
+    }
+    window.__hfRenamedIdSelectorEntries = entries;
+    return window.__hfRenamedIdSelectorEntries;
+  };
+  // element.querySelector("#authored") on an arbitrary Element never passes
+  // through the scoped document proxy, so the same rewrite is installed once
+  // per document on Element.prototype — only when at least one id was
+  // actually renamed, so a document without collisions runs untouched
+  // natives. Document.prototype is deliberately NOT patched: an unscoped
+  // document-wide lookup cannot know which instance it means, and rewriting
+  // it would only widen the ambiguity.
+  var __hfInstallRenamedIdSelectorShim = function() {
+    if (window.__hfRenamedIdSelectorShim) return;
+    var entries = __hfRenamedIdEntries();
+    if (!entries.length) return;
+    var proto = window.Element && window.Element.prototype;
+    if (!proto || typeof proto.querySelector !== "function" || typeof proto.querySelectorAll !== "function") {
+      return;
+    }
+    var nativeQuerySelector = proto.querySelector;
+    var nativeQuerySelectorAll = proto.querySelectorAll;
+    proto.querySelector = function(selector) {
+      return nativeQuerySelector.call(this, __hfRewriteIdSelectors(selector, __hfRenamedIdEntries()));
+    };
+    proto.querySelectorAll = function(selector) {
+      return nativeQuerySelectorAll.call(this, __hfRewriteIdSelectors(selector, __hfRenamedIdEntries()));
+    };
+    window.__hfRenamedIdSelectorShim = true;
+  };
+  var __hfNormalizeSelector = function(selector) {
+    if (!__hfCompId || typeof selector !== "string") return selector;
+    var normalized = selector
+      .replace(new RegExp(__hfRootSelectorPattern + '(?:' + __hfTimingSelectorPattern + ')+', 'g'), __hfRootSelector)
+      .replace(new RegExp('(?:' + __hfTimingSelectorPattern + ')+' + __hfRootSelectorPattern, 'g'), __hfRootSelector);
+    normalized = __hfRewriteIdSelectors(normalized, __hfAuthoredRootEntries);
+    return __hfRewriteIdSelectors(normalized, __hfRenamedIdEntries());
+  };
+  var __hfFindRoot = function() {
+    if (!__hfRoot && __hfRootSelector) {
+      __hfRoot = window.document.querySelector(__hfRootSelector);
+    }
+    return __hfRoot;
+  };
+  var __hfContains = function(node) {
+    var root = __hfFindRoot();
+    return !root || node === root || root.contains(node);
+  };
+  var __hfQueryAll = function(selector) {
+    var root = __hfFindRoot();
+    if (!root || typeof selector !== "string") {
+      return window.document.querySelectorAll(selector);
+    }
+    return Array.prototype.filter.call(window.document.querySelectorAll(__hfNormalizeSelector(selector)), function(node) {
+      return __hfContains(node);
+    });
+  };
+  var __hfQueryOne = function(selector) {
+    var matches = __hfQueryAll(selector);
+    return matches[0] || null;
+  };
+  var __hfGetElementById = function(id) {
+    var found = window.document.getElementById(id);
+    if (found && __hfContains(found)) return found;
+    var root = __hfFindRoot();
+    if (!root) return found || null;
+    var idValue = id + "";
+    if (__hfAuthoredRootId && __hfAuthoredRootId === idValue && root.getAttribute && root.getAttribute(__hfAuthoredRootAttr) === idValue) {
+      return root;
+    }
+    if (root.id === idValue) return root;
+    if (typeof root.querySelector !== "function") return null;
+    try {
+      var authoredRootMatch = root.querySelector('[' + __hfAuthoredRootAttr + '="' + __hfEscapeAttr(idValue) + '"]');
+      if (authoredRootMatch) return authoredRootMatch;
+    } catch {}
+    if (typeof CSS !== "undefined" && CSS && typeof CSS.escape === "function") {
+      try {
+        return root.querySelector("#" + CSS.escape(idValue)) || null;
+      } catch {}
+    }
+    try {
+      return root.querySelector('[id="' + __hfEscapeAttr(idValue) + '"]') || null;
+    } catch {}
+    return null;
+  };
+  var __hfScopedDocument = typeof Proxy === "function"
+    ? new Proxy(window.document, {
+        get: function(target, prop, receiver) {
+          if (prop === "querySelector") return __hfQueryOne;
+          if (prop === "querySelectorAll") return __hfQueryAll;
+          if (prop === "getElementById") return __hfGetElementById;
+          var value = Reflect.get(target, prop, target);
+          return typeof value === "function" ? value.bind(target) : value;
+        },
+      })
+    : window.document;
+  var __hfTimelineRegistryProxy = null;
+  var __hfGetTimelineRegistry = function() {
+    window.__timelines = window.__timelines || {};
+    if (!__hfCompId || __hfCompId === __hfTimelineCompId || typeof Proxy !== "function") {
+      return window.__timelines;
+    }
+    if (!__hfTimelineRegistryProxy) {
+      __hfTimelineRegistryProxy = new Proxy(window.__timelines, {
+        get: function(target, prop, receiver) {
+          if (prop !== __hfCompId) {
+            return Reflect.get(target, prop, target);
+          }
+          var authoredValue = Reflect.get(target, prop, target);
+          return authoredValue === undefined
+            ? Reflect.get(target, __hfTimelineCompId, target)
+            : authoredValue;
+        },
+        set: function(target, prop, value, receiver) {
+          if (prop !== __hfCompId) {
+            return Reflect.set(target, prop, value, target);
+          }
+          // The authored node remains in the compiled DOM when its local id
+          // differs from the runtime mount id, so readiness legitimately sees
+          // both compositions. Publish the same timeline under both identities
+          // instead of replacing one with the other.
+          var authoredSet = Reflect.set(target, __hfCompId, value, target);
+          var runtimeSet = Reflect.set(target, __hfTimelineCompId, value, target);
+          return authoredSet && runtimeSet;
+        },
+      });
+    }
+    return __hfTimelineRegistryProxy;
+  };
+  var __hfScopedWindow = typeof Proxy === "function"
+    ? new Proxy(window, {
+        get: function(target, prop, receiver) {
+          if (prop === "__timelines") return __hfGetTimelineRegistry();
+          // Inside a sub-composition, __hyperframes is passed as a bare script
+          // param bound to the SCOPED variant (per-comp getVariables). But
+          // authors routinely write the documented window.__hyperframes.
+          // getVariables() form, which would otherwise fall through to the host
+          // page's base __hyperframes and return the WRONG (or empty) variables
+          // for this instance. Route it to the scoped variant too so both
+          // spellings resolve to this composition's own variables.
+          // (__hfScopedHyperframes is a hoisted var assigned below, before any
+          // sub-comp script -- the only code that reads this -- runs.)
+          if (prop === "__hyperframes") return __hfScopedHyperframes;
+          // Native window methods must stay bound to the real window. Handed
+          // back unbound, "this" at call time is this Proxy and Chrome rejects
+          // it with "Illegal invocation", which broke window.addEventListener,
+          // setTimeout, matchMedia and getComputedStyle inside every
+          // sub-composition -- including the window.addEventListener("hf-seek",
+          // ...) form the Three.js and TypeGPU adapters document. The sibling
+          // document and gsap proxies here already bind.
+          //
+          // Only bind non-constructors. Function.prototype.bind drops static
+          // members, so binding a class exposed on window (window.Texts and
+          // friends) would silently strip its statics. Built-in methods have
+          // no .prototype; classes and constructor functions do.
+          var value = Reflect.get(target, prop, target);
+          return typeof value === "function" && value.prototype === undefined
+            ? value.bind(target)
+            : value;
+        },
+        set: function(target, prop, value, receiver) {
+          if (prop === "__timelines") {
+            // Common authoring boilerplate assigns the registry back to
+            // itself (window.__timelines = window.__timelines || {}). The
+            // getter above returns our proxy; do not replace the canonical
+            // registry with that proxy or later wrappers will stack proxies.
+            if (value === __hfTimelineRegistryProxy) return true;
+            target.__timelines = value || {};
+            __hfTimelineRegistryProxy = null;
+            return true;
+          }
+          return Reflect.set(target, prop, value, target);
+        },
+      })
+    : window;
+  var __hfResolveGsapTarget = function(target) {
+    if (typeof target === "string") return __hfQueryAll(target);
+    if (!Array.isArray(target)) return target;
+    return target.reduce(function(resolved, item) {
+      if (typeof item === "string") {
+        return resolved.concat(Array.prototype.slice.call(__hfQueryAll(item)));
+      }
+      resolved.push(item);
+      return resolved;
+    }, []);
+
+  };
+  var __hfScopeTimeline = function(timeline) {
+    if (!timeline || timeline.__hfScopedCompositionRoot === __hfFindRoot()) return timeline;
+    ["to", "from", "fromTo", "set"].forEach(function(method) {
+      var original = timeline[method];
+      if (typeof original !== "function") return;
+      timeline[method] = function(target) {
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = __hfResolveGsapTarget(target);
+        return original.apply(timeline, args);
+      };
+    });
+    try {
+      Object.defineProperty(timeline, "__hfScopedCompositionRoot", {
+        value: __hfFindRoot(),
+        configurable: true,
+      });
+    } catch {
+      // Best-effort: timelines coming from user code may have a frozen target
+      // or a non-extensible defineProperty path. Swallow — the scoped root
+      // is an enrichment, not a correctness invariant for playback.
+    }
+    return timeline;
+  };
+  var __hfBaseGsap = typeof gsap === "undefined" ? window.gsap : gsap;
+  var __hfScopedGsap = !__hfBaseGsap || typeof Proxy !== "function"
+    ? __hfBaseGsap
+    : new Proxy(__hfBaseGsap, {
+        get: function(target, prop, receiver) {
+          if (prop === "timeline") {
+            return function() {
+              return __hfScopeTimeline(target.timeline.apply(target, arguments));
+            };
+          }
+          if (prop === "to" || prop === "from" || prop === "fromTo" || prop === "set") {
+            return function(firstArg) {
+              var args = Array.prototype.slice.call(arguments);
+              args[0] = __hfResolveGsapTarget(firstArg);
+              return target[prop].apply(target, args);
+            };
+          }
+          if (prop === "utils" && target.utils && typeof Proxy === "function") {
+            return new Proxy(target.utils, {
+              get: function(utilsTarget, utilsProp, utilsReceiver) {
+                if (utilsProp === "toArray") {
+                  return function(firstArg) {
+                    var args = Array.prototype.slice.call(arguments);
+                    args[0] = __hfResolveGsapTarget(firstArg);
+                    return utilsTarget.toArray.apply(utilsTarget, args);
+                  };
+                }
+                if (utilsProp === "selector") {
+                  return function(base) {
+                    var baseEl = typeof base === "string" ? __hfQueryOne(base) : base;
+                    var root = baseEl || __hfFindRoot();
+                    return function(selector) {
+                      if (!root || typeof selector !== "string") return [];
+                      return Array.prototype.filter.call(
+                        window.document.querySelectorAll(__hfNormalizeSelector(selector)),
+                        function(node) {
+                          return node === root || (typeof root.contains === "function" && root.contains(node));
+                        },
+                      );
+                    };
+                  };
+                }
+                var value = Reflect.get(utilsTarget, utilsProp, utilsTarget);
+                return typeof value === "function" ? value.bind(utilsTarget) : value;
+              },
+            });
+          }
+          var value = Reflect.get(target, prop, target);
+          return typeof value === "function" ? value.bind(target) : value;
+        },
+      });
+  var __hfBaseHyperframes = window.__hyperframes;
+  var __hfScopedHyperframes = !__hfBaseHyperframes
+    ? __hfBaseHyperframes
+    : Object.assign({}, __hfBaseHyperframes, {
+        assetUrl: function(path) {
+          var page = window.document.baseURI;
+          return new URL(path, __hfCompositionSrc ? new URL(__hfCompositionSrc, page) : page).href;
+        },
+        getVariables: function() {
+          var byComp = window.__hfVariablesByComp;
+          var scoped = byComp && __hfTimelineCompId ? byComp[__hfTimelineCompId] : null;
+          return scoped ? Object.assign({}, scoped) : {};
+        },
+      });
+  var __hfRun = function() {
+    try {
+      (function(document, gsap, window, __hyperframes) {
+
+  window.__timelines = window.__timelines || {};
+
+  /* ---- yt-feather-highlight helpers (registry, verbatim) ---- */
+  window.ytHighlightIn = function (tl, target, at, opts) {
+    opts = opts || {};
+    gsap.set(target, {
+      "--yt-hl-x": opts.x !== undefined ? opts.x : "50%",
+      "--yt-hl-y": opts.y !== undefined ? opts.y : "50%",
+      "--yt-hl-rx": opts.rx !== undefined ? opts.rx : "22%",
+      "--yt-hl-ry": opts.ry !== undefined ? opts.ry : "26%"
+    });
+    tl.to(target, { opacity: 1, duration: 0.5, ease: "power2.out" }, at);
+  };
+  window.ytHighlightTo = function (tl, target, at, opts, dur) {
+    opts = opts || {};
+    var vars = { duration: dur === undefined ? 0.8 : dur, ease: "power2.inOut" };
+    if (opts.x !== undefined) vars["--yt-hl-x"] = opts.x;
+    if (opts.y !== undefined) vars["--yt-hl-y"] = opts.y;
+    if (opts.rx !== undefined) vars["--yt-hl-rx"] = opts.rx;
+    if (opts.ry !== undefined) vars["--yt-hl-ry"] = opts.ry;
+    tl.to(target, vars, at);
+  };
+  window.ytHighlightOut = function (tl, target, at) {
+    tl.to(target, { opacity: 0, duration: 0.4, ease: "power2.in" }, at);
+  };
+
+  /* ---- hw-callout-circle family runtime (registry, verbatim) ---- */
+  window.hwOnUpdate = function (tl, fn) {
+    if (!tl.__hwRenders) {
+      tl.__hwRenders = [];
+      tl.eventCallback("onUpdate", function () {
+        for (var i = 0; i < tl.__hwRenders.length; i++) tl.__hwRenders[i]();
+      });
+    }
+    tl.__hwRenders.push(fn);
+    fn();
+  };
+  window.hwHash = function (n, seed) {
+    var x = Math.sin(n * 127.1 + (seed || 1) * 311.7) * 43758.5453;
+    return (x - Math.floor(x)) * 2 - 1;
+  };
+  window.hwBoil = function (tl, target, opts) {
+    opts = opts || {};
+    var amp = opts.amp !== undefined ? opts.amp : 1.6;
+    var rot = opts.rot !== undefined ? opts.rot : 0.5;
+    var fps = opts.fps || 30;
+    var drop = opts.frameDrop || 3;
+    var seed = opts.seed || 1;
+    var els = gsap.utils.toArray(target);
+    window.hwOnUpdate(tl, function () {
+      var step = Math.floor((tl.time() * fps) / drop);
+      for (var i = 0; i < els.length; i++) {
+        gsap.set(els[i], {
+          x: window.hwHash(step * 3 + i * 97, seed) * amp,
+          y: window.hwHash(step * 3 + 1 + i * 97, seed) * amp,
+          rotation: (opts.baseRot || 0) + window.hwHash(step * 3 + 2 + i * 97, seed) * rot
+        });
+      }
+    });
+  };
+  window.hwBoilPose = function (tl, target, pose, opts) {
+    opts = opts || {};
+    var poses = { calm: { amp: 1.6, rot: 0.5 }, lively: { amp: 2.6, rot: 0.9 } };
+    if (pose === "off") return;
+    var p = poses[pose];
+    if (!p) {
+      console.error('hw: unknown boil pose "' + pose + '" — falling back to "calm"');
+      p = poses.calm;
+    }
+    window.hwBoil(tl, target, { amp: p.amp, rot: p.rot, frameDrop: 3, seed: opts.seed || 1 });
+  };
+  var LN1000 = Math.log(1000);
+  var FEELS = {
+    snappy: { zeta: 0.9, response: 0.22 },
+    "heavy-settle": { zeta: 1.0, response: 0.8 },
+    bouncy: { zeta: 0.5, response: 0.4 },
+    wobbly: { zeta: 0.28, response: 0.5 }
+  };
+  window.springEase = function (opts) {
+    var f = opts.feel ? FEELS[opts.feel] : opts;
+    var zeta = f.zeta, response = f.response;
+    var w0 = (2 * Math.PI) / response;
+    var T = LN1000 / (zeta * w0);
+    var x;
+    if (zeta < 1) {
+      var wd = w0 * Math.sqrt(1 - zeta * zeta);
+      x = function (t) {
+        return 1 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + ((zeta * w0) / wd) * Math.sin(wd * t));
+      };
+    } else {
+      x = function (t) { return 1 - Math.exp(-w0 * t) * (1 + w0 * t); };
+    }
+    var xT = x(T);
+    return { ease: function (p) { return p >= 1 ? 1 : x(p * T) / xT; }, duration: T, zeta: zeta, response: response };
+  };
+  window.hwWobbleEllipse = function (cx, cy, rx, ry, seed, wobblePct) {
+    wobblePct = wobblePct === undefined ? 3 : wobblePct;
+    var N = 14, pts = [];
+    for (var i = 0; i < N; i++) {
+      var a = (i / N) * Math.PI * 2;
+      var wr = 1 + window.hwHash(i * 13 + 5, seed) * (wobblePct / 100);
+      pts.push([cx + Math.cos(a) * rx * wr, cy + Math.sin(a) * ry * wr]);
+    }
+    var mx = (pts[0][0] + pts[N - 1][0]) / 2, my = (pts[0][1] + pts[N - 1][1]) / 2;
+    var d = "M" + mx.toFixed(1) + " " + my.toFixed(1);
+    for (var j = 0; j < N; j++) {
+      var p = pts[j], q = pts[(j + 1) % N];
+      d += " Q" + p[0].toFixed(1) + " " + p[1].toFixed(1) + " " + ((p[0] + q[0]) / 2).toFixed(1) + " " + ((p[1] + q[1]) / 2).toFixed(1);
+    }
+    return d;
+  };
+
+  window.hwStrokeTypes = {
+    plain: {},
+    soft: { blur: 0.6 },
+    sharp: { dash: [3.0, 1.55] },
+    spray: { coreOpacity: 0.5, coreBlur: 0.4, density: 0.16, scatter: 2.6, rMin: 1.1, rMax: 2.6 }
+  };
+  window.hwStrokeApply = function (pathEl, type, opts) {
+    opts = opts || {};
+    var cfg = window.hwStrokeTypes[type];
+    if (!cfg) {
+      console.error('hw: unknown strokeType "' + type + '" — falling back to "plain"');
+      type = "plain";
+      cfg = window.hwStrokeTypes.plain;
+    }
+    var svg = pathEl.ownerSVGElement;
+    var ns = "http://www.w3.org/2000/svg";
+    var w = parseFloat(getComputedStyle(pathEl).strokeWidth) || 6;
+    if (type === "plain") return { draw: pathEl, group: null, type: type };
+    if (type === "soft") {
+      pathEl.style.filter = "blur(" + cfg.blur + "px)";
+      return { draw: pathEl, group: null, type: type };
+    }
+    var id = opts.id || "hwsm-" + Math.abs(Math.round(window.hwHash((opts.seed || 1) * 13.7, 5) * 1e6));
+    var defs = svg.querySelector("defs");
+    if (!defs) {
+      defs = document.createElementNS(ns, "defs");
+      svg.insertBefore(defs, svg.firstChild);
+    }
+    var mask = document.createElementNS(ns, "mask");
+    mask.setAttribute("id", id);
+    mask.setAttribute("maskUnits", "userSpaceOnUse");
+    var clone = document.createElementNS(ns, "path");
+    clone.setAttribute("d", pathEl.getAttribute("d"));
+    clone.setAttribute("fill", "none");
+    clone.setAttribute("stroke", "#fff");
+    clone.setAttribute("stroke-width", w * (type === "spray" ? 2 + (cfg.scatter * 2) / w : 1.7));
+    clone.setAttribute("stroke-linecap", "round");
+    clone.setAttribute("stroke-linejoin", "round");
+    mask.appendChild(clone);
+    defs.appendChild(mask);
+    var group = document.createElementNS(ns, "g");
+    group.setAttribute("mask", "url(#" + id + ")");
+    pathEl.parentNode.insertBefore(group, pathEl);
+    group.appendChild(pathEl);
+    if (type === "sharp") {
+      pathEl.setAttribute("stroke-dasharray", (cfg.dash[0] * w).toFixed(1) + " " + (cfg.dash[1] * w).toFixed(1));
+    } else {
+      pathEl.setAttribute("stroke-opacity", cfg.coreOpacity);
+      pathEl.style.filter = "blur(" + cfg.coreBlur + "px)";
+      var len = pathEl.getTotalLength();
+      var n = Math.round(len * cfg.density * (opts.densityScale || 1));
+      var seed = opts.seed || 1;
+      var dots = document.createElementNS(ns, "g");
+      for (var i = 0; i < n; i++) {
+        var t = Math.min(1, Math.max(0, (i + 0.5) / n + (window.hwHash(i * 7, seed) * 0.35) / n));
+        var pt = pathEl.getPointAtLength(t * len);
+        var pt2 = pathEl.getPointAtLength(Math.min(len, t * len + 0.5));
+        var tx = pt2.x - pt.x, ty = pt2.y - pt.y;
+        var tl2 = Math.hypot(tx, ty) || 1;
+        var nx = -ty / tl2, nyv = tx / tl2;
+        var off = window.hwHash(i * 7 + 1, seed) * (cfg.scatter + w * 0.55);
+        var r = cfg.rMin + Math.abs(window.hwHash(i * 7 + 2, seed)) * (cfg.rMax - cfg.rMin);
+        var c = document.createElementNS(ns, "circle");
+        c.setAttribute("cx", (pt.x + nx * off).toFixed(1));
+        c.setAttribute("cy", (pt.y + nyv * off).toFixed(1));
+        c.setAttribute("r", r.toFixed(2));
+        c.setAttribute("fill", getComputedStyle(pathEl).stroke);
+        dots.appendChild(c);
+      }
+      group.appendChild(dots);
+    }
+    return { draw: clone, group: group, type: type };
+  };
+  window.hwDrawOn = function (tl, applied, at, dur, opts) {
+    opts = opts || {};
+    var p = applied.draw;
+    var len = p.getTotalLength();
+    p.setAttribute("stroke-dasharray", len + " " + len);
+    p.setAttribute("stroke-dashoffset", len);
+    gsap.set(p, { opacity: 0 });
+    var ease = opts.ease || "power2.inOut";
+    tl.set(p, { opacity: 1 }, at);
+    tl.to(p, { strokeDashoffset: 0, duration: dur === undefined ? 0.7 : dur, ease: ease }, at);
+  };
+  window.hwCalloutBuild = function (target, opts) {
+    opts = opts || {};
+    var seed = opts.seed || 1;
+    var el = document.querySelector(target);
+    var svg = el.querySelector("svg");
+    var vb = svg.getAttribute("viewBox").split(" ");
+    var W = parseFloat(vb[2]), H = parseFloat(vb[3]);
+    var cx = W / 2, cy = H / 2, rx = W * 0.42, ry = H * 0.36;
+    var outline = el.querySelector(".hw-co-outline");
+    outline.setAttribute("d", window.hwWobbleEllipse(cx, cy, rx, ry, seed, 4));
+    var scr = el.querySelector(".hw-co-scribble");
+    if (opts.scribble === false) {
+      scr.style.display = "none";
+    } else {
+      var d = "", rows = 11;
+      for (var i = 0; i < rows; i++) {
+        var t = (i + 0.5) / rows;
+        var yy = cy - ry + t * ry * 2;
+        var half = Math.sqrt(Math.max(0.05, 1 - Math.pow((yy - cy) / ry, 2)));
+        var xw = rx * half * 0.86;
+        var xa = cx - xw + window.hwHash(i * 7 + 2, seed) * 8;
+        var xb = cx + xw + window.hwHash(i * 7 + 3, seed) * 8;
+        d += (i === 0 ? "M " : " L ") + (i % 2 ? xa : xb).toFixed(1) + " " + yy.toFixed(1);
+        d += " L " + (i % 2 ? xb : xa).toFixed(1) + " " + (yy + window.hwHash(i * 7 + 4, seed) * 4).toFixed(1);
+      }
+      scr.setAttribute("d", d);
+    }
+    var conn = el.querySelector(".hw-co-connector");
+    var label = el.querySelector(".hw-co-label");
+    var at = opts.labelAt || "right";
+    if (at !== "left" && at !== "right" && at !== "below") {
+      console.error('hw: unknown labelAt "' + at + '" — falling back to "right"');
+      at = "right";
+    }
+    var ex = null, ey = null;
+    if (opts.connector === false) {
+      conn.style.display = "none";
+    } else {
+      var sx = at === "left" ? cx - rx : at === "below" ? cx : cx + rx;
+      var sy = at === "below" ? cy + ry : cy + ry * 0.35;
+      ex = at === "left" ? sx - 70 : at === "below" ? sx + 40 : sx + 70;
+      ey = sy + 55;
+      conn.setAttribute("d", "M " + sx.toFixed(1) + " " + sy.toFixed(1) + " Q " +
+        ((sx + ex) / 2 + window.hwHash(21, seed) * 14).toFixed(1) + " " + (sy + 46).toFixed(1) + " " +
+        ex.toFixed(1) + " " + ey.toFixed(1));
+      label.style.left = (at === "left" ? ex - 180 : ex + 12) + "px";
+      label.style.top = ey - 24 + "px";
+    }
+    label.textContent = opts.label || "";
+    var strokeType = opts.strokeType || "plain";
+    var idBase = (el.id || "hw-co") + "-sm";
+    el.__hwCo = {
+      rx: rx,
+      seed: seed,
+      boil: opts.boil || "calm",
+      popOrigin: ex === null ? "50% 50%" : ex.toFixed(1) + "px " + ey.toFixed(1) + "px",
+      draw: {
+        outline: window.hwStrokeApply(outline, strokeType, { seed: seed, id: idBase + "-outline" }),
+        scribble: opts.scribble === false ? null : window.hwStrokeApply(scr, "plain", { seed: seed }),
+        connector: opts.connector === false ? null : window.hwStrokeApply(conn, strokeType, { seed: seed, id: idBase + "-connector" })
+      }
+    };
+  };
+  window.hwCalloutOn = function (tl, target, at) {
+    var el = document.querySelector(target);
+    var co = el.__hwCo;
+    var t = at;
+    ["outline", "scribble", "connector"].forEach(function (k) {
+      var rec = co.draw[k];
+      if (!rec) return;
+      var dur = k === "scribble" ? 0.55 : k === "connector" ? 0.35 : 0.7;
+      window.hwDrawOn(tl, rec, t, dur);
+      t += dur * 0.85;
+    });
+    var pop = el.querySelector(".hw-co-pop");
+    var popEase = gsap.parseEase("power2.in");
+    gsap.set(pop, { scale: 0.001, opacity: 0, transformOrigin: co.popOrigin });
+    tl.to(pop, { opacity: 1, duration: 0.08, ease: "none" }, t);
+    tl.to(pop, { scale: 1, duration: 0.3, ease: popEase, immediateRender: false }, t);
+    var eps = 1e-4, pc = 1;
+    for (var k2 = 1; k2 <= 1000; k2++) {
+      if (popEase(k2 / 1000) >= 1) { pc = k2 / 1000; break; }
+    }
+    var vPop = ((popEase(Math.min(pc + eps, 1)) - popEase(pc - eps)) / (2 * eps)) * (co.rx / 0.3);
+    var S = Math.min(0.08 * (Math.abs(vPop) / 2000), 0.25);
+    var rec2 = window.springEase({ feel: "snappy" });
+    var st = { s: 0 };
+    var deform = el.querySelector(".hw-co-deform");
+    gsap.set(deform, { transformOrigin: "50% 100%" });
+    window.hwOnUpdate(tl, function () {
+      var along = 1 - st.s;
+      gsap.set(deform, { scaleY: along, scaleX: 1 / along });
+      var ax = parseFloat(gsap.getProperty(deform, "scaleX"));
+      var ay = parseFloat(gsap.getProperty(deform, "scaleY"));
+      if (Math.abs(ax * ay - 1) > 0.01) console.error("hw volume law violated (callout): " + (ax * ay).toFixed(4));
+    });
+    tl.to(st, { s: S, duration: 2 / 30, ease: "power3.out" }, t + 0.3);
+    tl.to(st, { s: 0, duration: rec2.duration, ease: rec2.ease }, t + 0.3 + 3 / 30);
+    window.hwBoilPose(tl, el.querySelector(".hw-co-boil"), co.boil, { seed: co.seed });
+  };
+  window.hwCalloutOff = function (tl, target, at) {
+    tl.to(target, { opacity: 0, duration: 0.35, ease: "power2.in" }, at);
+  };
+
+  /* host content: build the two scribble callouts into their measured wrappers.
+     scribble:false — the 11-row hatch is tuned for small targets; across
+     380–1200px wrappers it renders as banding that buries the annotated
+     content (verified in proof frames). The wobbled outline + connector +
+     handwritten label carry the scribble language. */
+  window.hwCalloutBuild("#hwFan", { seed: 4, scribble: false, label: "Chip action over the hero fan", labelAt: "right", strokeType: "plain", boil: "calm" });
+  window.hwCalloutBuild("#hwRules", { seed: 7, scribble: false, label: "Blackjack rules \u2014 the table briefing", labelAt: "below", strokeType: "plain", boil: "calm" });
+
+  const tl = gsap.timeline({ paused: true });
+
+  /* 0.0s hook: scale_punch on hero title over veil */
+  tl.fromTo("#veilTitle", { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "back.out(2.2)" }, 0.1);
+  tl.fromTo("#veilKicker", { autoAlpha: 0, y: -24 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.05);
+  tl.fromTo("#veilSub", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.25);
+  tl.to("#veil", { autoAlpha: 0, duration: 0.45, ease: "power2.in" }, 0.95);
+
+  /* scroll-camera-story pass 1: hero -> setup (lands 3.0s) */
+  tl.fromTo("#pageLayer", { y: 0 }, { y: -240, duration: 2.2, ease: "power2.inOut" }, 0.8);
+
+  /* oversized cursor: enters, tours fan, lands on Play now (screen 1150,442 @ scroll -240) */
+  tl.fromTo("#cursor", { autoAlpha: 0, x: 1750, y: 1000 }, { autoAlpha: 1, x: 1750, y: 1000, duration: 0.4, ease: "power2.out" }, 0.6);
+  tl.to("#cursor", { x: 1300, y: 300, duration: 0.9, ease: "power2.inOut" }, 1.0);
+  tl.to("#cursor", { x: 1114, y: 406, duration: 1.0, ease: "power2.inOut" }, 1.9);
+
+  /* hero fan callout: hw-callout-circle draws ON after arrival, never pre-applied */
+  window.hwCalloutOn(tl, "#hwFan", 1.2);
+  window.hwCalloutOff(tl, "#hwFan", 3.9);
+  window.ytHighlightIn(tl, "#hl", 1.2, { x: "50%", y: "16.5%", rx: "15%", ry: "10%" });
+  /* setup card locator frame + callout while its anchor is on screen (scroll pass 1) */
+  window.ytHighlightTo(tl, "#hl", 2.2, { x: "66.8%", y: "29.4%", rx: "20%", ry: "36%" }, 0.6);
+  tl.fromTo("#spotSetupFrame", { autoAlpha: 0, scaleX: 0 }, { autoAlpha: 1, scaleX: 1, duration: 0.55, ease: "power3.out", transformOrigin: "left center" }, 2.2);
+  tl.fromTo("#pillSetup", { autoAlpha: 0, scale: 0.6, y: 16 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(2.0)" }, 2.4);
+  tl.to("#pillSetup", { autoAlpha: 0, duration: 0.4, ease: "power2.in" }, 3.2);
+
+  /* 3.0s beat: press-ripple click + spotlight wipe on Play now + callout pop */
+  tl.fromTo("#ripple1", { autoAlpha: 0.95, scale: 0.25 }, { autoAlpha: 0, scale: 2.4, duration: 0.6, ease: "power2.out" }, 3.0);
+  tl.fromTo("#ripple2", { autoAlpha: 0.9, scale: 0.25 }, { autoAlpha: 0, scale: 3.1, duration: 0.75, ease: "power2.out" }, 3.12);
+  tl.fromTo("#cursor", { scale: 1 }, { scale: 0.86, duration: 0.12, ease: "power2.in", yoyo: true, repeat: 1, transformOrigin: "20% 15%", immediateRender: false }, 3.0);
+  tl.fromTo("#spotPlayFrame", { autoAlpha: 0, scaleX: 0 }, { autoAlpha: 1, scaleX: 1, duration: 0.5, ease: "power3.out", transformOrigin: "left center" }, 3.0);
+  window.ytHighlightTo(tl, "#hl", 3.0, { x: "59.9%", y: "40.8%", rx: "9%", ry: "4.5%" }, 0.5);
+  tl.fromTo("#pillPlay", { autoAlpha: 0, scale: 0.6, y: 16 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(2.0)" }, 3.3);
+  tl.to("#pillPlay", { scale: 1.015, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.8);
+  tl.to("#spotPlayFrame", { autoAlpha: 0, duration: 0.4, ease: "power2.in" }, 5.6);
+  tl.to("#pillPlay", { autoAlpha: 0, duration: 0.4, ease: "power2.in" }, 5.6);
+  window.ytHighlightOut(tl, "#hl", 5.6);
+
+  /* setup frame hands off to the Play-now beat */
+  tl.to("#spotSetupFrame", { autoAlpha: 0, duration: 0.45, ease: "power2.in" }, 3.5);
+
+  /* scroll-camera-story pass 2: setup -> rules (lands 6.7s); cursor tours to rules */
+  tl.to("#pageLayer", { y: -590, duration: 2.5, ease: "power2.inOut" }, 4.2);
+  tl.to("#cursor", { x: 1450, y: 700, duration: 0.6, ease: "power2.inOut" }, 3.6);
+  tl.to("#cursor", { x: 923, y: 719, duration: 1.6, ease: "power2.inOut" }, 5.3);
+
+  /* 7.0s beat: feathered spotlight + hw-callout-circle draw + handwritten label pop */
+  window.ytHighlightIn(tl, "#hl", 7.0, { x: "49.9%", y: "80.5%", rx: "40%", ry: "22%" });
+  window.hwCalloutOn(tl, "#hwRules", 7.0);
+
+  /* readable hold, then clear stage for end card (cursor hands off to the spotlight at 7.3) */
+  tl.to("#cursor", { autoAlpha: 0, duration: 0.4, ease: "power2.in" }, 7.3);
+  window.ytHighlightOut(tl, "#hl", 10.6);
+  window.hwCalloutOff(tl, "#hwRules", 10.6);
+  tl.to("#pageLayer", { autoAlpha: 0.25, duration: 0.5, ease: "power2.inOut" }, 10.6);
+
+  /* 11.0s: logo-outro end card lockup */
+  tl.fromTo("#endcard", { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" }, 11.0);
+  tl.fromTo("#chip", { autoAlpha: 0, scale: 0.5, rotation: -40 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 11.2);
+  tl.fromTo("#wordmark", { autoAlpha: 0, y: 48 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 11.45);
+  tl.fromTo("#tagline", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power3.out" }, 11.7);
+  tl.fromTo("#urlpill", { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "back.out(2.0)" }, 11.95);
+  tl.to("#urlpill", { boxShadow: "0 0 0 6px rgba(240,221,169,.55),0 0 90px rgba(240,221,169,.9),0 14px 50px rgba(0,0,0,.55)", duration: 0.4, ease: "sine.inOut", yoyo: true, repeat: 3 }, 12.4);
+
+  /* 14s: fade_out */
+  tl.fromTo("#outroblack", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: "power2.in" }, 13.4);
+
+  window.__timelines["blackjack-promo"] = tl;
+  tl.seek(0);
+
+      }).call(window, __hfScopedDocument, __hfScopedGsap, __hfScopedWindow, __hfScopedHyperframes);
+    } catch (_err) {
+      console.error(__hfErrorLabel, __hfCompId, _err);
+    }
+  };
+  // What the script started on the global gsap timeline, by any route, for a scene swap to revert.
+  // Only a page with a scene manifest can swap; elsewhere the first script stores null and none records.
+  var __hfRecordAnimations = function(run) {
+    if (window.__hfSceneAnimations === undefined) {
+      window.__hfSceneAnimations = window.document.querySelector("meta[name=\"hf-scene-parts\"]")
+        ? {}
+        : null;
+    }
+    var byComp = window.__hfSceneAnimations;
+    var globalTimeline = __hfBaseGsap && __hfBaseGsap.globalTimeline;
+    if (!byComp || !globalTimeline || !__hfTimelineCompId) return run();
+    var before = globalTimeline.getChildren(false);
+    // A set completes as it is made and would leave the timeline before the diff below.
+    var autoRemove = globalTimeline.autoRemoveChildren;
+    globalTimeline.autoRemoveChildren = false;
+    run();
+    globalTimeline.autoRemoveChildren = autoRemove;
+    var recorded = (byComp[__hfTimelineCompId] = byComp[__hfTimelineCompId] || []);
+    globalTimeline.getChildren(false).forEach(function(animation) {
+      if (before.indexOf(animation) >= 0) return;
+      recorded.push(animation);
+      // Dropped as the timeline drops a finished tween (it keeps a paused one); moved back, a tween re-adds itself.
+      if (autoRemove && !animation.getChildren && animation.totalProgress() === 1) globalTimeline.remove(animation);
+    });
+  };
+  __hfFindRoot();
+  window.__hfRenamedIdSelectorEntries = null;
+  __hfInstallRenamedIdSelectorShim();
+  __hfRecordAnimations(__hfRun);
+})();</script></body>
+</html>
