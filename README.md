@@ -12,6 +12,7 @@
 - [About](#about)
 - [How to play](#how-to-play)
 - [Rules](#rules)
+- [Liar's Table](#liars-table)
 - [Table settings](#table-settings)
 - [Tips for beginners](#tips-for-beginners)
 - [FAQ](#faq)
@@ -26,6 +27,7 @@ Black-Jack.io is a real-time multiplayer Blackjack game that runs entirely in th
 - Join with just a nickname and an avatar. Nothing to install.
 - Live table with chat, betting, and all standard Blackjack moves.
 - Virtual chips only, so every hand is risk-free.
+- A second table in the house: **Liar's Table**, a bluffing card game with a Risk Chamber (see below).
 
 ## How to play
 
@@ -78,6 +80,25 @@ The dealer has no choices to make and always follows the table rule, by default 
 | Same total as the dealer | Push, your bet is returned |
 | Natural Blackjack | Paid 3:2 by default |
 | Over 21 | Bust, the bet is lost |
+
+## Liar's Table
+
+A bluffing game for 2–4 players, played with an authentic 20-card Liar's Deck.
+
+### The deck
+
+6 Kings, 6 Queens, 6 Aces, plus 2 Jokers. Jokers are wild and always count as the table rank. Each player is dealt 5 cards.
+
+### How a round works
+
+1. The table names one rank — Kings, Queens, or Aces.
+2. On your turn, lay **1–3 cards face-down** and declare them as the table rank. Truthfully or not.
+3. The next player either calls **LIAR!** to challenge your claim, or lets it slide and lays their own cards.
+4. A truthful claim sends the **challenger** to the Risk Chamber; a caught bluff sends the **liar**.
+5. The chamber is 6 slots with 1 live by default (host can tune it). Survive and you take the pile; go out and you're eliminated.
+6. Empty your hand and survive the challenge to win the table — or be the last one standing.
+
+Shortcuts: `L` calls LIAR!, `C` continues, `Enter` plays the selected cards. The bar has its own chat, emotes, avatar cast, and sound kit.
 
 ## Table settings
 
