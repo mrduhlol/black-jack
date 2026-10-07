@@ -1111,6 +1111,9 @@ function renderBetting(r) {
   panel.classList.toggle('hidden', !inBetting);
   // Waiting view: bet locked — keep the panel visible with stake + who is still deciding.
   panel.classList.toggle('locked', inBetting && hasBet);
+  // Double-tap guard: once the bet is away the button stays dead until the next round.
+  const betGoBtn = $('betGo');
+  if (betGoBtn) betGoBtn.disabled = hasBet;
   if (!lastTurn) $('actionPanel').classList.add('hidden');
   if ($('betBalance') && me) $('betBalance').textContent = fmt(me.chips) + ' chips';
   let note = panel.querySelector('.bet-locked-note');
@@ -1256,6 +1259,7 @@ $('betGo').onclick = (e) => {
   Sound.unlock();
   Sound.chips();
   markActionPending(e.currentTarget);
+  e.currentTarget.disabled = true;
   Net.send({ t: 'place_bet', amount: pendingBet });
   pendingBet = 0;
   pendingStack = [];
