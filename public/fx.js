@@ -44,6 +44,7 @@
     if (!ctx || !active) return;
     ctx.clearRect(0, 0, W, H);
     const t = Date.now() / 1000;
+    const barMode = document.body && document.body.dataset.mode === 'liars';
     for (const p of parts) {
       p.y -= p.vy; p.x += p.vx + Math.sin(t * 0.7 + p.a) * 0.25;
       p.tw += 0.03;
@@ -52,12 +53,15 @@
       const alpha = 0.25 + Math.abs(Math.sin(p.tw)) * 0.5;
       if (p.suit) {
         ctx.font = `${14 * (window.devicePixelRatio || 1)}px serif`;
-        ctx.fillStyle = p.hue > 0.7 ? `rgba(255,61,129,${alpha * 0.5})` : `rgba(255,212,71,${alpha * 0.55})`;
+        ctx.fillStyle = barMode
+          ? (p.hue > 0.7 ? `rgba(179,64,46,${alpha * 0.55})` : `rgba(201,163,92,${alpha * 0.6})`)
+          : (p.hue > 0.7 ? `rgba(255,61,129,${alpha * 0.5})` : `rgba(255,212,71,${alpha * 0.55})`);
         ctx.fillText(p.suit, p.x, p.y);
       } else {
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
-        g.addColorStop(0, `rgba(255,232,154,${alpha})`);
-        g.addColorStop(1, 'rgba(255,232,154,0)');
+        const dust = barMode ? '201,163,92' : '255,232,154';
+        g.addColorStop(0, `rgba(${dust},${alpha})`);
+        g.addColorStop(1, `rgba(${dust},0)`);
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2); ctx.fill();
       }

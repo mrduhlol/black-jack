@@ -303,6 +303,10 @@
 .lb-risk-box h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 600; font-size: clamp(22px, 5vmin, 32px); margin: 0 0 6px; }
 .lb-risk-box h2 b { color: var(--lb-brass-hi); font-weight: 700; }
 .lb-risk-box > p { color: var(--lb-muted); font-size: 13.5px; margin: 0 0 20px; }
+.lb-risk-odds {
+  color: var(--lb-brass); font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase; margin: 0 0 16px;
+}
 .lb-chambers { display: flex; justify-content: center; gap: clamp(8px, 2vmin, 14px); flex-wrap: wrap; }
 .lb-chamber {
   width: clamp(52px, 11vmin, 68px); height: clamp(52px, 11vmin, 68px);

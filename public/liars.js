@@ -570,6 +570,12 @@ function lbRenderRisk() {
   const bx = document.createElement('div');
   bx.className = 'lb-risk-box';
   bx.innerHTML = `<p class="eyebrow">RISK CHAMBER</p><h2><b>${lbEsc(r.playerName)}</b> takes the risk</h2><p>${iAmPicker ? 'Tap a chamber. Choose wisely.' : 'Waiting on the challenged player…'}</p>`;
+  if (lbRoom && lbRoom.settings) {
+    const odds = document.createElement('p');
+    odds.className = 'lb-risk-odds';
+    odds.textContent = `${lbRoom.settings.liveChambers} live · ${lbRoom.settings.chambers} chambers`;
+    bx.appendChild(odds);
+  }
   const row = document.createElement('div');
   row.className = 'lb-chambers';
   const pickedInfo = lbRiskInfo();
