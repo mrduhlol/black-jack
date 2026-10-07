@@ -3,8 +3,8 @@
 // Usage: node e2e-liars.mjs [normal|devil]   (CP=1.0 forces every challenge)
 const MODE = process.argv[2] === 'devil' ? 'devil' : 'normal';
 const CHALLENGE_P = parseFloat(process.env.CP || '0.45');
-const BASE = 'http://localhost:8787';
-const WSURL = (code) => `ws://localhost:8787/liar/${code}/socket`;
+const BASE = process.env.E2E_BASE || 'http://localhost:8787';
+const WSURL = (code) => `${BASE.replace(/^http/, 'ws')}/liar/${code}/socket`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function makeBot(code, name, isHost, log) {

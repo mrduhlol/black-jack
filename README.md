@@ -161,6 +161,7 @@ Scripted bots can play full Liar's Table games (normal and Devil rules) against 
 npm run dev          # in one terminal (http://localhost:8787)
 CP=1.0 npm run e2e:liars devil   # in another: always-challenge Devil game
 npm run e2e:liars normal         # normal rules
+npm run e2e:blackjack            # full 2-round blackjack game
 ```
 
 MIT. See [LICENSE](LICENSE).

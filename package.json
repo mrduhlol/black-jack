@@ -7,7 +7,8 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "wrangler types && tsc --noEmit",
-    "e2e:liars": "node e2e-liars.mjs"
+    "e2e:liars": "node e2e-liars.mjs",
+    "e2e:blackjack": "node e2e-blackjack.mjs"
   },
   "license": "MIT",
   "devDependencies": {
