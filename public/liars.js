@@ -661,6 +661,10 @@ function lbRenderRisk() {
     row.appendChild(b);
   });
   bx.appendChild(row);
+  const timer = document.createElement('p');
+  timer.className = 'lb-risk-timer';
+  timer.id = 'lbRiskTimer';
+  bx.appendChild(timer);
   if (lbRoom.risk && lbRoom.risk.queueLeft > 0) {
     const q = document.createElement('p');
     q.className = 'lb-risk-queue';
@@ -678,6 +682,8 @@ function lbRenderRisk() {
 
 let lbLastRiskSlots = null;
 function lbRiskInfo() { return lbLastRiskSlots; }
+let lbRiskEndsAt = 0;
+let lbRiskSeenFor = null;
 
 // Keyboard shortcuts: L = LIAR!, C = continue, Enter = play selected.
 // Ignored while typing in chat or when the bar is not on screen.
@@ -772,6 +778,17 @@ setInterval(() => {
     note.classList.toggle('urgent',
       !!(lbRoom && lbRoom.state === 'playing' && lbEndsAt > Date.now() && lbEndsAt - Date.now() < 6000));
   }
+  const rt = $('lbRiskTimer');
+  if (rt) {
+    if (lbRiskEndsAt > Date.now()) {
+      const s = Math.ceil((lbRiskEndsAt - Date.now()) / 1000);
+      rt.textContent = `${s}s to pick`;
+      rt.classList.toggle('urgent', s <= 5);
+    } else {
+      rt.textContent = '';
+      rt.classList.remove('urgent');
+    }
+  }
 }, 500);
 
 // ---------- events ----------
@@ -828,6 +845,11 @@ LbNet.on('room', (r) => {
     lbEndsAt = Date.now() + (Number((r.settings && r.settings.turnTimer) || 30)) * 1000;
   }
   lbLastTurnSeen = r.turnId || null;
+  if (r.state === 'risk' && r.risk && r.risk.playerId !== lbRiskSeenFor) {
+    lbRiskSeenFor = r.risk.playerId;
+    lbRiskEndsAt = Date.now() + (Number((r.settings && r.settings.turnTimer) || 30)) * 1000;
+  }
+  if (r.state !== 'risk') { lbRiskEndsAt = 0; lbRiskSeenFor = null; }
   lbShow('liarGame');
   lbRender();
 });
@@ -857,8 +879,9 @@ LbNet.on('liar_reveal', (m) => {
     lbRenderReveal();
   }, 1100);
 });
-LbNet.on('liar_risk', () => {
+LbNet.on('liar_risk', ({ endsIn }) => {
   lbLastRiskSlots = null;
+  lbRiskEndsAt = Date.now() + (Number(endsIn) || 30) * 1000;
   try { Sound.revolverSpin(); } catch (e) {}
 });
 LbNet.on('liar_risk_result', ({ slots, fatal, playerName }) => {

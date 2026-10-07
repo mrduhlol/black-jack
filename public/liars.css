@@ -308,6 +308,8 @@
   letter-spacing: 0.14em; text-transform: uppercase; margin: 0 0 16px;
 }
 .lb-risk-queue { color: var(--lb-brass-hi); font-size: 12.5px; font-weight: 700; margin: 12px 0 0; }
+.lb-risk-timer { color: var(--lb-muted); font-size: 12px; font-variant-numeric: tabular-nums; margin: 12px 0 0; min-height: 1.2em; }
+.lb-risk-timer.urgent { color: #e07864; font-weight: 800; }
 /* devil card: marked rank card, rides alone */
 .lb-card { position: relative; }
 .lb-card.devil {
