@@ -901,7 +901,12 @@ LbNet.on('liar_risk_result', ({ slots, fatal, playerName }) => {
     el.classList.add(fatal ? 'live' : 'safe');
   }
   if (fatal) { try { Sound.bang(); } catch (e) {} lbFatalFlash(); }
-  else { try { Sound.emptyClick(); Sound.survive(); } catch (e) {} }
+  else {
+    try { Sound.emptyClick(); Sound.survive(); } catch (e) {}
+    try {
+      if (window.FX && window.FX.burst) window.FX.burst(14, ['★', '✦', '♠'], ['#ecd9a8', '#c9a35c', '#9db38f']);
+    } catch (e) {}
+  }
   setTimeout(() => lbRenderRisk(), 400);
 });
 LbNet.on('liar_gameover', (m) => {
