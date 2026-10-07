@@ -981,6 +981,34 @@ body[data-mode="liars"] .rules-number {
 .lb-board-meta { display: flex; flex-direction: column; }
 .lb-board-meta b { font-size: 13.5px; }
 .lb-board-meta span { font-size: 11.5px; color: var(--lb-muted); }
+/* bar mist drifting over the table */
+.lb-table-zone::before {
+  content: "";
+  position: absolute; inset: -6% -12%; z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 22% at 30% 70%, rgba(200, 180, 150, 0.07), transparent 70%),
+    radial-gradient(ellipse 55% 20% at 70% 60%, rgba(200, 180, 150, 0.06), transparent 70%);
+  animation: lbMist 9s ease-in-out infinite alternate;
+}
+@keyframes lbMist {
+  from { transform: translateX(-3%); opacity: 0.7; }
+  to { transform: translateX(3%); opacity: 1; }
+}
+/* patterned face-down pile backs */
+.lb-pile-card {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(236, 217, 168, 0.28) 0 2px, transparent 3px),
+    linear-gradient(135deg, #4a1620 0%, #230b10 70%);
+  background-size: 10px 10px, cover;
+}
+/* hub runs hot while a challenge hangs */
+.lb-hub.hot .lb-declare {
+  border-color: #e07864;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(179, 64, 46, 0.5);
+  animation: lbUrgent 1s infinite;
+}
 .lb-chat-wrap { max-width: 720px; margin: 12px auto 0; }
 .lb-chat {
   height: 150px; overflow-y: auto;

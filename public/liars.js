@@ -380,6 +380,8 @@ function lbRenderTable() {
   } else {
     note.classList.remove('decide');
   }
+  const hub = zone.querySelector('.lb-hub');
+  if (hub) hub.classList.toggle('hot', lbRoom.state === 'playing' && lbRoom.stage === 'decide');
 
   lbRenderHand();
   lbRenderActions();
