@@ -718,6 +718,10 @@ LbNet.on('room', (r) => {
   }
   const chatWrap = $('lbChatWrap');
   if (chatWrap) chatWrap.classList.toggle('hidden', r.state === 'lobby');
+  if (r.state === 'lobby' || r.state === 'playing') {
+    const ev = $('lbEndVeil');
+    if (ev) ev.remove();
+  }
   if (!(r.state === 'playing' && r.turnId === lbMyId)) {
     document.title = 'Liar’s Table — Bluff. Challenge. Survive.';
   }
@@ -769,9 +773,79 @@ LbNet.on('liar_gameover', (m) => {
   lbLastReveal = null;
   const veil = $('lbRiskVeil');
   if (veil) veil.remove();
-  Sound.win();
+  try { Sound.win(); } catch (e) {}
   lbRender();
+  lbShowEndVeil(m);
 });
+
+function lbShowEndVeil(go) {
+  if (!go) return;
+  let veil = $('lbEndVeil');
+  if (veil) veil.remove();
+  veil = document.createElement('div');
+  veil.id = 'lbEndVeil';
+  veil.className = 'lb-end-veil';
+  const bx = document.createElement('div');
+  bx.className = 'lb-end-box';
+  const brow = document.createElement('p');
+  brow.className = 'eyebrow';
+  brow.textContent = 'LAST ONE STANDING';
+  const h = document.createElement('h2');
+  h.textContent = `${go.winnerName} takes the table`;
+  const note = document.createElement('p');
+  note.className = 'lb-end-note';
+  note.textContent = go.note || '';
+  bx.appendChild(brow);
+  bx.appendChild(h);
+  bx.appendChild(note);
+  if (go.board && go.board.length) {
+    const table = document.createElement('div');
+    table.className = 'lb-board';
+    go.board.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'lb-board-row' + (p.eliminated ? ' dead' : '');
+      row.appendChild(lbAvatarImg({ name: p.name, avatar: p.avatar }, ''));
+      const meta = document.createElement('div');
+      meta.className = 'lb-board-meta';
+      const st = p.stats || {};
+      const nm = document.createElement('b');
+      nm.textContent = `#${i + 1} ${p.name}`;
+      const sub = document.createElement('span');
+      sub.textContent = `W${st.wins || 0} · survived ${st.survivals || 0} · calls won ${st.challengesWon || 0}${p.eliminated ? ' · OUT' : ''}`;
+      meta.appendChild(nm);
+      meta.appendChild(sub);
+      row.appendChild(meta);
+      table.appendChild(row);
+    });
+    bx.appendChild(table);
+  }
+  const actions = document.createElement('div');
+  actions.className = 'lb-end-actions';
+  const me = lbMe();
+  if (me && me.isHost) {
+    const again = document.createElement('button');
+    again.className = 'lb-btn primary';
+    again.type = 'button';
+    again.textContent = 'Play again';
+    again.onclick = () => { Sound.unlock(); try { Sound.chips(); } catch (e) {} LbNet.send({ t: 'rematch' }); };
+    actions.appendChild(again);
+  }
+  const close = document.createElement('button');
+  close.className = 'lb-btn quiet';
+  close.type = 'button';
+  close.textContent = 'View table';
+  close.onclick = () => { Sound.click(); veil.remove(); };
+  actions.appendChild(close);
+  const leave = document.createElement('button');
+  leave.className = 'lb-btn quiet';
+  leave.type = 'button';
+  leave.textContent = 'Leave';
+  leave.onclick = () => lbLeave();
+  actions.appendChild(leave);
+  bx.appendChild(actions);
+  veil.appendChild(bx);
+  document.body.appendChild(veil);
+}
 LbNet.on('liar_error', ({ message }) => lbToast(String(message || 'Action not allowed'), 'bad'));
 LbNet.on('error', ({ message }) => lbToast(String(message || 'Could not join room'), 'bad'));
 LbNet.on('kicked', () => {
@@ -830,6 +904,8 @@ function lbLeave() {
   lbLastReveal = null;
   lbRevealPending = null;
   lbLastGameover = null;
+  const endVeil = $('lbEndVeil');
+  if (endVeil) endVeil.remove();
   const veil = $('lbRiskVeil');
   if (veil) veil.remove();
   location.href = '/';
