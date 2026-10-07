@@ -227,6 +227,12 @@ function lbRenderLobby() {
   deck.textContent = '20-card deck · Kings, Queens, Aces + 2 wild Jokers · 5 cards each';
   box.appendChild(deck);
 
+  const odds = document.createElement('p');
+  odds.className = 'lb-oddsline';
+  const chN = lbRoom.settings.chambers, lvN = lbRoom.settings.liveChambers;
+  odds.textContent = `${chN} chambers · ${lvN} live · ${Math.round((lvN / chN) * 100)}% sudden death`;
+  box.appendChild(odds);
+
   const inv = document.createElement('button');
   inv.className = 'lb-btn quiet lb-invite';
   inv.type = 'button';
@@ -710,6 +716,9 @@ LbNet.on('room', (r) => {
   }
   const chatWrap = $('lbChatWrap');
   if (chatWrap) chatWrap.classList.toggle('hidden', r.state === 'lobby');
+  if (!(r.state === 'playing' && r.turnId === lbMyId)) {
+    document.title = 'Liar’s Table — Bluff. Challenge. Survive.';
+  }
   lbShow('liarGame');
   lbRender();
 });
@@ -717,6 +726,7 @@ LbNet.on('room', (r) => {
 LbNet.on('phase', () => { lbEndsAt = 0; });
 LbNet.on('liar_turn', ({ stage, endsIn }) => {
   lbEndsAt = Date.now() + (Number(endsIn) || 30) * 1000;
+  document.title = 'Your turn! — Liar’s Table';
   void stage;
 });
 LbNet.on('liar_played', ({ by }) => {

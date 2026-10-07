@@ -116,12 +116,17 @@ function updateOrientationGate() {
   if (!orientationGate) return;
   orientationGate.classList.toggle('hidden', !isPhone);
   orientationContinue.hidden = !isPhone || isPortrait;
+  const isLiar = document.body && document.body.dataset.mode === 'liars';
   if (isPortrait) {
     orientationTitle.textContent = 'Rotate your phone';
-    orientationHint.textContent = 'Blackjack is designed to be played in landscape. Turn your phone sideways to continue.';
+    orientationHint.textContent = isLiar
+      ? 'The bar is best viewed sideways. Turn your phone to take your seat.'
+      : 'Blackjack is designed to be played in landscape. Turn your phone sideways to continue.';
   } else {
     orientationTitle.textContent = 'Ready to play in landscape';
-    orientationHint.textContent = 'Enter full screen for an immersive table. Your browser controls will be hidden when supported.';
+    orientationHint.textContent = isLiar
+      ? 'Enter full screen for the full bar-room atmosphere.'
+      : 'Enter full screen for an immersive table. Your browser controls will be hidden when supported.';
   }
 }
 async function enterMobilePlay() {
@@ -473,6 +478,7 @@ function applyLandingTheme() {
   setText('.rules-note', copy.rulesNote);
   const footSpans = [...document.querySelectorAll('.landing-foot span')].filter((el) => !el.classList.contains('foot-sep'));
   footSpans.forEach((el, i) => { if (copy.foot[i] !== undefined) el.textContent = copy.foot[i]; });
+  if (typeof updateOrientationGate === 'function') { try { updateOrientationGate(); } catch (e) {} }
 }
 function paintModePicker() {
   const bj = $('modeBjBtn'), liar = $('modeLiarBtn');

@@ -428,7 +428,8 @@ export class LiarsBarRoom {
   // ---------- membership ----------
 
   private async onJoin(ws: WebSocket, msg: Record<string, unknown>): Promise<void> {
-    const name = String(msg.name || 'Player').slice(0, 14) || 'Player';
+    const rawName = String(msg.name || 'Player').replace(/\s+/g, ' ').trim().slice(0, 14);
+    const name = rawName || 'Player';
     const avatar = (msg.avatar as Avatar) && (msg.avatar as Avatar).style
       ? (msg.avatar as Avatar)
       : { style: 'adventurer', seed: name + String(Date.now() % 997), bg: 'ffd54f' };
