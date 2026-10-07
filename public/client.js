@@ -219,6 +219,7 @@ function clearActionPending() {
 function markActionPending(btn) {
   if (!btn) return;
   btn.classList.add('pending');
+  btn.disabled = true; // the room echo re-enables everything
   document.querySelectorAll('.btn.action').forEach((b) => {
     if (b !== btn) { b.disabled = true; b.classList.add('awaiting'); }
   });
