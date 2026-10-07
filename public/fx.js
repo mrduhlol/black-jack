@@ -163,16 +163,16 @@
 
   /* ---------- win bursts: DOM chips + flash + shake ---------- */
   const layer = $('burst-layer'), flash = $('flash'), wrap = $('shake-wrap');
-  function burst(n = 26, emojis = ['♠', '♥', '♦', '♣', '★', '$', '✦']) {
+  function burst(n = 26, emojis = ['♠', '♥', '♦', '♣', '★', '$', '✦'], colors = null) {
     if (!active || !layer || reduced()) return;
     const cx = window.innerWidth / 2, cy = window.innerHeight * 0.38;
+    const palette = colors || ['#ffd447', '#ff3d81', '#22e6ff'];
     for (let i = 0; i < n; i++) {
       const s = document.createElement('span');
       s.className = 'burst-p';
       s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      const gold = Math.random() < 0.55;
       s.style.left = cx + 'px'; s.style.top = cy + 'px';
-      s.style.color = gold ? '#ffd447' : (Math.random() < 0.5 ? '#ff3d81' : '#22e6ff');
+      s.style.color = palette[Math.floor(Math.random() * palette.length)];
       s.style.fontSize = (14 + Math.random() * 22) + 'px';
       s.style.textShadow = '0 0 12px currentColor';
       const ang = Math.random() * Math.PI * 2, dist = 120 + Math.random() * 320;

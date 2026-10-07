@@ -813,7 +813,7 @@ LbNet.on('liar_gameover', (m) => {
   if (veil) veil.remove();
   try { Sound.win(); } catch (e) {}
   try {
-    if (window.FX && window.FX.burst) window.FX.burst(44, ['♠', '★', '✦', '♣', '♦']);
+    if (window.FX && window.FX.burst) window.FX.burst(44, ['♠', '★', '✦', '♣', '♦'], ['#ecd9a8', '#c9a35c', '#e07864', '#b3402e']);
   } catch (e) {}
   lbRender();
   lbShowEndVeil(m);
