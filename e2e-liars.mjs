@@ -50,6 +50,20 @@ const bots = [
 for (const b of bots) await b.connect();
 await sleep(500);
 
+// lobby chat must route before the game starts
+let lobbyEcho = false;
+const lobbyProbe = (ev) => {
+  try {
+    const m = JSON.parse(ev.data);
+    if (m.t === 'chat' && m.text === 'lobby-hi') lobbyEcho = true;
+  } catch {}
+};
+bots[0].ws.addEventListener('message', lobbyProbe);
+bots[0].send({ t: 'chat', text: 'lobby-hi' });
+const ldead = Date.now() + 10000;
+while (Date.now() < ldead && !lobbyEcho) await sleep(250);
+console.log('LOBBYCHAT', lobbyEcho ? 'PASS' : 'FAIL');
+
 if (MODE === 'devil') {
   bots[0].send({ t: 'set_settings', devilMode: true, turnTimer: 10 });
   await sleep(300);
@@ -147,7 +161,7 @@ await sleep(1000);
 const cooldownPass = afterBurst === 1 && chatEchoes === 2;
 console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
 
-if (gamePass && rematchPass && cooldownPass) {
+if (gamePass && rematchPass && lobbyEcho && cooldownPass) {
   console.log('E2E_PASS');
   process.exitCode = 0;
 } else {
