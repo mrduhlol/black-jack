@@ -105,13 +105,40 @@ bots[0].ws.addEventListener('message', (ev) => {
 while (Date.now() < deadline && !seen.over) await sleep(500);
 
 console.log('STATS', JSON.stringify(stats));
+let gamePass = false;
 if (seen.over) {
   console.log(`GAMEOVER winner=${seen.over.winnerName} note=${seen.over.note}`);
   console.log('BOARD', JSON.stringify(seen.over.board.map((p) => ({ n: p.name, out: p.eliminated, st: p.stats }))));
+  gamePass = true;
+} else {
+  console.log('E2E_FAIL no gameover in time');
+}
+
+// cooldown probe: 3 rapid chats -> exactly 1 echo; after 1.2s the next goes through
+let chatEchoes = 0;
+const chatProbe = (ev) => {
+  try {
+    const m = JSON.parse(ev.data);
+    if (m.t === 'chat' && !m.sys && typeof m.text === 'string' && m.text.startsWith('spam-')) chatEchoes++;
+  } catch {}
+};
+bots[0].ws.addEventListener('message', chatProbe);
+bots[0].send({ t: 'chat', text: 'spam-1' });
+bots[0].send({ t: 'chat', text: 'spam-2' });
+bots[0].send({ t: 'chat', text: 'spam-3' });
+await sleep(600);
+const afterBurst = chatEchoes;
+await sleep(1200);
+bots[0].send({ t: 'chat', text: 'spam-4' });
+await sleep(600);
+const cooldownPass = afterBurst === 1 && chatEchoes === 2;
+console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
+
+if (gamePass && cooldownPass) {
   console.log('E2E_PASS');
   process.exitCode = 0;
 } else {
-  console.log('E2E_FAIL no gameover in time');
+  console.log('E2E_FAIL');
   process.exitCode = 1;
 }
 bots.forEach((b) => b.close());
