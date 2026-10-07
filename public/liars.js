@@ -656,7 +656,7 @@ function lbRenderRisk() {
     b.disabled = !iAmPicker || s.picked;
     b.setAttribute('aria-label', `Chamber ${i + 1}`);
     if (iAmPicker && !s.picked) {
-      b.onclick = () => { Sound.unlock(); Sound.click(); LbNet.send({ t: 'risk_pick', slot: i }); };
+      b.onclick = () => { Sound.unlock(); try { Sound.emptyClick(); } catch (e) { Sound.click(); } LbNet.send({ t: 'risk_pick', slot: i }); };
     }
     row.appendChild(b);
   });
