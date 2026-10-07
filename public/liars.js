@@ -104,6 +104,7 @@ let lbRevealPending = null;
 let lbEndsAt = 0;
 let lbPrevRank = null;
 let lbLastTurnSeen = null;
+let lbWarnKey = null;
 let lbOutWarned = new Set();
 
 // Table-cast flavor: every outlaw face gets a vice line in the roster.
@@ -787,6 +788,14 @@ setInterval(() => {
     } else {
       rt.textContent = '';
       rt.classList.remove('urgent');
+    }
+  }
+  if (lbRoom && lbRoom.state === 'playing' && lbEndsAt > Date.now()) {
+    const s = Math.ceil((lbEndsAt - Date.now()) / 1000);
+    const key = `${lbRoom.round}:${lbRoom.turnId}`;
+    if (s <= 5 && lbWarnKey !== key) {
+      lbWarnKey = key;
+      try { Sound.warning(); } catch (e) {}
     }
   }
 }, 500);
