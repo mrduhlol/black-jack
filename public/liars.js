@@ -847,7 +847,7 @@ LbNet.on('room', (r) => {
     });
   }
   const chatWrap = $('lbChatWrap');
-  if (chatWrap) chatWrap.classList.toggle('hidden', r.state === 'lobby');
+  if (chatWrap) chatWrap.classList.remove('hidden');
   if (r.state === 'lobby' || r.state === 'playing') {
     const ev = $('lbEndVeil');
     if (ev) ev.remove();
