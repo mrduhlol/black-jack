@@ -151,6 +151,7 @@ function lbAvatarImg(p, cls) {
   const img = document.createElement('img');
   img.className = cls;
   img.alt = p.name;
+  img.onerror = () => { img.replaceWith(document.createTextNode('🎭')); };
   try {
     img.src = avatarUrl(p.avatar);
   } catch (e) {
@@ -470,6 +471,14 @@ function lbRenderActions() {
     return;
   }
   if (lbRoom.stage === 'play') {
+    const hand = (me.cards || []);
+    const tr = lbRoom.tableRank;
+    const holdRank = hand.filter((c) => c.rank === tr).length;
+    const holdWild = hand.filter((c) => c.rank === 'JOKER').length;
+    const line = document.createElement('div');
+    line.className = 'lb-countline';
+    line.textContent = `You hold ${holdRank} ${lbRankLabel(tr)} + ${holdWild} wild`;
+    box.appendChild(line);
     const n = lbSelected.size;
     const btn = document.createElement('button');
     btn.className = 'lb-btn primary';
@@ -798,6 +807,9 @@ LbNet.on('liar_gameover', (m) => {
   const veil = $('lbRiskVeil');
   if (veil) veil.remove();
   try { Sound.win(); } catch (e) {}
+  try {
+    if (window.FX && window.FX.burst) window.FX.burst(44, ['♠', '★', '✦', '♣', '♦']);
+  } catch (e) {}
   lbRender();
   lbShowEndVeil(m);
 });

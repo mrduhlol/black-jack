@@ -992,6 +992,17 @@ body[data-mode="liars"] .rules-number {
 .lb-board-meta { display: flex; flex-direction: column; }
 .lb-board-meta b { font-size: 13.5px; }
 .lb-board-meta span { font-size: 11.5px; color: var(--lb-muted); }
+/* memory aid: what you actually hold */
+.lb-countline {
+  display: inline-block;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--lb-brass-hi);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(201, 163, 92, 0.4);
+  border-radius: 999px;
+  padding: 5px 13px;
+  margin-bottom: 8px;
+}
 /* bar mist drifting over the table */
 .lb-table-zone::before {
   content: "";
