@@ -501,6 +501,7 @@ input:focus,select:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 
 .podium .p3{background:linear-gradient(180deg,#e0a56f,#a86a32);color:#fff;min-height:88px}
 .podium img{width:44px;height:44px;border-radius:50%;background:#fff}
 .winner-stats{font-size:12.5px;color:#5c665f;margin-bottom:14px;overflow-wrap:anywhere}
+.winner-wait{font-size:13px;color:#5c665f;font-style:italic;margin:-6px 0 12px}
 .modal-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .confetti span{position:absolute;top:-10px;font-size:18px;animation:fall 2.6s linear forwards;pointer-events:none}
 @keyframes fall{to{transform:translateY(460px) rotate(360deg);opacity:0}}

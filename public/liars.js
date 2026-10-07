@@ -740,6 +740,11 @@ function lbRenderGameover(box) {
     again.textContent = 'Play again';
     again.onclick = () => { Sound.unlock(); Sound.chips(); LbNet.send({ t: 'rematch' }); };
     box.appendChild(again);
+  } else {
+    const wait = document.createElement('div');
+    wait.className = 'lb-waitline';
+    wait.textContent = 'Waiting for the host to run it back…';
+    box.appendChild(wait);
   }
 }
 

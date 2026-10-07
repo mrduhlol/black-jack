@@ -1117,3 +1117,4 @@ body[data-mode="liars"] .rules-number {
 .lb-end-note { color: var(--lb-muted); font-size: 13.5px; margin: 0 0 6px; }
 .lb-end-box .lb-board { text-align: left; }
 .lb-end-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.lb-waitline { color: var(--lb-muted); font-size: 13px; font-style: italic; margin-top: 12px; }

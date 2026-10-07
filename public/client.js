@@ -1422,6 +1422,16 @@ function showWinnerModal(board) {
   $('winnerStats').textContent = board.map((b) => `${b.name}: ${b.stats.wins}W/${b.stats.losses}L/${b.stats.pushes}P, ${b.stats.blackjacks} BJ`).join(' · ');
   const isHost = room && room.hostId === myId;
   $('rematchBtn').classList.toggle('hidden', !isHost);
+  let remWait = $('rematchWait');
+  if (!isHost) {
+    if (!remWait) {
+      remWait = document.createElement('div');
+      remWait.id = 'rematchWait';
+      remWait.className = 'winner-wait';
+      $('winnerStats').after(remWait);
+    }
+    remWait.textContent = 'Waiting for the host to run it back…';
+  } else if (remWait) remWait.remove();
   const conf = $('confetti');
   conf.innerHTML = '';
   if (!reduceMotion()) {
