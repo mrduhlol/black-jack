@@ -150,6 +150,7 @@ export class LiarsBarRoom {
   private risk: RiskState | null = null;
   private round = 0;
   private history: string[] = [];
+  private chatCooldown = new Map<string, number>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     this.ctx = ctx;
@@ -333,6 +334,22 @@ export class LiarsBarRoom {
     this.sendAll({ t: 'chat', sys: true, text });
   }
 
+  private checkChatCooldown(playerId: string): boolean {
+    const now = Date.now();
+    const last = this.chatCooldown.get(playerId) || 0;
+    if (now - last < 1000) return false;
+    this.chatCooldown.set(playerId, now);
+    if (this.chatCooldown.size > 50) {
+      let oldestKey: string | null = null;
+      let oldestAt = Infinity;
+      for (const [id, at] of this.chatCooldown) {
+        if (at < oldestAt) { oldestAt = at; oldestKey = id; }
+      }
+      if (oldestKey) this.chatCooldown.delete(oldestKey);
+    }
+    return true;
+  }
+
   private async reportDirectory(): Promise<void> {
     try {
       const stub = this.env.LOBBY.get(this.env.LOBBY.idFromName('lobby'));
@@ -509,12 +526,14 @@ export class LiarsBarRoom {
       case 'chat': {
         const text = String(msg.text || '').slice(0, 200);
         if (!text.trim()) return;
+        if (!this.checkChatCooldown(player.id)) return;
         this.sendAll({ t: 'chat', name: player.name, avatar: player.avatar, text });
         break;
       }
       case 'emote': {
         const emoji = String(msg.emoji || '');
         if (!EMOTE_ALLOWLIST.includes(emoji)) return;
+        if (!this.checkChatCooldown(player.id)) return;
         this.sendAll({ t: 'emote', name: player.name, emoji });
         break;
       }
