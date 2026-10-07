@@ -153,4 +153,14 @@ npm run dev
 
 Then open the URL shown in the terminal (usually http://localhost:8787).
 
+### End-to-end liar games
+
+Scripted bots can play full Liar's Table games (normal and Devil rules) against a local dev server:
+
+```bash
+npm run dev          # in one terminal (http://localhost:8787)
+CP=1.0 npm run e2e:liars devil   # in another: always-challenge Devil game
+npm run e2e:liars normal         # normal rules
+```
+
 MIT. See [LICENSE](LICENSE).
