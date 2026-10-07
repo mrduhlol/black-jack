@@ -249,6 +249,25 @@ function lbRenderLobby() {
   };
   box.appendChild(inv);
 
+  const rules = document.createElement('details');
+  rules.className = 'lb-rules';
+  const sum = document.createElement('summary');
+  sum.textContent = 'House rules';
+  rules.appendChild(sum);
+  const ol = document.createElement('ol');
+  [
+    'Lay 1–3 cards face-down as the table rank — Kings, Queens or Aces. Jokers are wild.',
+    'Next seat calls LIAR! or lets it slide and plays on.',
+    'Wrong side of a challenge faces the chamber. Survive and take the pile.',
+    'Empty your hand and live, or be the last one standing.',
+  ].forEach((t) => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    ol.appendChild(li);
+  });
+  rules.appendChild(ol);
+  box.appendChild(rules);
+
   const roster = document.createElement('div');
   roster.className = 'lb-roster';
   lbRoom.players.forEach((p) => {
