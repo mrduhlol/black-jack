@@ -103,6 +103,7 @@ let lbLastReveal = null;
 let lbRevealPending = null;
 let lbEndsAt = 0;
 let lbPrevRank = null;
+let lbLastTurnSeen = null;
 let lbOutWarned = new Set();
 
 // Table-cast flavor: every outlaw face gets a vice line in the roster.
@@ -758,6 +759,10 @@ LbNet.on('room', (r) => {
   if (!(r.state === 'playing' && r.turnId === lbMyId)) {
     document.title = 'Liar’s Table — Bluff. Challenge. Survive.';
   }
+  if (r.state === 'playing' && r.turnId && r.turnId !== lbMyId && r.turnId !== lbLastTurnSeen) {
+    lbEndsAt = Date.now() + (Number((r.settings && r.settings.turnTimer) || 30)) * 1000;
+  }
+  lbLastTurnSeen = r.turnId || null;
   lbShow('liarGame');
   lbRender();
 });
