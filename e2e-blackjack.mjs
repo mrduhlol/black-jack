@@ -88,6 +88,19 @@ if (seen.over) {
   console.log('E2E_FAIL no gameover in time');
 }
 
+// rematch: host runs it back, betting must reopen
+let rematchPass = false;
+if (gamePass) {
+  seen.over = null;
+  bots[0].send({ t: 'rematch' });
+  const rdead = Date.now() + 60000;
+  while (Date.now() < rdead && !rematchPass) {
+    await sleep(500);
+    rematchPass = bots.some((b) => b.room && (b.room.state === 'betting' || b.room.state === 'playing'));
+  }
+}
+console.log('REMATCH', rematchPass ? 'PASS' : 'FAIL');
+
 let chatEchoes = 0;
 const chatProbe = (ev) => {
   try {
@@ -107,7 +120,7 @@ await sleep(600);
 const cooldownPass = afterBurst === 1 && chatEchoes === 2;
 console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
 
-if (gamePass && cooldownPass) {
+if (gamePass && rematchPass && cooldownPass) {
   console.log('E2E_PASS');
   process.exitCode = 0;
 } else {
