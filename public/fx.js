@@ -84,20 +84,32 @@
     glow._startFollow = follow;
   }
 
-  /* ---------- hero 3D tilt ---------- */
+  /* ---------- hero 3D tilt (both tables: card fan + bar table) ---------- */
   const fan = $('heroFan');
-  if (fan && window.matchMedia('(hover:hover)').matches) {
+  const barHero = $('barHero');
+  if (window.matchMedia('(hover:hover)').matches) {
     const card = $('setupCard') || fan;
+    const tiltTarget = () => {
+      if (document.body.dataset.mode === 'liars' && barHero) return barHero;
+      return fan;
+    };
     card.addEventListener('pointermove', (e) => {
       if (!active) return;
-      const r = fan.getBoundingClientRect();
+      const t = tiltTarget();
+      if (!t) return;
+      const r = t.getBoundingClientRect();
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const dx = (e.clientX - cx) / r.width, dy = (e.clientY - cy) / r.height;
-      fan.style.setProperty('--ry', `${Math.max(-14, Math.min(14, dx * 18))}deg`);
-      fan.style.setProperty('--rx', `${Math.max(-12, Math.min(12, -dy * 14))}deg`);
+      t.style.setProperty('--ry', `${Math.max(-14, Math.min(14, dx * 18))}deg`);
+      t.style.setProperty('--rx', `${Math.max(-12, Math.min(12, -dy * 14))}deg`);
+      t.style.transform = `rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))`;
     });
     card.addEventListener('pointerleave', () => {
-      fan.style.setProperty('--rx', '0deg'); fan.style.setProperty('--ry', '0deg');
+      for (const t of [fan, barHero]) {
+        if (!t) continue;
+        t.style.setProperty('--rx', '0deg'); t.style.setProperty('--ry', '0deg');
+        t.style.transform = '';
+      }
     });
   }
 
@@ -128,6 +140,7 @@
     if (ctx) ctx.clearRect(0, 0, W, H);
     if (glow) glow.style.transform = 'translate(-9999px,-9999px)';
     if (fan) { fan.style.setProperty('--rx', '0deg'); fan.style.setProperty('--ry', '0deg'); }
+    if (barHero) { barHero.style.setProperty('--rx', '0deg'); barHero.style.setProperty('--ry', '0deg'); barHero.style.transform = ''; }
     document.querySelectorAll('.magnetic').forEach((btn) => { btn.style.transform = ''; });
     if (layer) layer.replaceChildren();
     if (flash) flash.classList.remove('go');

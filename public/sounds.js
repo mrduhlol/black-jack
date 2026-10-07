@@ -124,5 +124,12 @@ const Sound = (() => {
     reveal() { tone(392, 0.09, 'triangle', 0.13); tone(494, 0.09, 'triangle', 0.13, 0.08); tone(587, 0.16, 'triangle', 0.13, 0.16); },
     roundStart() { tone(523, 0.09, 'triangle', 0.14); tone(784, 0.14, 'triangle', 0.14, 0.09); },
     roundEnd() { tone(587, 0.1, 'triangle', 0.12); tone(392, 0.16, 'triangle', 0.12, 0.1); },
+    // Liar's Table kit: card slams, accusation stings, revolver foley.
+    slap() { noise(0.07, 0.2, 1400, 0, 0.8); noise(0.05, 0.14, 2600, 0.03); tone(180, 0.08, 'triangle', 0.14, 0.01); },
+    liar() { tone(233, 0.16, 'sawtooth', 0.1); tone(247, 0.16, 'sawtooth', 0.1, 0.02); tone(466, 0.3, 'sawtooth', 0.08, 0.18); noise(0.2, 0.05, 900, 0.18); },
+    revolverSpin() { for (let i = 0; i < 6; i++) noise(0.03, 0.12, 4200 + i * 300, i * 0.07); tone(330, 0.1, 'triangle', 0.08, 0.45); },
+    emptyClick() { noise(0.04, 0.2, 3200); tone(1200, 0.04, 'square', 0.06, 0.01); },
+    bang() { noise(0.5, 0.3, 400, 0, 0.6); tone(90, 0.5, 'sine', 0.3); tone(55, 0.6, 'sine', 0.25, 0.03); },
+    survive() { tone(392, 0.12, 'sine', 0.12); tone(523, 0.2, 'sine', 0.12, 0.1); },
   };
 })();

@@ -255,15 +255,41 @@ setInterval(() => {
   }
 }, 500);
 
-// --- character picker ---
-let avatar = { style: AVATAR_STYLES[0].id, seed: randomSeed(), bg: AVATAR_BGS[0] };
+// --- character picker (per-table casts: casino crew vs bar patrons) ---
+// Each table remembers its own face: flipping modes never wipes the other look.
+let avatarMode = 'blackjack';
+const avatarChoices = {
+  blackjack: { style: 'adventurer', seed: randomSeed(), bg: 'ffd54f' },
+  liars: { style: 'adventurer-neutral', seed: randomSeed(), bg: '3a2417' },
+};
+let avatar = avatarChoices.blackjack;
+
+function currentAvatarStyles() {
+  try {
+    if (typeof avatarStylesFor === 'function') return avatarStylesFor(avatarMode);
+  } catch (e) {}
+  return AVATAR_STYLES;
+}
+function currentAvatarBgs() {
+  try {
+    if (typeof avatarBgsFor === 'function') return avatarBgsFor(avatarMode);
+  } catch (e) {}
+  return AVATAR_BGS;
+}
+function ensureAvatarForMode() {
+  const styles = currentAvatarStyles();
+  const bgs = currentAvatarBgs();
+  if (!styles.some((s) => s.id === avatar.style)) avatar.style = styles[0].id;
+  if (!bgs.includes(avatar.bg)) avatar.bg = bgs[0];
+}
 
 function buildAvatarPicker() {
+  ensureAvatarForMode();
   const sr = $('styleRow');
   const cr = $('colorRow');
   sr.innerHTML = '';
   cr.innerHTML = '';
-  AVATAR_STYLES.forEach((s) => {
+  currentAvatarStyles().forEach((s) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = s.label;
@@ -272,7 +298,7 @@ function buildAvatarPicker() {
     b.onclick = () => { Sound.unlock(); Sound.click(); avatar.style = s.id; [...sr.children].forEach((x) => { x.classList.remove('sel'); x.setAttribute('aria-pressed', 'false'); }); b.classList.add('sel'); b.setAttribute('aria-pressed', 'true'); renderAvatar(); };
     sr.appendChild(b);
   });
-  AVATAR_BGS.forEach((c) => {
+  currentAvatarBgs().forEach((c) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.style.background = '#' + c;
@@ -286,7 +312,8 @@ function buildAvatarPicker() {
 }
 function renderAvatar() {
   const img = $('avatarPreview');
-  img.src = avatarUrl(avatar);
+  if (!img) return;
+  try { img.src = avatarUrl(avatar); } catch (e) { img.src = ''; }
   img.style.background = '#' + avatar.bg;
 }
 $('shuffleBtn').onclick = () => { Sound.unlock(); Sound.click(); avatar.seed = randomSeed(); renderAvatar(); };
@@ -298,8 +325,155 @@ buildAvatarPicker();
 buildChipTray();
 initSoundUI();
 initMobileTabs();
-// --- game-mode picker (blackjack vs liar's bar; blackjack stays default) ---
+// --- game-mode picker (blackjack vs liar's table; blackjack stays default) ---
+// Picking Liar's Table re-skins the whole landing: body[data-mode] flips the
+// CSS tokens (see liars.css) and the copy below swaps casino text for bar text.
 let selectedMode = 'blackjack';
+try {
+  const saved = localStorage.getItem('blackjack.tableMode');
+  if (saved === 'liars' || saved === 'blackjack') selectedMode = saved;
+} catch (e) {}
+const LANDING_COPY = {
+  blackjack: {
+    title: 'black-jack.io — Multiplayer Blackjack',
+    themeColor: '#080e0b',
+    brandText: 'BLACK-JACK<span class="brand-io">.IO</span>',
+    brandSub: 'Neon Casino',
+    brandChip: '21',
+    tableNote: 'Free play · virtual chips',
+    kicker1: 'PRIVATE TABLES',
+    htOutline: 'BLACK-JACK',
+    htGold: 'WILD<i>.</i>NIGHT<i>.</i>21<i>.</i>',
+    heroSub: 'Multiplayer blackjack, played with friends',
+    heroTag: 'Take a seat, invite your friends, and play a hand together. No account or real money required.',
+    miniCards: ['A♥', 'K♠', '★ 21', '⚡ instant deals'],
+    setupTitle: 'Choose your seat',
+    setupSub: 'Pick a nickname and you’re ready to play.',
+    playLabel: 'Play now',
+    createLabel: 'Create a private room',
+    joinLabel: 'Join room',
+    trust: ['<b>3:2</b> blackjack payout', '<b>Free</b> virtual chips', '<b>Private</b> invite links'],
+    feats: [
+      ['Make a table', 'Start a public game or create a private room for your group.'],
+      ['Play your hand', 'Bet, hit, stand, double, or split against the dealer.'],
+      ['Keep the chips', 'Virtual chips track your run. There’s no cash betting.'],
+    ],
+    how: ['Pick a nickname', 'Play or create a room', 'Beat the dealer'],
+    rulesKicker: 'At the table',
+    rulesTitle: 'Blackjack rules',
+    rulesSub: 'Get as close to 21 as you can without going over. Each player competes against the dealer.',
+    rulesCards: [
+      ['Know your cards', 'Number cards count at face value. Jacks, queens, and kings count as 10. An ace counts as 1 or 11, whichever keeps your hand at 21 or less.', 'An ace and a 10-value card in your first two cards is a natural Blackjack.'],
+      ['Choose your move', 'After placing a bet, choose to hit for another card or stand with your total. When allowed, you can also double down, split a pair, or surrender half your bet.', 'Go over 21 and your hand busts. The dealer plays after everyone finishes.'],
+      ['Beat the dealer', 'Higher than the dealer without busting wins. If the dealer busts, remaining hands win. Equal totals push and return your bet.', 'By default, the dealer stands on soft 17. A regular win pays 1:1; a natural Blackjack pays 3:2.'],
+    ],
+    rulesNote: 'Table settings can change the dealer’s soft 17 rule, Blackjack payout, and available actions. All chips are virtual.',
+    foot: ['♠ ♥ Blackjack pays 3:2', 'Dealer stands on 17', 'Made for game nights'],
+  },
+  liars: {
+    title: 'Liar’s Table — Bluff. Challenge. Survive.',
+    themeColor: '#0d0b09',
+    brandText: 'LIAR’S<span class="brand-io"> TABLE</span>',
+    brandSub: 'Bluff House',
+    brandChip: '♠',
+    tableNote: 'Free play · mind games',
+    kicker1: 'PRIVATE BAR TABLE',
+    htOutline: 'LIAR’S TABLE',
+    htGold: 'BLUFF<i>.</i>CALL<i>.</i>SURVIVE<i>.</i>',
+    heroSub: 'Multiplayer bluffing, played with friends',
+    heroTag: 'Pull up a chair at the round table. Lay cards face-down, declare the rank — truth or bluff — and call out anyone you doubt. Losers face the chamber.',
+    miniCards: ['K♠?', 'Q♥?', '★ liar', '⚡ chamber'],
+    setupTitle: 'Claim your outlaw',
+    setupSub: 'Pick a nickname and a shady face. The bar remembers.',
+    playLabel: 'Enter the bar',
+    createLabel: 'Create a private bar',
+    joinLabel: 'Join bar',
+    trust: ['<b>2–4</b> outlaws at the table', '<b>Face-down</b> plays & LIAR! calls', '<b>Private</b> invite links'],
+    feats: [
+      ['Open the bar', 'Start a public table or create a private room for your crew.'],
+      ['Bluff your cards', 'Declare the table rank — truthfully or not — and dare a challenge.'],
+      ['Survive the chamber', 'Losers face the Risk Chamber. Shed every card to win.'],
+    ],
+    how: ['Pick an outlaw name', 'Play or create a bar', 'Call the liar'],
+    rulesKicker: 'At the round table',
+    rulesTitle: 'Liar’s Table rules',
+    rulesSub: 'Shed all your cards first. Declare the table rank each turn — truth or bluff — and survive the chamber.',
+    rulesCards: [
+      ['Lay your cards', 'Each round names one table rank — Kings, Queens or Aces. On your turn, lay 1–3 cards face-down and declare them as that rank — truthfully or not.', 'Two Jokers are wild and always count as the table rank.'],
+      ['Call or continue', 'The next player can slam LIAR! to challenge the claim, or let it slide and lay their own cards.', 'A true claim punishes the challenger; a caught bluff punishes the liar.'],
+      ['Survive the chamber', 'Whoever loses the challenge faces the Risk Chamber and picks a slot — one hides the bullet.', 'Empty your hand first and you win the table.'],
+    ],
+    rulesNote: 'The host sets players, turn time and chamber odds. All risk is virtual.',
+    foot: ['♠ ♥ Declare the table rank', 'Loser faces the chamber', 'Made for game nights'],
+  },
+};
+function applyLandingTheme() {
+  const copy = LANDING_COPY[selectedMode] || LANDING_COPY.blackjack;
+  document.body.dataset.mode = selectedMode;
+  document.title = copy.title;
+  try { localStorage.setItem('blackjack.tableMode', selectedMode); } catch (e) {}
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', copy.themeColor);
+  const setHtml = (sel, html) => { const el = document.querySelector(sel); if (el) el.innerHTML = html; };
+  const setText = (sel, text) => { const el = document.querySelector(sel); if (el) el.textContent = text; };
+  setHtml('.brand-text', copy.brandText);
+  setText('.brand-sub', copy.brandSub);
+  setText('.brand-chip', copy.brandChip);
+  if (copy.setupTitle) setText('#setupTitle', copy.setupTitle);
+  if (copy.setupSub) setText('#setupSub', copy.setupSub);
+  const playSpan = document.querySelector('#playBtn span:last-child, #playBtn span');
+  if (playSpan && copy.playLabel) playSpan.textContent = copy.playLabel;
+  const createSpan = document.querySelector('#createBtn span');
+  if (createSpan && copy.createLabel) createSpan.textContent = copy.createLabel;
+  const joinBtn = $('joinBtn');
+  if (joinBtn && copy.joinLabel) joinBtn.textContent = copy.joinLabel;
+  const note = document.querySelector('.table-note');
+  if (note) { const i = note.querySelector('i'); note.textContent = copy.tableNote; if (i) note.prepend(i); }
+  const kicker = document.querySelector('.hero-kicker .kicker-pill');
+  if (kicker) { const dot = kicker.querySelector('.status-dot'); kicker.textContent = copy.kicker1; if (dot) kicker.prepend(dot); }
+  setText('.ht-outline', copy.htOutline);
+  setHtml('.ht-gold', copy.htGold);
+  const sub = document.querySelector('.hero-sub');
+  if (sub) { const dot = sub.querySelector('.status-dot'); sub.textContent = copy.heroSub; if (dot) sub.prepend(dot); }
+  setText('.hero-tag', copy.heroTag);
+  document.querySelectorAll('.hero-cards-strip .mini-card').forEach((el, i) => {
+    if (copy.miniCards[i] === undefined) return;
+    el.textContent = copy.miniCards[i];
+    if (i < 2) el.classList.toggle('red', /[♥♦]/.test(copy.miniCards[i]));
+  });
+  document.querySelectorAll('.trust-row span').forEach((el, i) => { if (copy.trust[i] !== undefined) el.innerHTML = copy.trust[i]; });
+  document.querySelectorAll('.feat-grid .feat').forEach((el, i) => {
+    const c = copy.feats[i];
+    if (!c) return;
+    const b = el.querySelector('b');
+    const s = el.querySelector('span:last-child');
+    if (b) b.textContent = c[0];
+    if (s) s.textContent = c[1];
+  });
+  const howSpans = [...document.querySelectorAll('.how-strip span')].filter((el) => !el.classList.contains('how-sep'));
+  howSpans.forEach((el, i) => {
+    if (copy.how[i] === undefined) return;
+    const b = el.querySelector('b');
+    el.textContent = copy.how[i];
+    if (b) el.prepend(b);
+  });
+  setText('.rules-kicker', copy.rulesKicker);
+  setText('#rulesTitle', copy.rulesTitle);
+  const rulesSub = document.querySelector('.rules-heading > p:last-child');
+  if (rulesSub) rulesSub.textContent = copy.rulesSub;
+  document.querySelectorAll('.rules-grid .rules-card').forEach((el, i) => {
+    const c = copy.rulesCards[i];
+    if (!c) return;
+    const h3 = el.querySelector('h3');
+    const ps = el.querySelectorAll('p');
+    if (h3) h3.textContent = c[0];
+    if (ps[0]) ps[0].textContent = c[1];
+    if (ps[1]) ps[1].textContent = c[2];
+  });
+  setText('.rules-note', copy.rulesNote);
+  const footSpans = [...document.querySelectorAll('.landing-foot span')].filter((el) => !el.classList.contains('foot-sep'));
+  footSpans.forEach((el, i) => { if (copy.foot[i] !== undefined) el.textContent = copy.foot[i]; });
+}
 function paintModePicker() {
   const bj = $('modeBjBtn'), liar = $('modeLiarBtn');
   if (!bj || !liar) return;
@@ -307,23 +481,41 @@ function paintModePicker() {
   bj.setAttribute('aria-pressed', String(selectedMode === 'blackjack'));
   liar.classList.toggle('sel', selectedMode === 'liars');
   liar.setAttribute('aria-pressed', String(selectedMode === 'liars'));
+  // Swap the whole cast when the table flips: casino crew <-> bar patrons.
+  // Each side keeps its own face (style/seed/bg) so nothing is ever wiped.
+  const nextMode = selectedMode === 'liars' ? 'liars' : 'blackjack';
+  if (avatar && avatarMode && avatarChoices[avatarMode]) {
+    avatarChoices[avatarMode] = avatar;
+  }
+  avatarMode = nextMode;
+  avatar = avatarChoices[avatarMode] || avatar;
+  buildAvatarPicker();
+  applyLandingTheme();
 }
-if ($('modeBjBtn')) $('modeBjBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'blackjack'; paintModePicker(); };
-if ($('modeLiarBtn')) $('modeLiarBtn').onclick = () => { Sound.unlock(); Sound.click(); selectedMode = 'liars'; paintModePicker(); };
-paintModePicker();
-// Bottom promo section: jump into Liar's Bar setup.
-if ($('liarPlayHereBtn')) $('liarPlayHereBtn').onclick = () => {
-  Sound.unlock(); Sound.click();
-  selectedMode = 'liars';
+function setMode(m) {
+  selectedMode = m === 'liars' ? 'liars' : 'blackjack';
   paintModePicker();
-  const card = $('setupCard');
-  if (card) card.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
-  const name = $('nameInput');
-  if (name) setTimeout(() => name.focus({ preventScroll: true }), 450);
-};
+}
+if ($('modeBjBtn')) $('modeBjBtn').onclick = () => { Sound.unlock(); Sound.click(); setMode('blackjack'); };
+if ($('modeLiarBtn')) $('modeLiarBtn').onclick = () => { Sound.unlock(); Sound.click(); setMode('liars'); };
+paintModePicker();
 // auto-fill invite code from ?XXXXXX like skribbl.io
 const qs = new URLSearchParams(location.search);
 if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
+// Invite links work for both tables — pre-theme the landing when the code is a liar's room.
+(async () => {
+  const code = [...qs.keys()][0];
+  if (!code) return;
+  try {
+    const res = await fetch(`/api/room-mode?code=${encodeURIComponent(code)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.mode === 'liars' && selectedMode !== 'liars') {
+      selectedMode = 'liars';
+      paintModePicker();
+    }
+  } catch (e) { /* stay on blackjack theme */ }
+})();
 
 $('playBtn').onclick = async () => {
   Sound.unlock(); Sound.click();

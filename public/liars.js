@@ -1,4 +1,4 @@
-/* Liar's Bar client — online rooms via the LiarsBarRoom Durable Object.
+/* Liar's Table client — online rooms via the LiarsBarRoom Durable Object.
    Own screen, own net layer, own styles. Blackjack's client.js is untouched.
    Reuses only globals: $, myName(), avatar, avatarUrl(), Sound. */
 
@@ -101,6 +101,22 @@ let lbMyId = null;
 let lbSelected = new Set();
 let lbLastReveal = null;
 let lbEndsAt = 0;
+let lbPrevRank = null;
+let lbOutWarned = new Set();
+
+// Table-cast flavor: every outlaw face gets a vice line in the roster.
+const LB_VICE = {
+  'adventurer-neutral': 'Owes the house money',
+  'lorelei-neutral': 'Never blinks first',
+  'notionists': 'Counts every card',
+  'open-peeps': 'Laughs when lying',
+  'thumbs': 'Already dead inside',
+  'fun-emoji': 'Smiles at funerals',
+};
+function lbVice(p) {
+  if (p && p.avatar && LB_VICE[p.avatar.style]) return LB_VICE[p.avatar.style];
+  return 'Bar regular';
+}
 
 function lbToast(msg, kind = '') {
   const stack = $('lbToasts');
@@ -149,12 +165,17 @@ function lbRankLabel(rank) {
 }
 
 // ---------- seat geometry ----------
-// Self sits at the bottom of the ring; everyone else spreads around.
+// Self sits at the bottom of the ring; everyone else spreads around the ellipse.
 function lbSeatPos(i, n) {
-  if (n <= 1) return { x: 50, y: 88 };
+  if (n <= 1) return { x: 50, y: 84 };
   const angle = Math.PI / 2 + (i / n) * Math.PI * 2; // start bottom, clockwise
-  const rx = 42, ry = 42;
-  return { x: 50 + rx * Math.cos(angle), y: 50 + ry * Math.sin(angle) };
+  const rx = 44, ry = 38;
+  const p = { x: 50 + rx * Math.cos(angle), y: 50 + ry * Math.sin(angle) };
+  // Pull the bottom seat (you) slightly inward so the hand below never clips.
+  if (i === 0) p.y = Math.min(p.y, 84);
+  p.x = Math.max(8, Math.min(92, p.x));
+  p.y = Math.max(8, Math.min(88, p.y));
+  return p;
 }
 
 function lbOrderedPlayers() {
@@ -190,7 +211,7 @@ function lbRenderLobby() {
   const box = $('lbLobby');
   box.innerHTML = '';
   const h = document.createElement('h2');
-  h.textContent = "Liar's Bar";
+  h.textContent = "Liar's Table";
   box.appendChild(h);
   const sub = document.createElement('p');
   sub.textContent = 'Bluff. Challenge. Survive. Shed every card — or send someone to the chamber.';
@@ -199,6 +220,25 @@ function lbRenderLobby() {
   code.className = 'lb-code';
   code.textContent = lbRoom.id;
   box.appendChild(code);
+
+  const deck = document.createElement('p');
+  deck.className = 'lb-deckline';
+  deck.textContent = '20-card deck · Kings, Queens, Aces + 2 wild Jokers · 5 cards each';
+  box.appendChild(deck);
+
+  const inv = document.createElement('button');
+  inv.className = 'lb-btn quiet lb-invite';
+  inv.type = 'button';
+  inv.textContent = 'Copy invite link';
+  inv.onclick = () => {
+    Sound.unlock(); Sound.click();
+    const url = `${location.origin}/?${lbRoom.id}`;
+    const done = () => lbToast(`Invite copied: ${lbRoom.id}`, 'gold');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(() => lbToast(url, ''));
+    } else lbToast(url, '');
+  };
+  box.appendChild(inv);
 
   const roster = document.createElement('div');
   roster.className = 'lb-roster';
@@ -209,6 +249,10 @@ function lbRenderLobby() {
     const nm = document.createElement('span');
     nm.textContent = p.name + (p.isYou ? ' (you)' : '') + (p.connected ? '' : ' · offline');
     row.appendChild(nm);
+    const vice = document.createElement('span');
+    vice.className = 'lb-vice';
+    vice.textContent = lbVice(p);
+    row.appendChild(vice);
     if (p.isHost) {
       const tag = document.createElement('span');
       tag.className = 'host-tag';
@@ -224,7 +268,7 @@ function lbRenderLobby() {
     const set = document.createElement('div');
     set.className = 'lb-settings';
     const defs = [
-      ['maxPlayers', 'Players', 2, 6],
+      ['maxPlayers', 'Players', 2, 4],
       ['turnTimer', 'Turn (s)', 10, 120],
       ['chambers', 'Chambers', 3, 8],
       ['liveChambers', 'Live', 1, 7],
@@ -310,12 +354,12 @@ function lbRenderTable() {
   const note = $('lbTurnNote');
   delete note.dataset.base;
   if (lbRoom.state === 'risk' && lbRoom.risk) {
-    note.innerHTML = `<b>${lbRoom.risk.playerName}</b> faces the chamber…`;
+    note.innerHTML = `<b>${lbEsc(lbRoom.risk.playerName)}</b> faces the chamber…`;
   } else if (lbRoom.state === 'playing' && lbRoom.turnId) {
     const t = lbName(lbRoom.turnId);
     note.innerHTML = lbRoom.stage === 'decide'
-      ? `<b>${t}</b> smells something…`
-      : `<b>${t}</b> is laying cards…`;
+      ? `<b>${lbEsc(t)}</b> smells something…`
+      : `<b>${lbEsc(t)}</b> is laying cards…`;
   } else if (lbRoom.state === 'gameover') {
     note.textContent = '';
   } else note.textContent = '';
@@ -326,16 +370,26 @@ function lbRenderTable() {
   lbRenderRisk();
 }
 
+function lbCardFace(d, c) {
+  if (c.rank === 'JOKER') {
+    d.classList.add('joker');
+    d.innerHTML = `<div class="lb-corner">★<small>WILD</small></div><div class="lb-pip">★</div><div class="lb-corner" style="transform:rotate(180deg)">★<small>WILD</small></div>`;
+    return;
+  }
+  if (['♥', '♦'].includes(c.suit)) d.classList.add('red');
+  d.innerHTML = `<div class="lb-corner">${c.rank}<small>${c.suit}</small></div><div class="lb-pip">${c.suit}</div><div class="lb-corner" style="transform:rotate(180deg)">${c.rank}<small>${c.suit}</small></div>`;
+}
+
 function lbCardEl(c, selectable) {
   const d = document.createElement('div');
-  d.className = 'lb-card' + (['♥', '♦'].includes(c.suit) ? ' red' : '') + (lbSelected.has(c.id) ? ' sel' : '');
+  d.className = 'lb-card' + (lbSelected.has(c.id) ? ' sel' : '');
   d.dataset.cid = c.id;
-  d.innerHTML = `<div class="lb-corner">${c.rank}<small>${c.suit}</small></div><div class="lb-pip">${c.suit}</div><div class="lb-corner" style="transform:rotate(180deg)">${c.rank}<small>${c.suit}</small></div>`;
+  lbCardFace(d, c);
   if (selectable) {
     d.onclick = () => {
       Sound.unlock(); Sound.click();
       if (lbSelected.has(c.id)) lbSelected.delete(c.id);
-      else if (lbSelected.size >= 4) lbToast('Lay at most 4 cards', 'bad');
+      else if (lbSelected.size >= 3) lbToast('Lay at most 3 cards', 'bad');
       else lbSelected.add(c.id);
       lbRenderHand();
       lbRenderActions();
@@ -390,7 +444,7 @@ function lbRenderActions() {
       lbSelected.clear();
     };
     box.appendChild(btn);
-    hint.textContent = `Lay 1–4 cards face-down and declare them as ${lbRankLabel(lbRoom.tableRank)}. Bluff if you must.`;
+    hint.textContent = `Lay 1–3 cards face-down and declare them as ${lbRankLabel(lbRoom.tableRank)}. Jokers are wild — bluff if you must.`;
   } else {
     const lp = lbRoom.lastPlay;
     const liar = document.createElement('button');
@@ -430,10 +484,10 @@ function lbRenderReveal() {
   cards.className = 'lb-reveal-cards';
   r.cards.forEach((c) => {
     const d = document.createElement('div');
-    d.className = 'lb-card' + (['♥', '♦'].includes(c.suit) ? ' red' : '');
+    d.className = 'lb-card';
     d.style.marginLeft = '0';
     d.style.cursor = 'default';
-    d.innerHTML = `<div class="lb-corner">${c.rank}<small>${c.suit}</small></div><div class="lb-pip">${c.suit}</div><div class="lb-corner" style="transform:rotate(180deg)">${c.rank}<small>${c.suit}</small></div>`;
+    lbCardFace(d, c);
     cards.appendChild(d);
   });
   box.appendChild(cards);
@@ -462,7 +516,7 @@ function lbRenderRisk() {
   veil.innerHTML = '';
   const bx = document.createElement('div');
   bx.className = 'lb-risk-box';
-  bx.innerHTML = `<p class="eyebrow">RISK CHAMBER</p><h2><b>${r.playerName}</b> takes the risk</h2><p>${iAmPicker ? 'Tap a chamber. Choose wisely.' : 'Waiting on the challenged player…'}</p>`;
+  bx.innerHTML = `<p class="eyebrow">RISK CHAMBER</p><h2><b>${lbEsc(r.playerName)}</b> takes the risk</h2><p>${iAmPicker ? 'Tap a chamber. Choose wisely.' : 'Waiting on the challenged player…'}</p>`;
   const row = document.createElement('div');
   row.className = 'lb-chambers';
   const pickedInfo = lbRiskInfo();
@@ -494,8 +548,29 @@ function lbRenderGameover(box) {
   if (!go) return;
   const h = document.createElement('div');
   h.className = 'lb-reveal truth';
-  h.innerHTML = `<h3>${go.winnerName} wins the table</h3><p>${go.note}</p>`;
+  h.innerHTML = `<h3>${lbEsc(go.winnerName)} wins the table</h3><p>${lbEsc(go.note)}</p>`;
   box.appendChild(h);
+  if (go.board && go.board.length) {
+    const table = document.createElement('div');
+    table.className = 'lb-board';
+    go.board.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'lb-board-row' + (p.eliminated ? ' dead' : '');
+      row.appendChild(lbAvatarImg({ name: p.name, avatar: p.avatar }, ''));
+      const meta = document.createElement('div');
+      meta.className = 'lb-board-meta';
+      const st = p.stats || {};
+      const nm = document.createElement('b');
+      nm.textContent = `#${i + 1} ${p.name}`;
+      const sub = document.createElement('span');
+      sub.textContent = `W${st.wins || 0} · survived ${st.survivals || 0} · calls won ${st.challengesWon || 0}${p.eliminated ? ' · OUT' : ''}`;
+      meta.appendChild(nm);
+      meta.appendChild(sub);
+      row.appendChild(meta);
+      table.appendChild(row);
+    });
+    box.appendChild(table);
+  }
   const me = lbMe();
   if (me && me.isHost) {
     const again = document.createElement('button');
@@ -538,16 +613,54 @@ setInterval(() => {
     note.innerHTML = note.dataset.base;
     delete note.dataset.base;
   }
+  if (note) {
+    note.classList.toggle('urgent',
+      !!(lbRoom && lbRoom.state === 'playing' && lbEndsAt > Date.now() && lbEndsAt - Date.now() < 6000));
+  }
 }, 500);
 
 // ---------- events ----------
+function lbEsc(s) {
+  return String(s).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function lbFatalFlash() {
+  const flash = $('flash');
+  if (flash) { flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); }
+  const wrap = $('shake-wrap');
+  if (wrap) { wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake'); }
+  if (navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
+}
+
 LbNet.on('room', (r) => {
   const first = !lbRoom;
+  const rankChanged = !first && lbRoom && lbRoom.tableRank !== r.tableRank && r.state === 'playing';
   lbRoom = r;
   const me = r.players.find((p) => p.isYou);
   if (me) lbMyId = me.id;
   if (first || r.state === 'lobby') { lbLastGameover = null; }
+  if (r.state === 'lobby') { lbPrevRank = null; lbOutWarned = new Set(); }
   if (r.state === 'playing' && !r.lastPlay) { lbLastReveal = null; }
+  if (rankChanged) {
+    lbToast(`New table rank: ${lbRankLabel(r.tableRank)}`, 'gold');
+    try { Sound.roundStart(); } catch (e) {}
+    const rankEl = $('lbTableRank');
+    if (rankEl) { rankEl.classList.remove('swap'); void rankEl.offsetWidth; rankEl.classList.add('swap'); }
+  }
+  if (r.state === 'playing') {
+    r.players.forEach((p) => {
+      const key = r.round + ':' + p.id;
+      if (!p.eliminated && p.connected && p.cardCount === 0 && !lbOutWarned.has(key)) {
+        lbOutWarned.add(key);
+        if (!first) {
+          lbToast(`${p.name} is out of cards — call it or they walk!`, 'bad');
+          try { Sound.warning(); } catch (e) {}
+        }
+      }
+    });
+  }
+  const chatWrap = $('lbChatWrap');
+  if (chatWrap) chatWrap.classList.toggle('hidden', r.state === 'lobby');
   lbShow('liarGame');
   lbRender();
 });
@@ -559,19 +672,19 @@ LbNet.on('liar_turn', ({ stage, endsIn }) => {
 });
 LbNet.on('liar_played', ({ by }) => {
   lbLastReveal = null;
-  Sound.deal();
+  try { Sound.slap(); } catch (e) {}
   const seat = [...document.querySelectorAll('.lb-seat')].find((s) => (s.textContent || '').includes(lbName(by)));
   if (seat) lbFly(seat);
 });
 LbNet.on('liar_reveal', (m) => {
   lbLastReveal = m;
-  Sound.warning();
+  try { Sound.liar(); } catch (e) {}
   if (navigator.vibrate) { try { navigator.vibrate([60, 40, 60]); } catch (e) {} }
   lbRenderReveal();
 });
 LbNet.on('liar_risk', () => {
   lbLastRiskSlots = null;
-  Sound.warning();
+  try { Sound.revolverSpin(); } catch (e) {}
 });
 LbNet.on('liar_risk_result', ({ slots, fatal, playerName }) => {
   lbLastRiskSlots = slots;
@@ -580,8 +693,8 @@ LbNet.on('liar_risk_result', ({ slots, fatal, playerName }) => {
     el.textContent = fatal ? `${playerName} is OUT.` : `${playerName} survives.`;
     el.classList.add(fatal ? 'live' : 'safe');
   }
-  if (fatal) Sound.bust();
-  else Sound.win();
+  if (fatal) { try { Sound.bang(); } catch (e) {} lbFatalFlash(); }
+  else { try { Sound.emptyClick(); Sound.survive(); } catch (e) {} }
   setTimeout(() => lbRenderRisk(), 400);
 });
 LbNet.on('liar_gameover', (m) => {
@@ -599,10 +712,46 @@ LbNet.on('kicked', () => {
   lbToast('Kicked by host', 'bad');
   setTimeout(() => { location.href = '/'; }, 900);
 });
-LbNet.on('chat', ({ name, text, sys }) => {
-  if (sys) lbToast(String(text), '');
+LbNet.on('chat', (m) => {
+  lbAddChat(m);
+  if (m.sys && /faces the (Risk )?Chamber|called LIAR|went out|survives|wins the table|is out of the game|Timed out/i.test(String(m.text || ''))) {
+    lbToast(String(m.text), '');
+  }
 });
-LbNet.on('emote', ({ name, emoji }) => lbToast(`${name} ${emoji}`, ''));
+LbNet.on('emote', ({ name, emoji }) => lbAddChat({ name, text: String(emoji) }));
+
+// ---------- bar chat (the bluffing is in the talking) ----------
+function lbAddChat({ name, text, sys }) {
+  const box = $('lbChatBox');
+  if (!box) return;
+  const div = document.createElement('div');
+  if (sys) div.className = 'sys';
+  div.textContent = sys ? String(text) : `${name}: ${text}`;
+  box.appendChild(div);
+  while (box.children.length > 60) box.firstChild.remove();
+  box.scrollTop = box.scrollHeight;
+}
+function lbSendChat() {
+  const inp = $('lbChatInput');
+  if (!inp) return;
+  const v = inp.value;
+  if (!v.trim()) return;
+  Sound.unlock();
+  inp.value = '';
+  LbNet.send({ t: 'chat', text: v });
+}
+if ($('lbChatSend')) $('lbChatSend').onclick = lbSendChat;
+if ($('lbChatInput')) $('lbChatInput').onkeydown = (e) => { if (e.key === 'Enter') lbSendChat(); };
+['🔥', '😎', '😭', '🍀', '💸', '👏', '🤯', '🃏'].forEach((em) => {
+  const row = $('lbEmoteRow');
+  if (!row) return;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = em;
+  b.setAttribute('aria-label', `Send ${em} reaction`);
+  b.onclick = () => { Sound.unlock(); LbNet.send({ t: 'emote', emoji: em }); };
+  row.appendChild(b);
+});
 
 function lbLeave() {
   Sound.click();

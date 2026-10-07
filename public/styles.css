@@ -785,20 +785,6 @@ html:not(.advanced-mode) #fx,html:not(.advanced-mode) #cursorGlow,html:not(.adva
 .rules-note{margin:12px 0 0;color:rgba(154,168,184,.9);font-size:11px;line-height:1.5;text-align:center}
 @media(max-width:600px){.rules-grid{grid-template-columns:1fr}.rules-section{margin-top:22px;padding-top:20px}.rules-card{padding:14px}}
 
-/* ===== Liar's Bar promo (landing bottom; liar identity, same app) ===== */
-.liar-promo{width:100%;margin-top:26px;border:1px solid rgba(201,163,92,.28);border-radius:20px;background:radial-gradient(120% 160% at 50% 0%,#241a10 0%,#100c08 62%,#0a0806 100%);overflow:hidden}
-.liar-promo-inner{position:relative;max-width:640px;margin:0 auto;padding:34px 26px 30px;text-align:center}
-.liar-promo-inner::before{content:"";position:absolute;inset:10px;border:1px solid rgba(201,163,92,.22);border-radius:14px;pointer-events:none}
-.liar-eyebrow{margin:0 0 8px;color:#8a7f6a;font-size:10px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
-.liar-promo h2{margin:0;color:#ece3d0;font-family:var(--display);font-size:clamp(30px,5.4vw,42px);letter-spacing:.02em}
-.liar-tagline{margin:8px 0 0;color:#c9a35c;font-family:var(--display);font-style:italic;font-size:clamp(15px,2.6vw,19px)}
-.liar-desc{margin:12px auto 0;max-width:46ch;color:#b6ab93;font-size:13.5px;line-height:1.65}
-.liar-steps{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin:18px 0 0;color:#8a7f6a;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
-.liar-steps i{font-style:normal;color:#c9a35c;opacity:.7}
-.liar-play-here{margin-top:20px;background:linear-gradient(180deg,#ecd9a8,#c9a35c);color:#241a08;border:0;border-radius:999px;padding:14px 44px;font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px rgba(201,163,92,.28);transition:transform var(--transition),box-shadow var(--transition)}
-.liar-play-here:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,163,92,.4)}
-@media(max-width:600px){.liar-promo-inner{padding:28px 18px 24px}.liar-steps{gap:6px}}
-
 /* ===== mobile table fit: circular felt, no-scroll actions, chat FAB sheet =====
    Small portrait phones AND compact landscape phones share one overlay model:
    chat lives in a bottom-left FAB and opens as a bottom sheet, so the table

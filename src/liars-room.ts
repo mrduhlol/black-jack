@@ -10,11 +10,12 @@
 // mirroring GameRoom.
 //
 // Game flow (states: lobby | playing | reveal | risk | gameover):
-// - playing, stage 'play':   turn player lays 1-4 cards face-down, declaring
-//                             a count of the table rank ("2 Kings").
+// - playing, stage 'play':   turn player lays 1-3 cards face-down, declaring
+//                             a count of the table rank ("2 Kings"). Jokers
+//                             are wild and always count as the table rank.
 // - playing, stage 'decide':  next player answers LIAR! or CONTINUE.
 // - reveal:                   challenged cards shown, truth determined.
-// - risk:                     loser faces the Risk Chamber.
+// - risk:                     loser faces the Risk Chamber (fresh chamber).
 // - going out (empty hand) wins once the next player's liar option resolves;
 //   last player standing also wins.
 //
@@ -110,7 +111,7 @@ const SETTING_KEYS = ['maxPlayers', 'turnTimer', 'chambers', 'liveChambers'] as 
 const REVEAL_MS = 4000;
 
 function defaultSettings(): LiarSettings {
-  return { maxPlayers: 6, turnTimer: 30, chambers: 6, liveChambers: 1, riskType: 'chamber' };
+  return { maxPlayers: 4, turnTimer: 30, chambers: 6, liveChambers: 1, riskType: 'chamber' };
 }
 
 function freshStats(): LiarStats {
@@ -432,6 +433,10 @@ export class LiarsBarRoom {
 
     let player = this.players.find((p) => p.id === requestedId);
     if (!player) {
+      if (this.roomState !== 'lobby' && this.roomState !== 'gameover') {
+        this.sendToSocket(ws, { t: 'error', message: 'Round in progress — wait for the next one.' });
+        return;
+      }
       if (this.players.length === 0 && !wantsCreate) {
         this.sendToSocket(ws, { t: 'error', message: 'Room not found. Check the invite code.' });
         return;
@@ -458,6 +463,13 @@ export class LiarsBarRoom {
     this.save();
     this.broadcast();
     this.ctx.waitUntil(this.reportDirectory());
+    // A reconnect may be resuming an idled table (alarms cancelled when the
+    // last seat dropped). Nudge the clock; harmless when already running.
+    if (this.roomState === 'playing') await this.promptTurn();
+    else if (this.roomState === 'risk' && this.risk) {
+      const riskPlayer = this.players.find((p) => p.id === this.risk!.playerId);
+      if (riskPlayer && riskPlayer.connected) this.scheduleAlarm(this.settings.turnTimer * 1000);
+    }
   }
 
   private async onPlayerMessage(player: LiarPlayer, ws: WebSocket, msg: Record<string, unknown>): Promise<void> {
@@ -510,7 +522,7 @@ export class LiarsBarRoom {
     for (const k of SETTING_KEYS) {
       if (patch[k] !== undefined) (this.settings as unknown as Record<string, unknown>)[k] = patch[k];
     }
-    this.settings.maxPlayers = Math.min(6, Math.max(2, this.settings.maxPlayers | 0 || 4));
+    this.settings.maxPlayers = Math.min(4, Math.max(2, this.settings.maxPlayers | 0 || 4));
     this.settings.turnTimer = Math.min(120, Math.max(10, this.settings.turnTimer | 0 || 30));
     this.settings.chambers = Math.min(8, Math.max(3, this.settings.chambers | 0 || 6));
     this.settings.liveChambers = Math.min(
@@ -604,6 +616,17 @@ export class LiarsBarRoom {
       await this.resetTable();
       return;
     }
+    // A departure can strand the decide stage (accuser gone, or the accused
+    // claim left with them). Fall back to a fresh play turn instead of
+    // waiting out a clock on a ghost decision.
+    if (this.roomState === 'playing' && this.stage === 'decide') {
+      const actor = this.actorId();
+      const actorOk = !!actor && this.players.some((p) => p.id === actor && p.connected && !p.eliminated);
+      if (!this.lastPlay || !actorOk) {
+        this.stage = 'play';
+        this.lastPlay = null;
+      }
+    }
     this.save();
     this.broadcast();
     this.ctx.waitUntil(this.reportDirectory());
@@ -659,6 +682,12 @@ export class LiarsBarRoom {
   private async promptTurn(): Promise<void> {
     const actor = this.actorId();
     if (!actor) return;
+    if (!this.players.some((p) => p.connected)) {
+      // Nobody is home: idle the table instead of spinning alarms forever.
+      this.cancelAlarm();
+      this.save();
+      return;
+    }
     this.save();
     this.broadcast();
     this.sendTo(actor, {
@@ -719,10 +748,10 @@ export class LiarsBarRoom {
       return;
     }
     const raw = msg.cards;
-    const ids = Array.isArray(raw) ? raw.map(String).slice(0, 4) : [];
+    const ids = Array.isArray(raw) ? raw.map(String).slice(0, 3) : [];
     const count = Number(msg.count) || 0;
-    if (ids.length === 0 || ids.length > 4) {
-      this.sendTo(player.id, { t: 'liar_error', message: 'Select 1 to 4 cards.' });
+    if (ids.length === 0 || ids.length > 3) {
+      this.sendTo(player.id, { t: 'liar_error', message: 'Select 1 to 3 cards.' });
       return;
     }
     if (count !== ids.length) {
@@ -947,18 +976,30 @@ export class LiarsBarRoom {
 
   private async checkContinuation(): Promise<void> {
     if (this.roomState === 'lobby' || this.roomState === 'gameover') return;
-    const standing = this.players.filter((p) => p.connected && !p.eliminated);
-    if (standing.length === 1) {
-      await this.endGame(standing[0].id, `${standing[0].name} is the last one standing.`);
+    const alive = this.players.filter((p) => !p.eliminated);
+    const standing = alive.filter((p) => p.connected);
+    if (alive.length === 1) {
+      await this.endGame(alive[0].id, `${alive[0].name} is the last one standing.`);
       return;
     }
-    if (standing.length === 0) {
+    if (alive.length === 0 || this.players.length === 0) {
       this.roomState = 'lobby';
       this.save();
       this.broadcast();
       this.ctx.waitUntil(this.reportDirectory());
       return;
     }
+    if (standing.length === 0) {
+      // Every seat walked away mid-game: idle the table. A reconnect
+      // resumes the clock via onJoin instead of alarms spinning forever.
+      this.cancelAlarm();
+      this.save();
+      this.broadcast();
+      this.ctx.waitUntil(this.reportDirectory());
+      return;
+    }
+    // One connected survivor among dropped seats: keep playing, the timers
+    // drive past the ghosts. No early crown while seats may reconnect.
     // Keep the turn on a live seat.
     const actor = this.actorId();
     const actorOk = actor && standing.some((p) => p.id === actor);
