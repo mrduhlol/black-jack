@@ -331,6 +331,16 @@ function lbRenderLobby() {
       set.appendChild(lab);
     });
     box.appendChild(set);
+    const devilLab = document.createElement('label');
+    devilLab.className = 'lb-devil-toggle';
+    const devilInp = document.createElement('input');
+    devilInp.type = 'checkbox';
+    devilInp.checked = !!lbRoom.settings.devilMode;
+    devilInp.setAttribute('aria-label', 'Devil card variant');
+    devilInp.onchange = () => LbNet.send({ t: 'set_settings', devilMode: devilInp.checked });
+    devilLab.appendChild(devilInp);
+    devilLab.append(' 😈 Devil card — a challenged devil punishes the whole table');
+    box.appendChild(devilLab);
     const start = document.createElement('button');
     start.className = 'lb-start';
     start.textContent = 'Start game';
@@ -341,6 +351,12 @@ function lbRenderLobby() {
     const wait = document.createElement('p');
     wait.textContent = 'Waiting for the host to start…';
     box.appendChild(wait);
+    if (lbRoom.settings.devilMode) {
+      const dv = document.createElement('p');
+      dv.className = 'lb-devil-note';
+      dv.textContent = '😈 Devil card in play — ride it alone, if you dare.';
+      box.appendChild(dv);
+    }
   }
 }
 
@@ -436,6 +452,14 @@ function lbCardFace(d, c) {
   }
   if (['♥', '♦'].includes(c.suit)) d.classList.add('red');
   d.innerHTML = `<div class="lb-corner">${c.rank}<small>${c.suit}</small></div><div class="lb-pip">${c.suit}</div><div class="lb-corner" style="transform:rotate(180deg)">${c.rank}<small>${c.suit}</small></div>`;
+  if (c.devil) {
+    d.classList.add('devil');
+    const mark = document.createElement('span');
+    mark.className = 'lb-devil-mark';
+    mark.textContent = '😈';
+    mark.title = 'Devil card — play it alone';
+    d.appendChild(mark);
+  }
 }
 
 function lbCardEl(c, selectable) {
@@ -495,15 +519,27 @@ function lbRenderActions() {
     const tr = lbRoom.tableRank;
     const holdRank = hand.filter((c) => c.rank === tr).length;
     const holdWild = hand.filter((c) => c.rank === 'JOKER').length;
+    const holdDevil = hand.some((c) => c.devil);
     const line = document.createElement('div');
     line.className = 'lb-countline';
-    line.textContent = `You hold ${holdRank} ${lbRankLabel(tr)} + ${holdWild} wild`;
+    line.textContent = `You hold ${holdRank} ${lbRankLabel(tr)} + ${holdWild} wild` + (holdDevil ? ' + 😈 devil' : '');
     box.appendChild(line);
     const n = lbSelected.size;
+    const selHasDevil = [...lbSelected].some((id) => {
+      const cc = hand.find((x) => x.id === id);
+      return cc && cc.devil;
+    });
     const btn = document.createElement('button');
     btn.className = 'lb-btn primary';
-    btn.textContent = n > 0 ? `Play ${n} ${lbRankLabel(lbRoom.tableRank)}` : `Select cards — ${lbRankLabel(lbRoom.tableRank)}`;
-    btn.disabled = n === 0;
+    if (selHasDevil && n > 1) {
+      btn.textContent = 'The Devil rides alone';
+      btn.disabled = true;
+    } else {
+      btn.textContent = n > 0
+        ? (selHasDevil ? 'Ride the Devil 😈' : `Play ${n} ${lbRankLabel(lbRoom.tableRank)}`)
+        : `Select cards — ${lbRankLabel(lbRoom.tableRank)}`;
+      btn.disabled = n === 0;
+    }
     btn.onclick = () => {
       Sound.unlock(); Sound.click();
       LbNet.send({ t: 'liar_play', cards: [...lbSelected], count: n });
@@ -540,10 +576,12 @@ function lbRenderReveal() {
     box.className = 'lb-reveal suspense';
     box.innerHTML = '';
     const h = document.createElement('h3');
-    h.textContent = 'Called it…';
+    h.textContent = lbRevealPending.devil ? 'Something burns…' : 'Called it…';
     box.appendChild(h);
     const p = document.createElement('p');
-    p.textContent = `${lbRevealPending.challengerName} called LIAR on ${lbRevealPending.byName}. Cards turning…`;
+    p.textContent = lbRevealPending.devil
+      ? 'The challenged cards carry a mark…'
+      : `${lbRevealPending.challengerName} called LIAR on ${lbRevealPending.byName}. Cards turning…`;
     box.appendChild(p);
     return;
   }
@@ -557,10 +595,10 @@ function lbRenderReveal() {
     $('lbSelf').insertBefore(box, $('lbActions'));
   }
   const r = lbLastReveal;
-  box.className = 'lb-reveal ' + (r.truthful ? 'truth' : 'bluff');
+  box.className = 'lb-reveal ' + (r.devil ? 'devil' : (r.truthful ? 'truth' : 'bluff'));
   box.innerHTML = '';
   const h = document.createElement('h3');
-  h.textContent = r.truthful ? 'Truth — wrong call' : 'Bluff caught';
+  h.textContent = r.devil ? 'THE DEVIL RIDES' : r.truthful ? 'Truth — wrong call' : 'Bluff caught';
   box.appendChild(h);
   const cards = document.createElement('div');
   cards.className = 'lb-reveal-cards';
@@ -574,9 +612,11 @@ function lbRenderReveal() {
   });
   box.appendChild(cards);
   const p = document.createElement('p');
-  p.textContent = r.truthful
-    ? `${r.challengerName} challenged ${r.byName}'s ${r.count} ${lbRankLabel(r.rank)} — every card matched. ${r.loserName} faces the chamber.`
-    : `${r.challengerName} challenged ${r.byName}'s ${r.count} ${lbRankLabel(r.rank)} — a lie. ${r.loserName} faces the chamber.`;
+  p.textContent = r.devil
+    ? `${r.byName} rode the Devil — EVERYONE else faces the chamber.`
+    : r.truthful
+      ? `${r.challengerName} challenged ${r.byName}'s ${r.count} ${lbRankLabel(r.rank)} — every card matched. ${r.loserName} faces the chamber.`
+      : `${r.challengerName} challenged ${r.byName}'s ${r.count} ${lbRankLabel(r.rank)} — a lie. ${r.loserName} faces the chamber.`;
   box.appendChild(p);
 }
 
@@ -621,6 +661,12 @@ function lbRenderRisk() {
     row.appendChild(b);
   });
   bx.appendChild(row);
+  if (lbRoom.risk && lbRoom.risk.queueLeft > 0) {
+    const q = document.createElement('p');
+    q.className = 'lb-risk-queue';
+    q.textContent = `+${lbRoom.risk.queueLeft} more after ${r.playerName}`;
+    bx.appendChild(q);
+  }
   row.classList.add('spin');
   setTimeout(() => { row.classList.remove('spin'); }, 900);
   const res = document.createElement('div');
@@ -800,6 +846,7 @@ LbNet.on('liar_played', ({ by }) => {
 });
 LbNet.on('liar_reveal', (m) => {
   try { Sound.liar(); } catch (e) {}
+  if (m.devil) { try { Sound.warning(); } catch (e) {} }
   if (navigator.vibrate) { try { navigator.vibrate([60, 40, 60]); } catch (e) {} }
   lbRevealPending = m;
   lbRenderReveal();

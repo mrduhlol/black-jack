@@ -307,6 +307,28 @@
   color: var(--lb-brass); font-size: 11.5px; font-weight: 800;
   letter-spacing: 0.14em; text-transform: uppercase; margin: 0 0 16px;
 }
+.lb-risk-queue { color: var(--lb-brass-hi); font-size: 12.5px; font-weight: 700; margin: 12px 0 0; }
+/* devil card: marked rank card, rides alone */
+.lb-card { position: relative; }
+.lb-card.devil {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 18px rgba(179, 64, 46, 0.55);
+  border-color: var(--lb-danger);
+}
+.lb-devil-mark {
+  position: absolute; right: 3px; bottom: 3px;
+  font-size: 15px; line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(179, 64, 46, 0.9));
+}
+.lb-reveal.devil { border-color: rgba(179, 64, 46, 0.8); box-shadow: 0 0 34px rgba(179, 64, 46, 0.4); }
+.lb-reveal.devil h3 { color: #e07864; animation: lbShake 0.4s ease; }
+.lb-devil-toggle {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(179, 64, 46, 0.1); border: 1px dashed rgba(179, 64, 46, 0.5);
+  border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px;
+  cursor: pointer;
+}
+.lb-devil-toggle input { width: 20px; height: 20px; accent-color: #b3402e; }
+.lb-devil-note { color: #e07864; font-size: 12.5px; font-style: italic; margin: 0; }
 .lb-chambers { display: flex; justify-content: center; gap: clamp(8px, 2vmin, 14px); flex-wrap: wrap; }
 .lb-chamber {
   width: clamp(52px, 11vmin, 68px); height: clamp(52px, 11vmin, 68px);

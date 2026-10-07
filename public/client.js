@@ -408,7 +408,7 @@ const LANDING_COPY = {
       ['Call or continue', 'The next player can slam LIAR! to challenge the claim, or let it slide and lay their own cards.', 'A true claim punishes the challenger; a caught bluff punishes the liar.'],
       ['Survive the chamber', 'Whoever loses the challenge faces the Risk Chamber and picks a slot — one hides the bullet.', 'Empty your hand first and you win the table.'],
     ],
-    rulesNote: 'The host sets players, turn time and chamber odds. All risk is virtual.',
+    rulesNote: 'The host sets players, turn time and chamber odds — plus an optional Devil card: play it alone, and if challenged, everyone else faces the chamber. All risk is virtual.',
     foot: ['♠ ♥ Declare the table rank', 'Loser faces the chamber', 'Made for game nights'],
   },
 };

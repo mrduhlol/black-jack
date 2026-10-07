@@ -63,6 +63,7 @@ interface LiarSettings {
   chambers: number;
   liveChambers: number;
   riskType: string; // 'chamber' — resolver dispatch keeps future types pluggable
+  devilMode: boolean; // one rank card is secretly marked; challenged devil = everyone else faces the chamber
 }
 
 interface LastPlay {
@@ -75,6 +76,8 @@ interface RiskState {
   type: string;
   playerId: string;
   slots: ChamberSlot[];
+  queue: string[]; // devil retribution: more seats still waiting their turn
+  devil: boolean; // true when this chain came from a challenged Devil card
 }
 
 interface RevealState {
@@ -101,17 +104,18 @@ interface PersistedLiarState {
   stage: string; // 'play' | 'decide'
   lastPlay: LastPlay | null;
   pendingOut: string | null;
+  devilId: string | null;
   risk: RiskState | null;
   round: number;
   history: string[];
 }
 
 const EMOTE_ALLOWLIST = ['🔥', '😎', '😭', '🍀', '💸', '👏', '🤯', '🃏'];
-const SETTING_KEYS = ['maxPlayers', 'turnTimer', 'chambers', 'liveChambers'] as const;
+const SETTING_KEYS = ['maxPlayers', 'turnTimer', 'chambers', 'liveChambers', 'devilMode'] as const;
 const REVEAL_MS = 4000;
 
 function defaultSettings(): LiarSettings {
-  return { maxPlayers: 4, turnTimer: 30, chambers: 6, liveChambers: 1, riskType: 'chamber' };
+  return { maxPlayers: 4, turnTimer: 30, chambers: 6, liveChambers: 1, riskType: 'chamber', devilMode: false };
 }
 
 function freshStats(): LiarStats {
@@ -142,6 +146,7 @@ export class LiarsBarRoom {
   private stage = 'play';
   private lastPlay: LastPlay | null = null;
   private pendingOut: string | null = null;
+  private devilId: string | null = null;
   private risk: RiskState | null = null;
   private round = 0;
   private history: string[] = [];
@@ -170,6 +175,7 @@ export class LiarsBarRoom {
       this.stage = saved.stage;
       this.lastPlay = saved.lastPlay;
       this.pendingOut = saved.pendingOut;
+      this.devilId = (saved as { devilId?: string | null }).devilId || null;
       this.risk = saved.risk;
       this.round = saved.round;
       this.history = saved.history;
@@ -192,6 +198,7 @@ export class LiarsBarRoom {
       stage: this.stage,
       lastPlay: this.lastPlay,
       pendingOut: this.pendingOut,
+      devilId: this.devilId,
       risk: this.risk,
       round: this.round,
       history: this.history,
@@ -284,7 +291,11 @@ export class LiarsBarRoom {
         eliminated: !!p.eliminated,
         isHost: p.id === this.hostId,
         isYou: p.id === forPlayerId,
-        cards: p.id === forPlayerId ? this.hands[p.id] || [] : undefined,
+        cards: p.id === forPlayerId
+          ? (this.hands[p.id] || []).map((c) =>
+              c.id === this.devilId ? { ...c, devil: true } : c,
+            )
+          : undefined,
         cardCount: (this.hands[p.id] || []).length,
         stats: p.stats,
       })),
@@ -304,6 +315,7 @@ export class LiarsBarRoom {
             playerId: this.risk.playerId,
             playerName: this.playerName(this.risk.playerId),
             slots: this.risk.slots.map((s) => ({ picked: s.picked })),
+            queueLeft: (this.risk.queue || []).length,
           }
         : null,
       history: this.history.slice(-8),
@@ -559,6 +571,18 @@ export class LiarsBarRoom {
     this.pile = [];
     this.round = 1;
     this.tableRank = randomTableRank();
+    this.devilId = null;
+    if (this.settings.devilMode) {
+      const dealt: LiarCard[] = [];
+      for (const pid of starters.map((p) => p.id)) {
+        for (const c of this.hands[pid] || []) {
+          if (c.rank !== 'JOKER') dealt.push(c);
+        }
+      }
+      if (dealt.length > 0) {
+        this.devilId = dealt[Math.floor(Math.random() * dealt.length)].id;
+      }
+    }
     this.turnOrder = starters.map((p) => p.id);
     this.turnIndex = 0;
     this.stage = 'play';
@@ -580,6 +604,9 @@ export class LiarsBarRoom {
     if (idx < 0) return;
     const [kicked] = this.players.splice(idx, 1);
     delete this.hands[targetId];
+    if (this.devilId && !Object.values(this.hands).some((h) => h.some((c) => c.id === this.devilId))) {
+      this.devilId = null;
+    }
     this.turnOrder = this.turnOrder.filter((id) => id !== targetId);
     if (this.turnIndex >= this.turnOrder.length) this.turnIndex = 0;
     for (const ws of this.socketsFor(targetId)) {
@@ -600,10 +627,29 @@ export class LiarsBarRoom {
   private async onLeave(player: LiarPlayer): Promise<void> {
     this.players = this.players.filter((p) => p.id !== player.id);
     delete this.hands[player.id];
+    if (this.devilId && !Object.values(this.hands).some((h) => h.some((c) => c.id === this.devilId))) {
+      this.devilId = null;
+    }
     this.turnOrder = this.turnOrder.filter((id) => id !== player.id);
     if (this.turnIndex >= this.turnOrder.length) this.turnIndex = 0;
     // Never strand a risk or pending exit on a departed seat.
-    if (this.risk && this.risk.playerId === player.id) this.risk = null;
+    if (this.risk) {
+      this.risk.queue = (this.risk.queue || []).filter((id) => id !== player.id);
+      if (this.risk.playerId === player.id) {
+        const nxt = this.risk.queue.shift();
+        if (nxt && this.players.some((p) => p.id === nxt && p.connected && !p.eliminated)) {
+          this.risk = {
+            type: this.risk.type,
+            playerId: nxt,
+            slots: buildChamber(this.settings.chambers, this.settings.liveChambers),
+            queue: this.risk.queue,
+            devil: this.risk.devil,
+          };
+        } else {
+          this.risk = null;
+        }
+      }
+    }
     if (this.pendingOut === player.id) this.pendingOut = null;
     if (this.lastPlay && this.lastPlay.by === player.id) this.lastPlay = null;
     for (const ws of this.socketsFor(player.id)) {
@@ -661,6 +707,7 @@ export class LiarsBarRoom {
     this.stage = 'play';
     this.lastPlay = null;
     this.pendingOut = null;
+    this.devilId = null;
     this.risk = null;
     this.round = 0;
     this.history = [];
@@ -768,6 +815,10 @@ export class LiarsBarRoom {
       this.sendTo(player.id, { t: 'liar_error', message: 'Those cards are not in your hand.' });
       return;
     }
+    if (this.settings.devilMode && this.devilId && ids.includes(this.devilId) && ids.length > 1) {
+      this.sendTo(player.id, { t: 'liar_error', message: 'The Devil rides alone — play it by itself.' });
+      return;
+    }
     await this.applyPlay(player.id, ids, count);
   }
 
@@ -837,8 +888,9 @@ export class LiarsBarRoom {
     const play = this.lastPlay;
     const truthful = judgeChallenge(play.cards, this.tableRank);
     const loser = truthful ? challengerId : play.by;
+    const devilHit = this.settings.devilMode && !!this.devilId && play.cards.some((c) => c.id === this.devilId);
     const challenger = this.players.find((p) => p.id === challengerId);
-    if (challenger && !truthful) challenger.stats.challengesWon += 1;
+    if (challenger && !truthful && !devilHit) challenger.stats.challengesWon += 1;
     this.roomState = 'reveal';
     this.cancelAlarm();
     this.sendAll({
@@ -849,15 +901,18 @@ export class LiarsBarRoom {
       challengerName: this.playerName(challengerId),
       count: play.count,
       rank: this.tableRank,
-      cards: play.cards,
+      cards: play.cards.map((c) => (c.id === this.devilId ? { ...c, devil: true } : c)),
       truthful,
+      devil: devilHit,
       loser,
       loserName: this.playerName(loser),
     });
     this.chat(
-      truthful
-        ? `${this.playerName(challengerId)} called LIAR — but it was the truth.`
-        : `${this.playerName(challengerId)} called LIAR — caught bluffing.`,
+      devilHit
+        ? `${this.playerName(play.by)} rode the Devil — everyone else faces the chamber!`
+        : truthful
+          ? `${this.playerName(challengerId)} called LIAR — but it was the truth.`
+          : `${this.playerName(challengerId)} called LIAR — caught bluffing.`,
     );
     this.save();
     this.broadcast();
@@ -885,10 +940,16 @@ export class LiarsBarRoom {
       await this.checkContinuation();
       return;
     }
+    const devilHit = this.settings.devilMode && !!this.devilId && play.cards.some((c) => c.id === this.devilId);
     // An out-player whose truthful final play survives the challenge wins now.
-    if (truthful && this.pendingOut === play.by) {
+    // (The Devil overrides everything: no clean wins on a devil round.)
+    if (truthful && this.pendingOut === play.by && !devilHit) {
       this.pendingOut = null;
       await this.endGame(play.by, `${this.playerName(play.by)} went out clean.`);
+      return;
+    }
+    if (devilHit) {
+      await this.openDevilRetribution(play.by);
       return;
     }
     this.pendingOut = null;
@@ -897,6 +958,8 @@ export class LiarsBarRoom {
       type: this.settings.riskType,
       playerId: loser,
       slots: buildChamber(this.settings.chambers, this.settings.liveChambers),
+      queue: [],
+      devil: false,
     };
     this.chat(`${this.playerName(loser)} faces the Risk Chamber.`);
     this.save();
@@ -906,6 +969,41 @@ export class LiarsBarRoom {
   }
 
   // ---------- risk chamber (modular: dispatched by risk type) ----------
+
+  private async openDevilRetribution(riderId: string): Promise<void> {
+    const damned = this.turnOrder.filter((pid) => {
+      if (pid === riderId) return false;
+      const p = this.players.find((x) => x.id === pid);
+      return p && !p.eliminated && p.connected;
+    });
+    this.pendingOut = null;
+    if (damned.length === 0) {
+      this.pile = [];
+      this.lastPlay = null;
+      this.round += 1;
+      this.tableRank = randomTableRank();
+      this.roomState = 'playing';
+      this.stage = 'play';
+      this.chat('The Devil found no one to punish — new rank: ' + this.tableRank + '.');
+      this.save();
+      this.broadcast();
+      await this.checkContinuation();
+      return;
+    }
+    this.roomState = 'risk';
+    const [first, ...rest] = damned;
+    this.risk = {
+      type: this.settings.riskType,
+      playerId: first,
+      slots: buildChamber(this.settings.chambers, this.settings.liveChambers),
+      queue: rest,
+      devil: true,
+    };
+    this.save();
+    this.broadcast();
+    this.sendTo(first, { t: 'liar_risk', slots: this.risk.slots.length, endsIn: this.settings.turnTimer });
+    this.scheduleAlarm(this.settings.turnTimer * 1000);
+  }
 
   private async onRiskPick(player: LiarPlayer, slot: number): Promise<void> {
     if (this.roomState !== 'risk' || !this.risk) {
@@ -970,6 +1068,33 @@ export class LiarsBarRoom {
     this.risk = null;
     this.lastPlay = null;
     this.stage = 'play';
+    // Devil queues walk seat to seat; the table turns over once paid.
+    const queue = (risk.queue || []).filter((pid) => {
+      const p = this.players.find((x) => x.id === pid);
+      return p && !p.eliminated && p.connected;
+    });
+    if (queue.length > 0) {
+      const [next, ...rest] = queue;
+      this.risk = {
+        type: risk.type,
+        playerId: next,
+        slots: buildChamber(this.settings.chambers, this.settings.liveChambers),
+        queue: rest,
+        devil: risk.devil,
+      };
+      this.chat(`${this.playerName(next)} steps up to the chamber…`);
+      this.save();
+      this.broadcast();
+      this.sendTo(next, { t: 'liar_risk', slots: this.risk.slots.length, endsIn: this.settings.turnTimer });
+      this.scheduleAlarm(this.settings.turnTimer * 1000);
+      return;
+    }
+    if (risk.devil) {
+      this.pile = [];
+      this.round += 1;
+      this.tableRank = randomTableRank();
+      this.chat(`The Devil is paid — new rank: ${this.tableRank}.`);
+    }
     // Play resumes with the next live seat after the risk player.
     this.turnIndex = this.nextAliveIndex(Math.max(0, this.turnOrder.indexOf(risk.playerId)));
     this.save();
