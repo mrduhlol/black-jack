@@ -98,6 +98,8 @@ A bluffing game for 2–4 players, played with an authentic 20-card Liar's Deck.
 5. The chamber is 6 slots with 1 live by default (host can tune it). Survive and you take the pile; go out and you're eliminated.
 6. Empty your hand and survive the challenge to win the table — or be the last one standing.
 
+**Devil variant** (host toggle): one rank card is secretly marked 😈. It can only be played alone — but if anyone challenges it, *every other player* faces the chamber instead of just one.
+
 Shortcuts: `L` calls LIAR!, `C` continues, `Enter` plays the selected cards. The bar has its own chat, emotes, avatar cast, and sound kit.
 
 ## Table settings

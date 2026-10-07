@@ -1050,6 +1050,10 @@ function statusLabel(h) {
 
 function renderLobby(r) {
   const isHost = r.hostId === myId;
+  const print = document.querySelector('.felt-print');
+  if (print) {
+    print.textContent = `Blackjack pays ${r.settings.blackjackPays}   •   Dealer ${r.settings.dealerHitsSoft17 ? 'hits soft 17' : 'stands on 17'}   •   ${r.settings.allowSurrender ? 'Surrender allowed' : 'No surrender'}`;
+  }
   $('lobbyPanel').style.display = r.state === 'lobby' ? 'block' : 'none';
   $('startBtn').classList.toggle('hidden', !isHost);
   const s = $('settingsBox');
