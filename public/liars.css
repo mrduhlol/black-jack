@@ -944,6 +944,31 @@ body[data-mode="liars"] .rules-number {
 }
 .lb-turn-note.urgent { color: #e07864; font-weight: 800; animation: lbUrgent 1s infinite; }
 @keyframes lbUrgent { 50% { opacity: 0.55; } }
+/* next-up seat + decide stamp on the turn line */
+.lb-seat.next .lb-ava { border-style: dashed; border-color: var(--lb-brass); }
+.lb-seat.next .lb-nm::after {
+  content: "NEXT";
+  margin-left: 5px;
+  font-size: 9px; font-weight: 900; letter-spacing: 0.1em;
+  color: var(--lb-brass-hi);
+  border: 1px solid rgba(201, 163, 92, 0.55);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.lb-turn-note.decide {
+  color: #e07864;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  border: 1px dashed rgba(224, 120, 100, 0.6);
+  border-radius: 6px;
+  padding: 3px 10px;
+  display: inline-block;
+  transform: rotate(-1.5deg);
+}
+.lb-reveal.suspense { border-style: dashed; }
+.lb-reveal.suspense h3 { animation: lbUrgent 0.8s infinite; }
+.lb-chambers.spin button:not(:disabled) { animation: lbChamberSpin 0.12s linear infinite; }
+@keyframes lbChamberSpin { 50% { transform: translateY(-4px); } }
 .lb-board { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 4px; }
 .lb-board-row {
   display: flex; align-items: center; gap: 10px;

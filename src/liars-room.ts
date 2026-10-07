@@ -294,6 +294,10 @@ export class LiarsBarRoom {
         : null,
       turnId: this.turnOrder[this.turnIndex] || null,
       stage: this.stage,
+      order: this.turnOrder.filter((pid) => {
+        const p = this.players.find((x) => x.id === pid);
+        return p && !p.eliminated;
+      }),
       risk: this.risk
         ? {
             type: this.risk.type,

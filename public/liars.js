@@ -100,6 +100,7 @@ let lbRoom = null;
 let lbMyId = null;
 let lbSelected = new Set();
 let lbLastReveal = null;
+let lbRevealPending = null;
 let lbEndsAt = 0;
 let lbPrevRank = null;
 let lbOutWarned = new Set();
@@ -310,6 +311,10 @@ function lbRenderTable() {
     const seat = document.createElement('div');
     const isTurn = lbRoom.turnId === p.id && (lbRoom.state === 'playing');
     seat.className = 'lb-seat' + (isTurn ? ' turn' : '') + (p.eliminated ? ' dead' : '') + (p.isYou ? ' me' : '');
+    if (!isTurn && lbRoom.state === 'playing' && Array.isArray(lbRoom.order)) {
+      const idx = lbRoom.order.indexOf(lbRoom.turnId);
+      if (idx >= 0 && lbRoom.order[(idx + 1) % lbRoom.order.length] === p.id) seat.classList.add('next');
+    }
     seat.style.left = pos.x + '%';
     seat.style.top = pos.y + '%';
     seat.appendChild(lbAvatarImg(p, 'lb-ava'));
@@ -363,6 +368,12 @@ function lbRenderTable() {
   } else if (lbRoom.state === 'gameover') {
     note.textContent = '';
   } else note.textContent = '';
+
+  if (lbRoom.stage === 'decide') {
+    note.classList.add('decide');
+  } else {
+    note.classList.remove('decide');
+  }
 
   lbRenderHand();
   lbRenderActions();
@@ -465,6 +476,22 @@ function lbRenderActions() {
 
 function lbRenderReveal() {
   let box = $('lbRevealBox');
+  if (lbRevealPending && !lbLastReveal) {
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'lbRevealBox';
+      $('lbSelf').insertBefore(box, $('lbActions'));
+    }
+    box.className = 'lb-reveal suspense';
+    box.innerHTML = '';
+    const h = document.createElement('h3');
+    h.textContent = 'Called it…';
+    box.appendChild(h);
+    const p = document.createElement('p');
+    p.textContent = `${lbRevealPending.challengerName} called LIAR on ${lbRevealPending.byName}. Cards turning…`;
+    box.appendChild(p);
+    return;
+  }
   if (!lbLastReveal) {
     if (box) box.remove();
     return;
@@ -533,6 +560,8 @@ function lbRenderRisk() {
     row.appendChild(b);
   });
   bx.appendChild(row);
+  row.classList.add('spin');
+  setTimeout(() => { row.classList.remove('spin'); }, 900);
   const res = document.createElement('div');
   res.className = 'lb-risk-result';
   res.id = 'lbRiskResult';
@@ -542,6 +571,25 @@ function lbRenderRisk() {
 
 let lbLastRiskSlots = null;
 function lbRiskInfo() { return lbLastRiskSlots; }
+
+// Keyboard shortcuts: L = LIAR!, C = continue, Enter = play selected.
+// Ignored while typing in chat or when the bar is not on screen.
+document.addEventListener('keydown', (e) => {
+  const lg = $('liarGame');
+  if (!lg || lg.classList.contains('hidden')) return;
+  const tag = (e.target && e.target.tagName) || '';
+  if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+  if (e.key === 'l' || e.key === 'L') {
+    const b = document.querySelector('#lbActions .lb-btn.danger');
+    if (b) { e.preventDefault(); b.click(); }
+  } else if (e.key === 'c' || e.key === 'C') {
+    const b = [...document.querySelectorAll('#lbActions .lb-btn.quiet')].find((x) => x.textContent === 'Continue');
+    if (b) { e.preventDefault(); b.click(); }
+  } else if (e.key === 'Enter') {
+    const b = document.querySelector('#lbActions .lb-btn.primary');
+    if (b && !b.disabled) { e.preventDefault(); b.click(); }
+  }
+});
 
 function lbRenderGameover(box) {
   const go = lbLastGameover;
@@ -639,8 +687,9 @@ LbNet.on('room', (r) => {
   const me = r.players.find((p) => p.isYou);
   if (me) lbMyId = me.id;
   if (first || r.state === 'lobby') { lbLastGameover = null; }
-  if (r.state === 'lobby') { lbPrevRank = null; lbOutWarned = new Set(); }
-  if (r.state === 'playing' && !r.lastPlay) { lbLastReveal = null; }
+  if (r.state === 'lobby') { lbPrevRank = null; lbOutWarned = new Set(); lbRevealPending = null; }
+  if (r.state === 'playing' && !r.lastPlay) { lbLastReveal = null; lbRevealPending = null; }
+  if (r.state === 'risk' || r.state === 'gameover') { lbRevealPending = null; }
   if (rankChanged) {
     lbToast(`New table rank: ${lbRankLabel(r.tableRank)}`, 'gold');
     try { Sound.roundStart(); } catch (e) {}
@@ -677,10 +726,16 @@ LbNet.on('liar_played', ({ by }) => {
   if (seat) lbFly(seat);
 });
 LbNet.on('liar_reveal', (m) => {
-  lbLastReveal = m;
   try { Sound.liar(); } catch (e) {}
   if (navigator.vibrate) { try { navigator.vibrate([60, 40, 60]); } catch (e) {} }
+  lbRevealPending = m;
   lbRenderReveal();
+  setTimeout(() => {
+    if (lbRevealPending !== m) return;
+    lbLastReveal = m;
+    lbRevealPending = null;
+    lbRenderReveal();
+  }, 1100);
 });
 LbNet.on('liar_risk', () => {
   lbLastRiskSlots = null;
@@ -761,6 +816,7 @@ function lbLeave() {
   lbMyId = null;
   lbSelected = new Set();
   lbLastReveal = null;
+  lbRevealPending = null;
   lbLastGameover = null;
   const veil = $('lbRiskVeil');
   if (veil) veil.remove();
