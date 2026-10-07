@@ -920,6 +920,10 @@ body[data-mode="liars"] .rules-number {
 @media (max-width: 760px) {
   .bar-hero { height: 168px; }
   .bar-table { width: 262px; height: 132px; }
+  .lb-chat { height: 120px; }
+  .lb-end-actions .lb-btn { flex: 1 1 100%; }
+  .lb-vice { display: none; }
+  .lb-countline { font-size: 11px; }
   .lamp-l { left: calc(50% - 148px); }
   .lamp-r { right: calc(50% - 148px); }
   .bchip-a { left: calc(50% - 148px); }
