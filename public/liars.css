@@ -933,6 +933,13 @@ body[data-mode="liars"] .rules-number {
 .lb-deckline { color: var(--lb-muted); font-size: 12.5px; margin: 0 0 4px; }
 .lb-oddsline { color: var(--lb-brass); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin: 0 0 12px; }
 .lb-invite { width: 100%; margin-bottom: 14px; }
+.lb-kick {
+  margin-left: 8px; flex: 0 0 auto; font-size: 11px; font-weight: 800; cursor: pointer;
+  background: transparent; color: var(--lb-muted);
+  border: 1px solid #3a3227; border-radius: 8px; padding: 6px 10px;
+}
+.lb-kick:hover { color: #e07864; border-color: var(--lb-danger); }
+.lb-need { color: var(--lb-muted); font-size: 12.5px; font-style: italic; margin: 0 0 12px; }
 .lb-vice {
   margin-left: auto; font-size: 11px; font-style: italic; color: var(--lb-muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%;

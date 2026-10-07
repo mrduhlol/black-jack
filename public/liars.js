@@ -266,9 +266,27 @@ function lbRenderLobby() {
       tag.textContent = 'HOST';
       row.appendChild(tag);
     }
+    const meNow = lbMe();
+    if (meNow && meNow.isHost && !p.isYou) {
+      const kick = document.createElement('button');
+      kick.className = 'lb-kick';
+      kick.type = 'button';
+      kick.textContent = 'Kick';
+      kick.setAttribute('aria-label', `Kick ${p.name}`);
+      kick.onclick = () => { Sound.unlock(); Sound.click(); LbNet.send({ t: 'kick', targetId: p.id }); };
+      row.appendChild(kick);
+    }
     roster.appendChild(row);
   });
   box.appendChild(roster);
+
+  const connected = lbRoom.players.filter((p) => p.connected).length;
+  if (connected < 2) {
+    const need = document.createElement('p');
+    need.className = 'lb-need';
+    need.textContent = `Waiting for players (${connected}/2 to start)…`;
+    box.appendChild(need);
+  }
 
   const me = lbMe();
   if (me && me.isHost) {
