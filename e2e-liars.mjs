@@ -114,6 +114,19 @@ if (seen.over) {
   console.log('E2E_FAIL no gameover in time');
 }
 
+// rematch: host runs it back, the table must deal again
+let rematchPass = false;
+if (gamePass) {
+  seen.over = null;
+  bots[0].send({ t: 'rematch' });
+  const rdead = Date.now() + 60000;
+  while (Date.now() < rdead && !rematchPass) {
+    await sleep(500);
+    rematchPass = bots.some((b) => b.room && b.room.state === 'playing');
+  }
+}
+console.log('REMATCH', rematchPass ? 'PASS' : 'FAIL');
+
 // cooldown probe: 3 rapid chats -> exactly 1 echo; after 1.2s the next goes through
 let chatEchoes = 0;
 const chatProbe = (ev) => {
@@ -126,15 +139,15 @@ bots[0].ws.addEventListener('message', chatProbe);
 bots[0].send({ t: 'chat', text: 'spam-1' });
 bots[0].send({ t: 'chat', text: 'spam-2' });
 bots[0].send({ t: 'chat', text: 'spam-3' });
-await sleep(600);
+await sleep(1000);
 const afterBurst = chatEchoes;
-await sleep(1200);
+await sleep(1500);
 bots[0].send({ t: 'chat', text: 'spam-4' });
-await sleep(600);
+await sleep(1000);
 const cooldownPass = afterBurst === 1 && chatEchoes === 2;
 console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
 
-if (gamePass && cooldownPass) {
+if (gamePass && rematchPass && cooldownPass) {
   console.log('E2E_PASS');
   process.exitCode = 0;
 } else {
