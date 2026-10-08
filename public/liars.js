@@ -439,6 +439,10 @@ function lbRenderTable() {
     pile.appendChild(c);
   }
   $('lbPileCount').textContent = lbRoom.pileCount > 0 ? `${lbRoom.pileCount} in the pile` : 'pile empty';
+  const cfg = $('lbTableCfg');
+  if (cfg && lbRoom.settings) {
+    cfg.textContent = `${lbRoom.settings.chambers} chambers · ${lbRoom.settings.liveChambers} live` + (lbRoom.settings.devilMode ? ' · 😈' : '');
+  }
   const note = $('lbTurnNote');
   delete note.dataset.base;
   if (lbRoom.state === 'risk' && lbRoom.risk) {
