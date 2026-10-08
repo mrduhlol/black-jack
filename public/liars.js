@@ -368,6 +368,11 @@ function lbRenderLobby() {
     const wait = document.createElement('p');
     wait.textContent = 'Waiting for the host to start…';
     box.appendChild(wait);
+    const s = lbRoom.settings;
+    const sum = document.createElement('p');
+    sum.className = 'lb-setting-sum';
+    sum.textContent = `${s.maxPlayers} seats · ${s.turnTimer}s turns · ${s.chambers} chambers (${s.liveChambers} live)` + (s.devilMode ? ' · 😈 devil' : '');
+    box.appendChild(sum);
     if (lbRoom.settings.devilMode) {
       const dv = document.createElement('p');
       dv.className = 'lb-devil-note';
