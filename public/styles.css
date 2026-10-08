@@ -43,6 +43,7 @@ button{font-family:inherit;touch-action:manipulation}
 :focus-visible{outline:3px solid var(--gold-hi);outline-offset:2px;border-radius:8px}
 .skip-link{position:fixed;left:12px;top:12px;z-index:1000;padding:10px 14px;transform:translateY(-160%);background:var(--gold-hi);color:var(--ink);font-weight:800;border-radius:8px}
 .skip-link:focus{transform:translateY(0)}
+.boot-error{position:fixed;left:12px;right:12px;top:12px;z-index:1000;padding:12px 16px;border-radius:12px;background:#3d0f18;color:#ffe9a8;border:1px solid #ff4d6d;font-weight:700;font-size:14px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
 
 /* ===== FX layers ===== */
 #fx{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.9}

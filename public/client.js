@@ -95,6 +95,22 @@ const Net = {
 };
 const $ = (id) => document.getElementById(id);
 
+// Last-resort surface: if one of our own scripts throws during boot, say so
+// instead of stranding the player on a dead page. Third-party/extension
+// errors stay silent.
+window.addEventListener('error', (e) => {
+  try {
+    const f = String((e && e.filename) || '');
+    if (!f || (f.indexOf(location.host) === -1 && f.indexOf('black-jack') === -1 && f.indexOf('liar') === -1)) return;
+    if (document.querySelector('.boot-error')) return;
+    const d = document.createElement('div');
+    d.className = 'boot-error';
+    d.setAttribute('role', 'alert');
+    d.textContent = 'The table hiccuped while loading — hard-refresh (Ctrl+Shift+R). Still stuck? Send a screenshot of the Console (F12).';
+    document.body.prepend(d);
+  } catch (_) { /* never break boot to report boot */ }
+});
+
 const CROWN_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M3 17 2 7l5.5 3.5L12 4l4.5 6.5L22 7l-1 10H3Zm0 2h18v2H3v-2Z"/></svg>';
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
