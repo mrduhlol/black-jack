@@ -162,8 +162,10 @@ Then open the URL shown in the terminal (usually http://localhost:8787).
 Scripted bots can play full Liar's Table games (normal and Devil rules) against a local dev server:
 
 ```bash
-npm run dev          # in one terminal (http://localhost:8787)
-CP=1.0 npm run e2e:liars devil   # in another: always-challenge Devil game
+npm run e2e:all            # boots wrangler dev, runs the fast sweep, stops it
+SUITES=match,match-bj,liars-normal,liars-devil,blackjack,resume,resume-bj npm run e2e:all  # full sweep
+# or run suites individually against your own `npm run dev` (http://localhost:8787):
+CP=1.0 npm run e2e:liars devil   # always-challenge Devil game
 npm run e2e:liars normal         # normal rules
 npm run e2e:blackjack            # full 2-round blackjack game
 BOTS=2 npm run e2e:liars devil   # 2-seat edge; BOTS=2..4
