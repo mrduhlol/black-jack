@@ -670,7 +670,7 @@ function lbRenderRisk() {
   if (!veil) {
     veil = document.createElement('div');
     veil.id = 'lbRiskVeil';
-    veil.className = 'lb-risk-veil';
+    veil.className = 'lb-risk-veil' + (lbRoom.risk && lbRoom.risk.devil ? ' devilchain' : '');
     document.body.appendChild(veil);
   }
   veil.innerHTML = '';

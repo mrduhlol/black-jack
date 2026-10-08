@@ -317,6 +317,7 @@ export class LiarsBarRoom {
             playerName: this.playerName(this.risk.playerId),
             slots: this.risk.slots.map((s) => ({ picked: s.picked })),
             queueLeft: (this.risk.queue || []).length,
+            devil: !!this.risk.devil,
           }
         : null,
       history: this.history.slice(-8),
