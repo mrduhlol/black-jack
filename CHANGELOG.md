@@ -24,9 +24,15 @@ cast, sound kit, chat, and test coverage.
   cooldowns, double-tap guards on bets/actions, two-tap kicks, stored-XSS
   fixes, live felt print that follows table settings.
 - **Tests** — engine unit suite plus bot-driven end-to-end games for both
-  tables: full games, rematches, lobby chat, cooldowns
-  (`npm run e2e:liars`, `npm run e2e:blackjack` against `npm run dev`).
-- **Sharing** — Open Graph / Twitter cards with a preview image.
+  tables: full games (2–4 seats), rematches, lobby chat, cooldowns,
+  drop-and-reconnect resumes, both matchmaking pools
+  (`npm run e2e:liars`, `npm run e2e:blackjack`, `npm run e2e:match`,
+  `npm run e2e:resume`, `npm run e2e:resume-bj` against `npm run dev`).
+- **Sharing** — Open Graph / Twitter cards with a preview image,
+  plus `#liars` / `?mode=liars` links straight to the bar front page.
+- **Ongoing hardening** — turn pings, chamber countdowns, rematch waiting
+  lines, lobby settings visibility, double-tap guards, social unfurls,
+  accessibility names and keyboard play, remembered nicknames and faces.
 
 ## Earlier
 

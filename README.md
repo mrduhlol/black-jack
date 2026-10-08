@@ -104,6 +104,8 @@ A bluffing game for 2–4 players, played with an authentic 20-card Liar's Deck.
 
 Shortcuts: `L` calls LIAR!, `C` continues, `Enter` plays the selected cards. The bar has its own chat, emotes, avatar cast, and sound kit.
 
+Link straight to the bar front page with `#liars` (or `?mode=liars`).
+
 ## Table settings
 
 The host can configure each room before starting:
