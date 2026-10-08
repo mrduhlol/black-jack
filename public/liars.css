@@ -962,6 +962,7 @@ body[data-mode="liars"] .rules-number {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 16px rgba(201, 163, 92, 0.35);
 }
 .lb-card.joker .lb-pip { color: var(--lb-brass-hi); text-shadow: 0 0 12px rgba(201, 163, 92, 0.8); }
+.lb-card:focus-visible { outline: 3px solid var(--lb-brass-hi); outline-offset: 3px; }
 .lb-deckline { color: var(--lb-muted); font-size: 12.5px; margin: 0 0 4px; }
 .lb-oddsline { color: var(--lb-brass); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin: 0 0 12px; }
 .lb-invite { width: 100%; margin-bottom: 14px; }

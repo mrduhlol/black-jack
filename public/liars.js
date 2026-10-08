@@ -484,14 +484,26 @@ function lbCardEl(c, selectable) {
   d.className = 'lb-card' + (lbSelected.has(c.id) ? ' sel' : '');
   d.dataset.cid = c.id;
   lbCardFace(d, c);
+  const suitWord = { '♠': 'spades', '♥': 'hearts', '♦': 'diamonds', '♣': 'clubs', '★': 'stars' }[c.suit] || c.suit;
+  const face = c.rank === 'JOKER' ? 'Wild joker' : `${c.rank} of ${suitWord}`;
+  const setLabel = () => d.setAttribute('aria-label',
+    `${face}${c.devil ? ', devil card' : ''}${lbSelected.has(c.id) ? ', selected' : ''}`);
+  setLabel();
   if (selectable) {
-    d.onclick = () => {
+    d.setAttribute('role', 'button');
+    d.tabIndex = 0;
+    const toggle = () => {
       Sound.unlock(); Sound.click();
       if (lbSelected.has(c.id)) lbSelected.delete(c.id);
       else if (lbSelected.size >= 3) lbToast('Lay at most 3 cards', 'bad');
       else lbSelected.add(c.id);
+      setLabel();
       lbRenderHand();
       lbRenderActions();
+    };
+    d.onclick = toggle;
+    d.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
     };
   }
   return d;
