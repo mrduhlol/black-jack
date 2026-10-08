@@ -909,6 +909,8 @@ LbNet.on('phase', () => { lbEndsAt = 0; });
 LbNet.on('liar_turn', ({ stage, endsIn }) => {
   lbEndsAt = Date.now() + (Number(endsIn) || 30) * 1000;
   document.title = 'Your turn! — Liar’s Table';
+  try { Sound.turn(); } catch (e) {}
+  if (navigator.vibrate) { try { navigator.vibrate(80); } catch (e) {} }
   void stage;
 });
 LbNet.on('liar_played', ({ by }) => {
