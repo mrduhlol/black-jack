@@ -55,6 +55,7 @@ await sleep(500);
 bots[0].send({ t: 'set_settings', rounds: 2, betTimer: 8, turnTimer: 10 });
 await sleep(300);
 bots[0].send({ t: 'start_game' });
+bots[0].send({ t: 'start_game' }); // duplicate must no-op
 
 for (const b of bots) {
   const basic = (cards) => {
@@ -106,6 +107,7 @@ let rematchPass = false;
 if (gamePass) {
   seen.over = null;
   bots[0].send({ t: 'rematch' });
+  bots[0].send({ t: 'rematch' }); // duplicate must no-op
   const rdead = Date.now() + 60000;
   while (Date.now() < rdead && !rematchPass) {
     await sleep(500);
