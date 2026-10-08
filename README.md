@@ -19,6 +19,8 @@
 - [Run it yourself](#run-it-yourself)
 - [License](#license)
 
+See [CHANGELOG.md](CHANGELOG.md) for what's new.
+
 ## About
 
 Black-Jack.io is a real-time multiplayer Blackjack game that runs entirely in the browser.
