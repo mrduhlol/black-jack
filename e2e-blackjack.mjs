@@ -33,7 +33,7 @@ function makeBot(code, name, isHost) {
       if (m.t === 'your_turn') bot.onTurn && bot.onTurn(m);
       if (m.t === 'settle') stats.settles++;
       if (m.t === 'gameover') { seen.over = m; }
-      if (m.t === 'action_error') console.log('[e2e]', name, 'ERR:', m.message);
+      if (m.t === 'action_error') { console.log('[e2e]', name, 'ERR:', m.message); bot.onActionError && bot.onActionError(m); }
     };
   });
   bot.send = (o) => bot.ws.send(JSON.stringify(o));
@@ -41,7 +41,7 @@ function makeBot(code, name, isHost) {
   return bot;
 }
 
-const stats = { settles: 0, bets: 0, actions: 0 };
+const stats = { settles: 0, bets: 0, actions: 0, fancy: 0 };
 const seen = { over: null };
 const deadline = Date.now() + 150000;
 
@@ -57,12 +57,25 @@ await sleep(300);
 bots[0].send({ t: 'start_game' });
 
 for (const b of bots) {
-  b.onTurn = (m) => {
-    const cards = m.cards || [];
+  const basic = (cards) => {
     const t = total(cards);
     stats.actions++;
     b.send({ t: 'action', kind: t < 17 ? 'hit' : 'stand' });
   };
+  b.onTurn = (m) => {
+    const cards = m.cards || [];
+    b.lastCards = cards;
+    const t = total(cards);
+    if (cards.length === 2 && !b.triedFancy) {
+      b.triedFancy = true;
+      if (t >= 9 && t <= 11) { stats.fancy++; return b.send({ t: 'action', kind: 'double' }); }
+      if (cards[0].rank === cards[1].rank) { stats.fancy++; return b.send({ t: 'action', kind: 'split' }); }
+      if (t === 15 || t === 16) { stats.fancy++; return b.send({ t: 'action', kind: 'surrender' }); }
+    }
+    b.triedFancy = false;
+    basic(cards);
+  };
+  b.onActionError = () => { if (b.lastCards) basic(b.lastCards); };
 }
 
 // auto-bet whenever anyone is in betting with no hands yet
