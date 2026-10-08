@@ -7,13 +7,14 @@ import { spawn, execFileSync } from 'node:child_process';
 
 const PORT = Number(process.argv[2] || 9287);
 const BASE = `http://localhost:${PORT}`;
-const SUITES = (process.env.SUITES || 'match,match-bj,liars-normal').split(',').map((s) => s.trim()).filter(Boolean);
+const SUITES = (process.env.SUITES || 'match,match-bj,liars-devil-quick,blackjack').split(',').map((s) => s.trim()).filter(Boolean);
 
 const JOBS = {
   'match': { cmd: ['node', 'e2e-match.mjs'], env: {} },
   'match-bj': { cmd: ['node', 'e2e-match.mjs'], env: { MATCH_MODE: 'blackjack' } },
   'liars-normal': { cmd: ['node', 'e2e-liars.mjs', 'normal'], env: {} },
   'liars-devil': { cmd: ['node', 'e2e-liars.mjs', 'devil'], env: { CP: '1.0' } },
+  'liars-devil-quick': { cmd: ['node', 'e2e-liars.mjs', 'devil'], env: { CP: '1.0', BOTS: '2' } },
   'blackjack': { cmd: ['node', 'e2e-blackjack.mjs'], env: {} },
   'resume': { cmd: ['node', 'e2e-resume.mjs'], env: {} },
   'resume-bj': { cmd: ['node', 'e2e-resume-bj.mjs'], env: {} },
