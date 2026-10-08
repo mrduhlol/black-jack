@@ -34,16 +34,25 @@ const Net = {
     return new Promise((resolve, reject) => {
       let settled = false;
       const ws = new WebSocket(this.socketUrl(code));
-      ws.onopen = () => { if (!settled) { settled = true; this.ws = ws; resolve(); } };
+      // Never strand the UI: a handshake that neither opens nor fails
+      // (proxies, AV filters, dead networks) rejects instead of hanging.
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          try { ws.close(); } catch (e) {}
+          reject(new Error('ws timeout'));
+        }
+      }, 15000);
+      ws.onopen = () => { if (!settled) { settled = true; clearTimeout(timer); this.ws = ws; resolve(); } };
       ws.onmessage = (ev) => {
         let msg = null;
         try { msg = JSON.parse(ev.data); } catch (e) { return; }
         if (msg && typeof msg.t === 'string') this.dispatch(msg);
       };
-      ws.onerror = () => { if (!settled) { settled = true; reject(new Error('ws error')); } };
+      ws.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); reject(new Error('ws error')); } };
       ws.onclose = () => {
         if (this.ws === ws) this.ws = null;
-        if (!settled) { settled = true; reject(new Error('ws closed')); return; }
+        if (!settled) { settled = true; clearTimeout(timer); reject(new Error('ws closed')); return; }
         if (myEpoch !== this.epoch) return; // superseded by a newer connection
         this.onUnexpectedClose();
       };
@@ -194,6 +203,23 @@ const TRAY = [10, 50, 100, 250, 500];
 // real coins: denominations + colors (used by paintTray during init)
 const DENOMS = [500, 250, 100, 50, 10];
 const CHIP_COLORS = { 10: '#2b6cb0', 50: '#1f9d63', 100: '#2b313c', 250: '#6b5cc7', 500: '#b32335' };
+
+function busy(btn, on) {
+  if (!btn) return;
+  btn.disabled = !!on;
+  btn.classList.toggle('is-busy', !!on);
+  btn.setAttribute('aria-busy', String(!!on));
+}
+// fetch with a hard ceiling: a stalled API must fail loudly (toast) instead
+// of stranding the landing with a dead button.
+function fetchJson(url, opts, ms = 20000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, ms);
+  const p = fetch(url, { ...(opts || {}), signal: ctrl.signal });
+  if (p && typeof p.finally === 'function') return p.finally(() => clearTimeout(timer));
+  clearTimeout(timer);
+  return p;
+}
 
 function toast(msg, kind = '') {
   const stack = $('toastStack');
@@ -581,46 +607,51 @@ if ([...qs.keys()][0]) $('codeInput').value = [...qs.keys()][0].toUpperCase();
   } catch (e) { /* stay on blackjack theme */ }
 })();
 
-$('playBtn').onclick = async () => {
+$('playBtn').onclick = async (e) => {
   Sound.unlock(); Sound.click();
+  busy(e.currentTarget, true);
   try {
     if (selectedMode === 'liars') {
-      const res = await fetch('/api/liar-public-room', { method: 'POST' });
+      const res = await fetchJson('/api/liar-public-room', { method: 'POST' });
       if (!res.ok) throw new Error('no room');
       const { code } = await res.json();
       await LbNet.joinRoom(code, true);
       return;
     }
-    const res = await fetch('/api/public-room', { method: 'POST' });
+    const res = await fetchJson('/api/public-room', { method: 'POST' });
     if (!res.ok) throw new Error('no room');
     const { code } = await res.json();
     await Net.joinRoom(code, true);
   } catch (e) { toast('Could not join a table — try again', 'bad'); }
+  finally { busy(e.currentTarget, false); }
 };
-$('createBtn').onclick = async () => {
+$('createBtn').onclick = async (e) => {
   Sound.unlock(); Sound.click();
+  busy(e.currentTarget, true);
   try {
     if (selectedMode === 'liars') {
-      const res = await fetch('/api/liar-create-room', { method: 'POST' });
+      const res = await fetchJson('/api/liar-create-room', { method: 'POST' });
       if (!res.ok) throw new Error('no room');
       const { code } = await res.json();
       await LbNet.joinRoom(code, true);
       return;
     }
-    const res = await fetch('/api/create-room', { method: 'POST' });
+    const res = await fetchJson('/api/create-room', { method: 'POST' });
     if (!res.ok) throw new Error('no room');
     const { code } = await res.json();
     await Net.joinRoom(code, true);
   } catch (e) { toast('Could not create a room — try again', 'bad'); }
+  finally { busy(e.currentTarget, false); }
 };
-$('joinBtn').onclick = async () => {
+$('joinBtn').onclick = async (e) => {
   Sound.unlock(); Sound.click();
+  busy(e.currentTarget, true);
   try {
     const code = $('codeInput').value.trim();
     // Invite links work for both modes — ask the directory which table this is.
     let mode = selectedMode;
     try {
-      const res = await fetch(`/api/room-mode?code=${encodeURIComponent(code)}`);
+      const res = await fetchJson(`/api/room-mode?code=${encodeURIComponent(code)}`);
       if (res.ok) {
         const data = await res.json();
         if (data && (data.mode === 'liars' || data.mode === 'blackjack')) mode = data.mode;
@@ -629,6 +660,7 @@ $('joinBtn').onclick = async () => {
     if (mode === 'liars') await LbNet.joinRoom(code, false);
     else await Net.joinRoom(code, false);
   } catch (e) { toast('Could not join room — check the code', 'bad'); }
+  finally { busy(e.currentTarget, false); }
 };
 if ($('lbLeaveBtn')) $('lbLeaveBtn').onclick = () => lbLeave();
 

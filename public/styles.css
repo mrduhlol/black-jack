@@ -128,6 +128,8 @@ button{font-family:inherit;touch-action:manipulation}
 .btn:hover{filter:brightness(1.05)}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.is-busy{opacity:.75}
+.btn.is-busy::after{content:' …';animation:blink 1s infinite}
 .btn.primary{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,#c9932a);color:#2e2004;border:1px solid rgba(255,255,255,.4)}
 .btn.primary::after{content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;z-index:1;background:linear-gradient(105deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-18deg);animation:btnShine 3.4s ease-in-out infinite;pointer-events:none}
 @keyframes btnShine{0%,55%{left:-80px}85%,100%{left:calc(100% + 40px)}}

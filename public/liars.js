@@ -35,16 +35,25 @@ const LbNet = {
     return new Promise((resolve, reject) => {
       let settled = false;
       const ws = new WebSocket(this.socketUrl(code));
-      ws.onopen = () => { if (!settled) { settled = true; this.ws = ws; resolve(); } };
+      // Never strand the UI: a handshake that neither opens nor fails
+      // (proxies, AV filters, dead networks) rejects instead of hanging.
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          try { ws.close(); } catch (e) {}
+          reject(new Error('ws timeout'));
+        }
+      }, 15000);
+      ws.onopen = () => { if (!settled) { settled = true; clearTimeout(timer); this.ws = ws; resolve(); } };
       ws.onmessage = (ev) => {
         let msg = null;
         try { msg = JSON.parse(ev.data); } catch (e) { return; }
         if (msg && typeof msg.t === 'string') this.dispatch(msg);
       };
-      ws.onerror = () => { if (!settled) { settled = true; reject(new Error('ws error')); } };
+      ws.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); reject(new Error('ws error')); } };
       ws.onclose = () => {
         if (this.ws === ws) this.ws = null;
-        if (!settled) { settled = true; reject(new Error('ws closed')); return; }
+        if (!settled) { settled = true; clearTimeout(timer); reject(new Error('ws closed')); return; }
         if (myEpoch !== this.epoch) return;
         this.onUnexpectedClose();
       };
