@@ -166,6 +166,7 @@ npm run e2e:liars normal         # normal rules
 npm run e2e:blackjack            # full 2-round blackjack game
 BOTS=2 npm run e2e:liars devil   # 2-seat edge; BOTS=2..4
 npm run e2e:match                 # public pool hands a joinable liar lobby
+MATCH_MODE=blackjack npm run e2e:match  # same for the blackjack pool
 ```
 
 MIT. See [LICENSE](LICENSE).

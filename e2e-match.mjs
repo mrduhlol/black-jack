@@ -1,10 +1,13 @@
-// E2E: public liar matchmaking hands out a joinable lobby, and the
-// invite-link mode lookup reports it as such.
+// E2E: public matchmaking hands out a joinable lobby, and the invite-link
+// mode lookup reports it as such. MATCH_MODE=blackjack checks the other pool.
 // Needs `npm run dev` in another terminal. E2E_BASE overrides the host.
 const BASE = process.env.E2E_BASE || 'http://localhost:8787';
+const MODE = process.env.MATCH_MODE === 'blackjack' ? 'blackjack' : 'liars';
+const POOL = MODE === 'blackjack' ? '/api/public-room' : '/api/liar-public-room';
+const SOCK = MODE === 'blackjack' ? 'room' : 'liar';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const pub = await (await fetch(`${BASE}/api/liar-public-room`, {
+const pub = await (await fetch(`${BASE}${POOL}`, {
   method: 'POST', signal: AbortSignal.timeout(15000),
 })).json();
 console.log('public code =', pub.code);
@@ -13,9 +16,9 @@ if (!pub.code) { console.log('MATCH_FAIL no code'); process.exit(1); }
 const modeRes = await fetch(`${BASE}/api/room-mode?code=${encodeURIComponent(pub.code)}`, { signal: AbortSignal.timeout(15000) });
 const { mode } = await modeRes.json();
 console.log('room-mode =', mode);
-if (mode !== 'liars') { console.log('MATCH_FAIL wrong mode'); process.exit(1); }
+if (mode !== MODE) { console.log('MATCH_FAIL wrong mode'); process.exit(1); }
 
-const ws = new WebSocket(`${BASE.replace(/^http/, 'ws')}/liar/${pub.code}/socket`);
+const ws = new WebSocket(`${BASE.replace(/^http/, 'ws')}/${SOCK}/${pub.code}/socket`);
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
 let lobbySeen = false;
 ws.onmessage = (ev) => {
@@ -25,7 +28,7 @@ ws.onmessage = (ev) => {
     if (m.t === 'error') console.log('server error:', m.message);
   } catch {}
 };
-ws.send(JSON.stringify({ t: 'join', create: true, playerId: `match-${Date.now()}`, name: 'Match', avatar: { style: 'thumbs', seed: 'm', bg: '3a2417' } }));
+ws.send(JSON.stringify({ t: 'join', create: true, playerId: `match-${Date.now()}`, name: 'Match', avatar: { style: MODE === 'blackjack' ? 'adventurer' : 'thumbs', seed: 'm', bg: 'ffd54f' } }));
 const dead = Date.now() + 15000;
 while (Date.now() < dead && !lobbySeen) await sleep(250);
 ws.close();
