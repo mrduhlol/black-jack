@@ -321,12 +321,41 @@ function renderAvatar() {
   if (!img) return;
   try { img.src = avatarUrl(avatar); } catch (e) { img.src = ''; }
   img.style.background = '#' + avatar.bg;
+  persistIdentity();
+}
+function persistIdentity() {
+  try {
+    const nm = $('nameInput');
+    if (nm) localStorage.setItem('blackjack.playerName', nm.value.slice(0, 14));
+    localStorage.setItem('blackjack.avatars', JSON.stringify(avatarChoices));
+  } catch (e) {}
+}
+function restoreIdentity() {
+  try {
+    const nm = $('nameInput');
+    const savedName = localStorage.getItem('blackjack.playerName');
+    if (nm && savedName) nm.value = savedName.slice(0, 14);
+    const savedAv = JSON.parse(localStorage.getItem('blackjack.avatars') || 'null');
+    if (savedAv) {
+      for (const mode of ['blackjack', 'liars']) {
+        if (savedAv[mode] && savedAv[mode].style) {
+          avatarChoices[mode] = {
+            style: String(savedAv[mode].style).slice(0, 40),
+            seed: String(savedAv[mode].seed || randomSeed()).slice(0, 24),
+            bg: String(savedAv[mode].bg || avatarChoices[mode].bg).replace(/[^0-9a-f]/gi, '').slice(0, 6) || avatarChoices[mode].bg,
+          };
+        }
+      }
+      avatar = avatarChoices[avatarMode] || avatar;
+    }
+  } catch (e) {}
 }
 $('shuffleBtn').onclick = () => { Sound.unlock(); Sound.click(); avatar.seed = randomSeed(); renderAvatar(); };
 function myName() {
   return ($('nameInput').value || 'Player').slice(0, 14);
 }
 
+restoreIdentity();
 buildAvatarPicker();
 buildChipTray();
 initSoundUI();
@@ -339,6 +368,8 @@ try {
   const saved = localStorage.getItem('blackjack.tableMode');
   if (saved === 'liars' || saved === 'blackjack') selectedMode = saved;
 } catch (e) {}
+restoreIdentity();
+if ($('nameInput')) $('nameInput').addEventListener('input', () => persistIdentity());
 const LANDING_COPY = {
   blackjack: {
     title: 'black-jack.io — Multiplayer Blackjack',
