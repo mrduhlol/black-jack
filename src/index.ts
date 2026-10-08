@@ -131,6 +131,11 @@ export default {
     }
 
     // Static frontend (./public via the assets binding).
-    return fullEnv.ASSETS.fetch(request);
+    const asset = await fullEnv.ASSETS.fetch(request);
+    const headers = new Headers(asset.headers);
+    headers.set('X-Content-Type-Options', 'nosniff');
+    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
   },
 };
