@@ -83,7 +83,7 @@ export class LobbyDirectory {
         }
       }
       const code = this.mint(new Set(this.rooms.keys()));
-      const max = mode === 'liars' ? 6 : 5;
+      const max = mode === 'liars' ? 4 : 5;
       this.rooms.set(code, { code, mode, isPrivate: false, seats: 0, connected: 0, max, state: 'lobby' });
       this.save();
       return json({ code, mode });
@@ -98,7 +98,7 @@ export class LobbyDirectory {
         // no body — default pool
       }
       const code = this.mint(new Set(this.rooms.keys()));
-      const max = mode === 'liars' ? 6 : 5;
+      const max = mode === 'liars' ? 4 : 5;
       this.rooms.set(code, { code, mode, isPrivate: true, seats: 0, connected: 0, max, state: 'lobby' });
       this.save();
       return json({ code, mode });
