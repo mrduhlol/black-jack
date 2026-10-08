@@ -42,11 +42,10 @@ const deadline = Date.now() + 150000;
 const { code } = await (await fetch(`${BASE}/api/liar-create-room`, { method: 'POST' })).json();
 log(`room ${code} mode=${MODE}`);
 
-const bots = [
-  makeBot(code, 'Alf', true, log),
-  makeBot(code, 'Bet', false, log),
-  makeBot(code, 'Cal', false, log),
-];
+const bots = [];
+const NAMES = ['Alf', 'Bet', 'Cal', 'Dan'];
+const N = Math.min(4, Math.max(2, parseInt(process.env.BOTS || '3', 10) || 3));
+for (let i = 0; i < N; i++) bots.push(makeBot(code, NAMES[i], i === 0, log));
 for (const b of bots) await b.connect();
 await sleep(500);
 
