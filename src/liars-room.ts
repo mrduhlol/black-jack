@@ -498,8 +498,9 @@ export class LiarsBarRoom {
     this.broadcast();
     this.ctx.waitUntil(this.reportDirectory());
     // A reconnect may be resuming an idled table (alarms cancelled when the
-    // last seat dropped). Nudge the clock; harmless when already running.
-    if (this.roomState === 'playing') await this.promptTurn();
+    // last seat dropped). Only the returning actor nudges the clock, so a
+    // flapping spectator never resets anyone's timer.
+    if (this.roomState === 'playing' && this.actorId() === player.id) await this.promptTurn();
     else if (this.roomState === 'risk' && this.risk) {
       const riskPlayer = this.players.find((p) => p.id === this.risk!.playerId);
       if (riskPlayer && riskPlayer.connected) this.scheduleAlarm(this.settings.turnTimer * 1000);
