@@ -982,6 +982,7 @@ body[data-mode="liars"] .rules-number {
   border: 1px solid #3a3227; border-radius: 8px; padding: 6px 10px;
 }
 .lb-kick:hover { color: #e07864; border-color: var(--lb-danger); }
+.lb-kick.armed { color: #fff; background: var(--lb-danger); border-color: var(--lb-danger); }
 .lb-need { color: var(--lb-muted); font-size: 12.5px; font-style: italic; margin: 0 0 12px; }
 .lb-vice {
   margin-left: auto; font-size: 11px; font-style: italic; color: var(--lb-muted);

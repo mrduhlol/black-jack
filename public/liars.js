@@ -275,6 +275,8 @@ function lbRenderLobby() {
     const row = document.createElement('div');
     row.className = 'lb-roster-row';
     row.appendChild(lbAvatarImg(p, ''));
+    const st0 = p.stats || {};
+    row.title = `Wins ${st0.wins || 0} · survivals ${st0.survivals || 0} · calls won ${st0.challengesWon || 0}`;
     const nm = document.createElement('span');
     nm.textContent = p.name + (p.isYou ? ' (you)' : '') + (p.connected ? '' : ' · offline');
     row.appendChild(nm);
@@ -295,7 +297,21 @@ function lbRenderLobby() {
       kick.type = 'button';
       kick.textContent = 'Kick';
       kick.setAttribute('aria-label', `Kick ${p.name}`);
-      kick.onclick = () => { Sound.unlock(); Sound.click(); LbNet.send({ t: 'kick', targetId: p.id }); };
+      kick.onclick = () => {
+        if (kick.dataset.armed) {
+          Sound.unlock(); Sound.click();
+          LbNet.send({ t: 'kick', targetId: p.id });
+          return;
+        }
+        kick.dataset.armed = '1';
+        kick.textContent = 'Sure?';
+        kick.classList.add('armed');
+        setTimeout(() => {
+          delete kick.dataset.armed;
+          kick.textContent = 'Kick';
+          kick.classList.remove('armed');
+        }, 3000);
+      };
       row.appendChild(kick);
     }
     roster.appendChild(row);
