@@ -10,7 +10,8 @@
     "e2e:liars": "node e2e-liars.mjs",
     "e2e:blackjack": "node e2e-blackjack.mjs",
     "e2e:match": "node e2e-match.mjs",
-    "e2e:resume": "node e2e-resume.mjs"
+    "e2e:resume": "node e2e-resume.mjs",
+    "e2e:resume-bj": "node e2e-resume-bj.mjs"
   },
   "license": "MIT",
   "devDependencies": {
