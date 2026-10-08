@@ -6,8 +6,11 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   // Static frontend served from ./public (index.html, client.js, styles.css, …).
+  // run_worker_first lets the Worker attach hardening headers to assets.
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
   },
   "durable_objects": {
     "bindings": [

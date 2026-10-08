@@ -31,6 +31,8 @@ ws.onmessage = (ev) => {
 ws.send(JSON.stringify({ t: 'join', create: true, playerId: `match-${Date.now()}`, name: 'Match', avatar: { style: MODE === 'blackjack' ? 'adventurer' : 'thumbs', seed: 'm', bg: 'ffd54f' } }));
 const dead = Date.now() + 15000;
 while (Date.now() < dead && !lobbySeen) await sleep(250);
+ws.send(JSON.stringify({ t: 'leave' }));
+await sleep(500);
 ws.close();
 if (lobbySeen) { console.log('MATCH_PASS'); process.exitCode = 0; }
 else { console.log('MATCH_FAIL no lobby'); process.exitCode = 1; }
