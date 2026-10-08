@@ -368,6 +368,16 @@ try {
   const saved = localStorage.getItem('blackjack.tableMode');
   if (saved === 'liars' || saved === 'blackjack') selectedMode = saved;
 } catch (e) {}
+// Shareable front pages: #liars / #blackjack or ?mode=liars. Invite codes
+// still win via the room-mode lookup below.
+try {
+  if (location.hash === '#liars') selectedMode = 'liars';
+  else if (location.hash === '#blackjack') selectedMode = 'blackjack';
+  else {
+    const mp = new URLSearchParams(location.search).get('mode');
+    if (mp === 'liars' || mp === 'blackjack') selectedMode = mp;
+  }
+} catch (e) {}
 restoreIdentity();
 if ($('nameInput')) $('nameInput').addEventListener('input', () => persistIdentity());
 const LANDING_COPY = {
