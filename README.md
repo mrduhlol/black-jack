@@ -165,6 +165,7 @@ CP=1.0 npm run e2e:liars devil   # in another: always-challenge Devil game
 npm run e2e:liars normal         # normal rules
 npm run e2e:blackjack            # full 2-round blackjack game
 BOTS=2 npm run e2e:liars devil   # 2-seat edge; BOTS=2..4
+npm run e2e:match                 # public pool hands a joinable liar lobby
 ```
 
 MIT. See [LICENSE](LICENSE).

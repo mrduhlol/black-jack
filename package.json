@@ -8,7 +8,8 @@
     "deploy": "wrangler deploy",
     "typecheck": "wrangler types && tsc --noEmit",
     "e2e:liars": "node e2e-liars.mjs",
-    "e2e:blackjack": "node e2e-blackjack.mjs"
+    "e2e:blackjack": "node e2e-blackjack.mjs",
+    "e2e:match": "node e2e-match.mjs"
   },
   "license": "MIT",
   "devDependencies": {
