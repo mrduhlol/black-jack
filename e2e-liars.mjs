@@ -107,11 +107,12 @@ for (const b of bots) {
 }
 
 // track reveals/devils via Alf's socket
-const seen = { over: null };
+const seen = { over: null, devilVeil: false };
 bots[0].ws.addEventListener('message', (ev) => {
   let m;
   try { m = JSON.parse(ev.data); } catch { return; }
   if (m.t === 'liar_reveal') { stats.reveals++; if (m.devil) stats.devilHits++; }
+  if (m.t === 'room' && m.state === 'risk' && m.risk && m.risk.devil) seen.devilVeil = true;
   if (m.t === 'liar_gameover') seen.over = m;
 });
 
@@ -152,15 +153,18 @@ bots[0].ws.addEventListener('message', chatProbe);
 bots[0].send({ t: 'chat', text: 'spam-1' });
 bots[0].send({ t: 'chat', text: 'spam-2' });
 bots[0].send({ t: 'chat', text: 'spam-3' });
-await sleep(1000);
+// poll: the first echo must arrive (dev servers lag), the blocked ones never do
+let waited = 0;
+while (waited < 10000 && chatEchoes < 1) { await sleep(250); waited += 250; }
 const afterBurst = chatEchoes;
 await sleep(1500);
 bots[0].send({ t: 'chat', text: 'spam-4' });
-await sleep(1000);
+waited = 0;
+while (waited < 10000 && chatEchoes < 2) { await sleep(250); waited += 250; }
 const cooldownPass = afterBurst === 1 && chatEchoes === 2;
 console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
 
-if (gamePass && rematchPass && lobbyEcho && cooldownPass) {
+if (gamePass && rematchPass && lobbyEcho && cooldownPass && (stats.devilHits === 0 || seen.devilVeil)) {
   console.log('E2E_PASS');
   process.exitCode = 0;
 } else {

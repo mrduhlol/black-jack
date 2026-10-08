@@ -125,11 +125,14 @@ bots[0].ws.addEventListener('message', chatProbe);
 bots[0].send({ t: 'chat', text: 'spam-1' });
 bots[0].send({ t: 'chat', text: 'spam-2' });
 bots[0].send({ t: 'chat', text: 'spam-3' });
-await sleep(600);
+// poll: the first echo must arrive (dev servers lag), the blocked ones never do
+let waited = 0;
+while (waited < 10000 && chatEchoes < 1) { await sleep(250); waited += 250; }
 const afterBurst = chatEchoes;
-await sleep(1200);
+await sleep(1500);
 bots[0].send({ t: 'chat', text: 'spam-4' });
-await sleep(600);
+waited = 0;
+while (waited < 10000 && chatEchoes < 2) { await sleep(250); waited += 250; }
 const cooldownPass = afterBurst === 1 && chatEchoes === 2;
 console.log(`COOLDOWN burst=${afterBurst} total=${chatEchoes} ${cooldownPass ? 'PASS' : 'FAIL'}`);
 
