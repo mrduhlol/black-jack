@@ -963,7 +963,18 @@ function renderPlayers(r) {
       k.textContent = 'Kick';
       k.className = 'small';
       k.setAttribute('aria-label', `Kick ${p.name}`);
-      k.onclick = () => Net.send({ t: 'kick', targetId: p.id });
+      k.onclick = () => {
+        if (k.dataset.armed) { Net.send({ t: 'kick', targetId: p.id }); return; }
+        k.dataset.armed = '1';
+        k.textContent = 'Sure?';
+        k.classList.add('armed');
+        setTimeout(() => {
+          if (!k.isConnected) return;
+          delete k.dataset.armed;
+          k.textContent = 'Kick';
+          k.classList.remove('armed');
+        }, 3000);
+      };
       div.appendChild(k);
     }
     box.appendChild(div);

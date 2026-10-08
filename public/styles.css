@@ -442,6 +442,7 @@ input:focus,select:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 
 .player-row .psub{color:#6b7570;font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-row .psub small{color:#8a938d}
 .player-row button.small{border:1px solid rgba(0,0,0,.15);background:#fff;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;padding:8px 10px;min-height:36px}
+.player-row button.small.armed{background:#b32335;border-color:#b32335;color:#fff}
 .stack-chips{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-variant-numeric:tabular-nums}
 .stack-chips .pile{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,var(--gold) 55%,#fff 57%,#fff 68%,var(--gold) 70%);box-shadow:0 1px 0 rgba(0,0,0,.3);flex:0 0 auto}
 .turn-pill{font-size:10px;font-weight:900;background:var(--gold);color:#2e2004;border-radius:var(--r-pill);padding:2px 8px;letter-spacing:.05em;flex:0 0 auto}
