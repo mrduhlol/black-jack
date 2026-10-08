@@ -70,6 +70,8 @@ if (MODE === 'devil') {
 bots[0].send({ t: 'set_settings', turnTimer: 10 });
 await sleep(300);
 bots[0].send({ t: 'start_game' });
+await sleep(200);
+bots[0].send({ t: 'start_game' }); // duplicate must no-op
 await sleep(500);
 
 let stats = { plays: 0, calls: 0, risks: 0, reveals: 0, devilHits: 0 };
@@ -133,6 +135,7 @@ let rematchPass = false;
 if (gamePass) {
   seen.over = null;
   bots[0].send({ t: 'rematch' });
+  bots[0].send({ t: 'rematch' }); // duplicate must no-op
   const rdead = Date.now() + 60000;
   while (Date.now() < rdead && !rematchPass) {
     await sleep(500);
