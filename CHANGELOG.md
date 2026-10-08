@@ -27,7 +27,8 @@ cast, sound kit, chat, and test coverage.
   tables: full games (2–4 seats), rematches, lobby chat, cooldowns,
   drop-and-reconnect resumes, both matchmaking pools
   (`npm run e2e:liars`, `npm run e2e:blackjack`, `npm run e2e:match`,
-  `npm run e2e:resume`, `npm run e2e:resume-bj` against `npm run dev`).
+  `npm run e2e:resume`, `npm run e2e:resume-bj` against `npm run dev`,
+  or the whole matrix via `npm run e2e:all` — 7 suites, all green).
 - **Sharing** — Open Graph / Twitter cards with a preview image,
   plus `#liars` / `?mode=liars` links straight to the bar front page.
 - **Ongoing hardening** — turn pings, chamber countdowns, rematch waiting
