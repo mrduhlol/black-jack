@@ -73,7 +73,9 @@
 
 /* ---------- lobby ---------- */
 .lb-lobby {
-  max-width: 560px;
+  width: min(720px, calc(100% - 24px));
+  max-width: 720px;
+  box-sizing: border-box;
   margin: 4vh auto;
   background: var(--lb-panel);
   border: 1px solid #2a231b;
@@ -81,15 +83,26 @@
   padding: 26px 26px 22px;
   text-align: center;
 }
-.lb-lobby h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 600; margin: 0 0 4px; letter-spacing: 0.04em; }
+.lb-lobby-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; text-align: left; margin-bottom: 18px; }
+.lb-lobby-heading h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 600; margin: 3px 0 4px; letter-spacing: 0.04em; }
+.lb-lobby-heading p { color: var(--lb-muted); font-size: 13.5px; margin: 0; }
+.lb-invite-label { display: block; color: var(--lb-brass); font-size: 10px; font-weight: 800; letter-spacing: 0.18em; }
+.lb-player-count { flex: 0 0 auto; border: 1px solid rgba(201,163,92,.35); color: var(--lb-brass-hi); border-radius: 999px; padding: 7px 10px; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.lb-invite-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; margin: 0 0 14px; text-align: left; background: #0f0b08; border: 1px solid rgba(201,163,92,.35); border-radius: 10px; }
 .lb-lobby p { color: var(--lb-muted); font-size: 13.5px; margin: 0 0 16px; }
 .lb-code {
-  font-size: 26px;
-  letter-spacing: 0.3em;
+  font-size: clamp(24px, 5vw, 32px);
+  letter-spacing: 0.22em;
   color: var(--lb-brass-hi);
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-top: 3px;
 }
+.lb-section-head { margin: 18px 0 8px; color: var(--lb-brass); font-size: 10px; font-weight: 800; letter-spacing: .18em; text-align: left; }
+.lb-connection-status { margin: 12px 0 !important; padding: 11px 13px; background: rgba(201,163,92,.08); border: 1px solid rgba(201,163,92,.22); border-radius: 9px; color: var(--lb-ivory) !important; font-size: 13px !important; text-align: left; }
+.lb-connection-status.bad { border-color: rgba(179,64,46,.6); color: #f0b3a8 !important; }
+.lb-lobby-connecting { text-align: left; }
+.lb-lobby-connecting h2 { margin: 0 0 14px; font-family: "Playfair Display", Georgia, serif; }
+.lb-lobby-connecting .lb-start { margin-top: 4px; }
 .lb-roster { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; text-align: left; }
 .lb-roster-row {
   display: flex; align-items: center; gap: 10px;
@@ -928,6 +941,7 @@ body[data-mode="liars"] .rules-number {
   75% { transform: translateX(4px); }
 }
 .lb-lobby {
+  width: min(720px, calc(100% - 24px));
   border-radius: 8px;
   outline: 1px dashed rgba(201,163,92,0.35);
   outline-offset: 5px;
@@ -953,6 +967,13 @@ body[data-mode="liars"] .rules-number {
 }
 
 @media (max-width: 760px) {
+  .lb-lobby { width: calc(100% - 8px); margin: 12px auto; padding: 18px 14px 16px; }
+  .lb-lobby-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .lb-player-count { align-self: flex-start; }
+  .lb-invite-card { align-items: stretch; flex-direction: column; padding: 12px; gap: 10px; }
+  .lb-invite-card .lb-btn { width: 100%; }
+  .lb-code { font-size: 30px; }
+  .lb-start { min-height: 52px; }
   .bar-hero { height: 168px; }
   .bar-table { width: 262px; height: 132px; }
   .lb-chat { height: 120px; }

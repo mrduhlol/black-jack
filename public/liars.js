@@ -11,6 +11,7 @@ const LbNet = {
   manualClose: false,
   reconnectTries: 0,
   epoch: 0,
+  joinTimer: null,
   on(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn); },
   dispatch(msg) {
     const fns = this.handlers[msg.t] || [];
@@ -91,10 +92,22 @@ const LbNet = {
     this.newIdentity();
     this.roomCode = code;
     this.joined = false;
-    await this.connect(code);
+    if (!lbRoom) lbShowConnection(code, 'connecting', !!create);
+    try {
+      await this.connect(code);
+    } catch (e) {
+      if (!lbRoom) lbShowConnection(code, 'error', !!create, 'Could not connect to this table. Check your connection and retry.');
+      throw e;
+    }
     this.joined = true;
     this.send({ t: 'join', create: !!create, playerId: this.playerId, name: myName(), avatar });
     history.replaceState(null, '', `/?${code}`);
+    clearTimeout(this.joinTimer);
+    this.joinTimer = setTimeout(() => {
+      if (!lbRoom && this.roomCode === code) {
+        lbShowConnection(code, 'error', !!create, 'The table did not respond. Check the code and try connecting again.');
+      }
+    }, 9000);
   },
   disconnect() {
     this.manualClose = true;
@@ -147,6 +160,58 @@ function lbShow(id) {
     if (el) el.classList.toggle('hidden', s !== id);
   }
   window.scrollTo(0, 0);
+}
+
+function lbShowConnection(code, state, create, message = '') {
+  lbShow('liarGame');
+  $('lbRoomCode').textContent = code;
+  $('lbRoundLabel').textContent = state === 'connecting' ? 'Connecting…' : 'Connection issue';
+  $('lbTableWrap').classList.add('hidden');
+  const box = $('lbLobby');
+  box.classList.add('lb-lobby-connecting');
+  box.classList.remove('hidden');
+  box.innerHTML = '';
+
+  const heading = document.createElement('h2');
+  heading.textContent = create ? 'Your private table' : 'Joining Liar’s Table';
+  box.appendChild(heading);
+  const invite = document.createElement('section');
+  invite.className = 'lb-invite-card';
+  const label = document.createElement('span');
+  label.className = 'lb-invite-label';
+  label.textContent = 'ROOM CODE';
+  invite.appendChild(label);
+  const codeEl = document.createElement('strong');
+  codeEl.className = 'lb-code';
+  codeEl.textContent = code;
+  invite.appendChild(codeEl);
+  const copy = document.createElement('button');
+  copy.type = 'button';
+  copy.className = 'lb-btn quiet';
+  copy.textContent = 'Copy invite link';
+  copy.onclick = () => {
+    const url = `${location.origin}/?${code}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => lbToast('Invite link copied', 'gold')).catch(() => lbToast(url));
+    } else lbToast(url);
+  };
+  invite.appendChild(copy);
+  box.appendChild(invite);
+
+  const status = document.createElement('p');
+  status.className = 'lb-connection-status' + (state === 'error' ? ' bad' : '');
+  status.setAttribute('role', 'status');
+  status.textContent = state === 'connecting' ? 'Connecting to your table…' : (message || 'Could not connect.');
+  box.appendChild(status);
+
+  if (state === 'error') {
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'lb-start';
+    retry.textContent = 'Retry connection';
+    retry.onclick = () => LbNet.joinRoom(code, create).catch(() => {});
+    box.appendChild(retry);
+  }
 }
 
 function lbMe() {
@@ -202,6 +267,8 @@ function lbOrderedPlayers() {
 
 function lbRender() {
   if (!lbRoom) return;
+  clearTimeout(LbNet.joinTimer);
+  $('lbLobby').classList.remove('lb-lobby-connecting');
   const me = lbMe();
   if (me) lbMyId = me.id;
   $('lbRoomCode').textContent = lbRoom.id;
@@ -223,28 +290,43 @@ function lbRender() {
 function lbRenderLobby() {
   const box = $('lbLobby');
   box.innerHTML = '';
+  box.classList.remove('lb-lobby-connecting');
+  const me = lbMe();
+  const isHost = !!(me && me.isHost);
+  const connected = lbRoom.players.filter((p) => p.connected).length;
+
+  const heading = document.createElement('div');
+  heading.className = 'lb-lobby-heading';
+  const title = document.createElement('div');
+  const eyebrow = document.createElement('span');
+  eyebrow.className = 'lb-invite-label';
+  eyebrow.textContent = isHost ? 'PRIVATE TABLE' : 'YOU’RE IN';
+  title.appendChild(eyebrow);
   const h = document.createElement('h2');
   h.textContent = "Liar's Table";
-  box.appendChild(h);
+  title.appendChild(h);
   const sub = document.createElement('p');
-  sub.textContent = 'Bluff. Challenge. Survive. Shed every card — or send someone to the chamber.';
-  box.appendChild(sub);
+  sub.textContent = isHost ? 'Invite your crew, set the house rules, then deal.' : 'You joined the table. The host will start when everyone is ready.';
+  title.appendChild(sub);
+  heading.appendChild(title);
+  const playerCount = document.createElement('span');
+  playerCount.className = 'lb-player-count';
+  playerCount.textContent = `${connected}/${lbRoom.settings.maxPlayers} PLAYERS`;
+  heading.appendChild(playerCount);
+  box.appendChild(heading);
+
+  const invite = document.createElement('section');
+  invite.className = 'lb-invite-card';
+  const codeWrap = document.createElement('div');
+  const codeLabel = document.createElement('span');
+  codeLabel.className = 'lb-invite-label';
+  codeLabel.textContent = 'ROOM CODE';
+  codeWrap.appendChild(codeLabel);
   const code = document.createElement('div');
   code.className = 'lb-code';
   code.textContent = lbRoom.id;
-  box.appendChild(code);
-
-  const deck = document.createElement('p');
-  deck.className = 'lb-deckline';
-  deck.textContent = '20-card deck · Kings, Queens, Aces + 2 wild Jokers · 5 cards each';
-  box.appendChild(deck);
-
-  const odds = document.createElement('p');
-  odds.className = 'lb-oddsline';
-  const chN = lbRoom.settings.chambers, lvN = lbRoom.settings.liveChambers;
-  odds.textContent = `${chN} chambers · ${lvN} live · ${Math.round((lvN / chN) * 100)}% sudden death`;
-  box.appendChild(odds);
-
+  codeWrap.appendChild(code);
+  invite.appendChild(codeWrap);
   const inv = document.createElement('button');
   inv.className = 'lb-btn quiet lb-invite';
   inv.type = 'button';
@@ -252,12 +334,13 @@ function lbRenderLobby() {
   inv.onclick = () => {
     Sound.unlock(); Sound.click();
     const url = `${location.origin}/?${lbRoom.id}`;
-    const done = () => lbToast(`Invite copied: ${lbRoom.id}`, 'gold');
+    const done = () => lbToast('Invite link copied', 'gold');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(done).catch(() => lbToast(url, ''));
     } else lbToast(url, '');
   };
-  box.appendChild(inv);
+  invite.appendChild(inv);
+  box.appendChild(invite);
 
   const rules = document.createElement('details');
   rules.className = 'lb-rules';
@@ -278,6 +361,10 @@ function lbRenderLobby() {
   rules.appendChild(ol);
   box.appendChild(rules);
 
+  const rosterHead = document.createElement('div');
+  rosterHead.className = 'lb-section-head';
+  rosterHead.textContent = 'AT THE TABLE';
+  box.appendChild(rosterHead);
   const roster = document.createElement('div');
   roster.className = 'lb-roster';
   lbRoom.players.forEach((p) => {
@@ -327,15 +414,18 @@ function lbRenderLobby() {
   });
   box.appendChild(roster);
 
-  const connected = lbRoom.players.filter((p) => p.connected).length;
-  if (connected < 2) {
-    const need = document.createElement('p');
-    need.className = 'lb-need';
-    need.textContent = `Waiting for players (${connected}/2 to start)…`;
-    box.appendChild(need);
-  }
+  const status = document.createElement('p');
+  status.className = 'lb-connection-status';
+  status.setAttribute('role', 'status');
+  status.textContent = connected < 2
+    ? `Waiting for one more player. Share code ${lbRoom.id} or copy the invite link above.`
+    : `${connected} players connected. The host can start the game.`;
+  box.appendChild(status);
 
-  const me = lbMe();
+  const settingsHead = document.createElement('div');
+  settingsHead.className = 'lb-section-head';
+  settingsHead.textContent = isHost ? 'HOUSE SETUP' : 'HOUSE RULES';
+  box.appendChild(settingsHead);
   if (me && me.isHost) {
     const set = document.createElement('div');
     set.className = 'lb-settings';
@@ -367,16 +457,7 @@ function lbRenderLobby() {
     devilLab.appendChild(devilInp);
     devilLab.append(' 😈 Devil card — a challenged devil punishes the whole table');
     box.appendChild(devilLab);
-    const start = document.createElement('button');
-    start.className = 'lb-start';
-    start.textContent = 'Start game';
-    start.disabled = lbRoom.players.filter((p) => p.connected).length < 2;
-    start.onclick = () => { Sound.unlock(); Sound.click(); LbNet.send({ t: 'start_game' }); };
-    box.appendChild(start);
   } else {
-    const wait = document.createElement('p');
-    wait.textContent = 'Waiting for the host to start…';
-    box.appendChild(wait);
     const s = lbRoom.settings;
     const sum = document.createElement('p');
     sum.className = 'lb-setting-sum';
@@ -388,6 +469,20 @@ function lbRenderLobby() {
       dv.textContent = '😈 Devil card in play — ride it alone, if you dare.';
       box.appendChild(dv);
     }
+  }
+
+  const start = document.createElement('button');
+  start.className = 'lb-start';
+  if (isHost) {
+    start.textContent = connected < 2 ? 'Waiting for a player…' : 'Start game';
+    start.disabled = connected < 2;
+    start.title = connected < 2 ? 'A second player must join before the game can start.' : '';
+    start.onclick = () => { Sound.unlock(); Sound.click(); LbNet.send({ t: 'start_game' }); };
+    box.appendChild(start);
+  } else {
+    start.textContent = 'Waiting for host to start';
+    start.disabled = true;
+    box.appendChild(start);
   }
 }
 
@@ -1044,7 +1139,11 @@ function lbShowEndVeil(go) {
   document.body.appendChild(veil);
 }
 LbNet.on('liar_error', ({ message }) => lbToast(String(message || 'Action not allowed'), 'bad'));
-LbNet.on('error', ({ message }) => lbToast(String(message || 'Could not join room'), 'bad'));
+LbNet.on('error', ({ message }) => {
+  const text = String(message || 'Could not join room');
+  if (!lbRoom && LbNet.roomCode) lbShowConnection(LbNet.roomCode, 'error', false, text);
+  else lbToast(text, 'bad');
+});
 LbNet.on('kicked', () => {
   LbNet.disconnect();
   lbToast('Kicked by host', 'bad');
