@@ -490,6 +490,11 @@ export class LiarsBarRoom {
       player.avatar = avatar;
       if (!this.hostId) this.hostId = player.id;
     }
+    // A creator can refresh after a deployment. If the old host socket is
+    // gone and their browser has a new identity (older clients did not persist
+    // it), let the first connected player reclaim the lobby controls.
+    const currentHost = this.players.find((p) => p.id === this.hostId);
+    if (!currentHost || !currentHost.connected) this.hostId = player.id;
     try {
       ws.serializeAttachment(player.id);
     } catch {

@@ -79,18 +79,24 @@ const LbNet = {
       } catch (e) { this.onUnexpectedClose(); }
     }, 1200 * this.reconnectTries);
   },
-  newIdentity() {
+  newIdentity(code) {
+    const key = `liars.playerId.${code}`;
+    try {
+      const saved = sessionStorage.getItem(key);
+      if (saved) { this.playerId = saved; return; }
+    } catch (e) {}
     this.playerId = (window.crypto && crypto.randomUUID)
       ? crypto.randomUUID()
       : String(Date.now()) + Math.random().toString(16).slice(2);
+    try { sessionStorage.setItem(key, this.playerId); } catch (e) {}
   },
   async joinRoom(code, create) {
     code = String(code || '').toUpperCase();
     if (!code) { lbToast('Enter a room code', 'bad'); return; }
     this.manualClose = false;
     this.reconnectTries = 0;
-    this.newIdentity();
     this.roomCode = code;
+    this.newIdentity(code);
     this.joined = false;
     if (!lbRoom) lbShowConnection(code, 'connecting', !!create);
     try {
